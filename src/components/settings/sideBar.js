@@ -1,18 +1,30 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Box,
-  Divider,
-  FormControl,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
+import { Box, FormControl, MenuItem, Select } from "@mui/material";
 import CommonLabel from "../common/label";
-import SettingsTabs from "./tabs";
+import Tabs from "../common/tab";
+import GlobalSettings from "./global";
+import PageSettings from "./page";
+import { useDispatch, useSelector } from "react-redux";
+import { setScope, setUserType } from "@/redux/slices/configSlice";
 
 const Sidebar = () => {
-  const [userType, setUserType] = useState("");
+  const dispatch = useDispatch();
+  const { userType, scope, page } = useSelector((state) => state.config);
+
+  // const [userType, setUserType] = useState("");
+  const tabs = [
+    {
+      label: "Global Setting",
+      content: <GlobalSettings />,
+      id: "global",
+    },
+    {
+      label: "Page Setting",
+      content: <PageSettings />,
+      id: "page",
+    },
+  ];
   return (
     <Box className="w-[400px] bg-white shadow-lg flex flex-col overflow-scroll py-4">
       <FormControl fullWidth margin="normal" required className="px-4">
@@ -21,7 +33,7 @@ const Sidebar = () => {
           labelId="tenant-select-label"
           name="User Type"
           value={userType}
-          onChange={(e) => setUserType(e.target.value)}
+          onChange={(e) => dispatch(setUserType(e.target.value))}
         >
           <MenuItem value="">
             <em>None</em>
@@ -31,9 +43,17 @@ const Sidebar = () => {
           <MenuItem value="tenant3">Retailer</MenuItem>
         </Select>
       </FormControl>
-      <Box className="pt-2">
-        <SettingsTabs />
-      </Box>
+      {userType && (
+        <Box className="pt-2">
+          <Tabs
+            tabs={tabs}
+            value={scope}
+            onChange={(val) => {
+              dispatch(setScope(val));
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

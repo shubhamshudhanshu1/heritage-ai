@@ -18,7 +18,7 @@ const NumberInput = ({ label, value, onChange, min, max, step, ...props }) => {
   };
 
   return (
-    <>
+    <div>
       <CommonLabel>{label}</CommonLabel>
       <TextField
         type="number"
@@ -34,7 +34,7 @@ const NumberInput = ({ label, value, onChange, min, max, step, ...props }) => {
         fullWidth
         {...props}
       />
-    </>
+    </div>
   );
 };
 
