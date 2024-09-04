@@ -8,7 +8,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { addSchemaToConfig } from "@/redux/slices/configSlice";
 
 const schemaTypes = [
   "select",
@@ -21,8 +20,6 @@ const schemaTypes = [
 
 const AddSchema = ({ onAddSchema }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const { tenant, userType, scope } = useSelector((state) => state.config);
-  const dispatch = useDispatch();
 
   const [newSchema, setNewSchema] = useState({
     type: "",
@@ -40,19 +37,6 @@ const AddSchema = ({ onAddSchema }) => {
 
   const onClose = () => {
     setModalOpen(false);
-  };
-
-  const handleAddSchema = async () => {
-    try {
-      await dispatch(
-        addSchemaToConfig({ tenant, userType, scope, newSchema })
-      ).unwrap(); // Unwrap the result for error handling
-      onAddSchema(newSchema);
-    } catch (error) {
-      console.error("Failed to add schema:", error);
-    } finally {
-      onClose();
-    }
   };
 
   return (
@@ -156,7 +140,10 @@ const AddSchema = ({ onAddSchema }) => {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleAddSchema}
+            onClick={() => {
+              onClose();
+              onAddSchema(newSchema);
+            }}
             fullWidth
           >
             Add Schema

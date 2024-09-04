@@ -19,7 +19,7 @@ const NumberInput = ({ label, value, onChange, min, max, step, ...props }) => {
 
   return (
     <div>
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       <TextField
         type="number"
         value={value}

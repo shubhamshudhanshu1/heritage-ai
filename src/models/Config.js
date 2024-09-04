@@ -1,4 +1,3 @@
-// models/Config.js
 import mongoose from "mongoose";
 
 const OptionSchema = new mongoose.Schema({
@@ -16,23 +15,24 @@ const SettingSchema = new mongoose.Schema({
   options: [OptionSchema],
 });
 
-const PropsSchema = new mongoose.Schema({
-  key: { type: String, required: true },
-  value: { type: mongoose.Schema.Types.Mixed, required: true },
-});
-
 const BlockSchema = new mongoose.Schema({
   name: { type: String, required: true },
   label: { type: String, required: true },
   settings: [SettingSchema],
-  props: [PropsSchema],
+  props: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+  },
 });
 
 const SectionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   label: { type: String, required: true },
   settings: [SettingSchema],
-  props: [PropsSchema],
+  props: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+  },
   blocks: [BlockSchema],
 });
 
@@ -40,7 +40,10 @@ const PageSchema = new mongoose.Schema({
   name: { type: String, required: true },
   label: { type: String, required: true },
   settings: [SettingSchema],
-  props: [PropsSchema],
+  props: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+  },
   sections: [SectionSchema],
 });
 
@@ -49,7 +52,10 @@ const ConfigSchema = new mongoose.Schema({
   userType: { type: String, required: true },
   scope: { type: String, required: true },
   settings: [SettingSchema],
-  props: [PropsSchema],
+  props: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+  },
   pages: [PageSchema],
 });
 

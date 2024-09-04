@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Box, Typography, Modal, TextField, Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import Image from "next/image";
+import CommonLabel from "@/components/common/label";
 
 const ImageUpload = ({ label, onImageUpload, preview, ...props }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -42,9 +44,7 @@ const ImageUpload = ({ label, onImageUpload, preview, ...props }) => {
 
   return (
     <Box {...props}>
-      <Typography variant="subtitle1" gutterBottom>
-        {label}
-      </Typography>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       {/* <input
         accept="image/*"
         style={{ display: "none" }}
@@ -69,7 +69,7 @@ const ImageUpload = ({ label, onImageUpload, preview, ...props }) => {
         >
           {!selectedImage && <Add sx={{ fontSize: 40, color: "#ccc" }} />}
           {selectedImage && (
-            <img
+            <Image
               src={selectedImage}
               alt="Selected"
               style={{

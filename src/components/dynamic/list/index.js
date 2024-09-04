@@ -16,11 +16,11 @@ const CommonAutocompleteWithChips = ({
   readOnly = false,
   variant = "outlined",
   onChange = () => {},
-  ...rest
+  ...props
 }) => {
   return (
     <div>
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       <Autocomplete
         multiple
         options={options}
@@ -44,7 +44,7 @@ const CommonAutocompleteWithChips = ({
           })
         }
         renderInput={(params) => (
-          <TextField {...params} variant={variant} {...rest} />
+          <TextField {...params} variant={variant} {...props} />
         )}
       />
     </div>

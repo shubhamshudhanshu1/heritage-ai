@@ -21,7 +21,9 @@ export const fetchConfig = createAsyncThunk(
 
 export const addSchemaToConfig = createAsyncThunk(
   "config/addSchemaToConfig",
-  async ({ tenant, userType, scope, newSchema }, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
+    const state = getState();
+    const { tenant, userType, scope, settings, props } = state.config?.config;
     try {
       const response = await fetch(
         `/api/config/${tenant}/${userType}/${scope}`,
@@ -31,13 +33,16 @@ export const addSchemaToConfig = createAsyncThunk(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            settings: [newSchema],
+            settings,
+            props,
           }),
         }
       );
+
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
+
       return await response.json();
     } catch (error) {
       return rejectWithValue(error.message);
@@ -108,9 +113,14 @@ const initialState = {
   userType: null,
   scope: "global",
   page: null,
-  config: null,
+  config: {
+    settings: [],
+    props: {},
+    sections: [],
+  },
   loading: false,
   error: null,
+  schemaEditMode: false,
 };
 
 // Config slice
@@ -118,6 +128,9 @@ const configSlice = createSlice({
   name: "config",
   initialState,
   reducers: {
+    setSchemaEditMode(state, action) {
+      state.schemaEditMode = action.payload;
+    },
     setTenant(state, action) {
       state.tenant = action.payload;
     },
@@ -132,6 +145,17 @@ const configSlice = createSlice({
     },
     resetConfig(state) {
       return initialState;
+    },
+    addSettings(state, action) {
+      const configCopy = { ...state.config };
+      configCopy.settings.push(action.payload);
+      state.config = configCopy;
+    },
+    onChangeProp(state, action) {
+      let { id, value } = action.payload;
+      const configCopy = { ...state.config };
+      configCopy.props[id] = value;
+      state.config = configCopy;
     },
   },
   extraReducers: (builder) => {
@@ -154,9 +178,7 @@ const configSlice = createSlice({
       })
       .addCase(addSchemaToConfig.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.config && state.config.settings) {
-          state.config.settings.push(...action.payload.settings);
-        }
+        state.config = action.payload.data;
       })
       .addCase(addSchemaToConfig.rejected, (state, action) => {
         state.loading = false;
@@ -192,7 +214,15 @@ const configSlice = createSlice({
   },
 });
 
-export const { setTenant, setUserType, setScope, setPage, resetConfig } =
-  configSlice.actions;
+export const {
+  setTenant,
+  setUserType,
+  setScope,
+  setPage,
+  resetConfig,
+  addSettings,
+  onChangeProp,
+  setSchemaEditMode,
+} = configSlice.actions;
 
 export default configSlice.reducer;

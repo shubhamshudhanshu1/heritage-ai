@@ -1,19 +1,31 @@
 "use client";
 import React, { useState } from "react";
-import { Box, FormControl, MenuItem, Select } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  FormControlLabel,
+  MenuItem,
+  Select,
+  Switch,
+} from "@mui/material";
 import CommonLabel from "../common/label";
 import Tabs from "../common/tab";
 import GlobalSettings from "./global";
 import PageSettings from "./page";
 import { useDispatch, useSelector } from "react-redux";
-import { setScope, setTenant, setUserType } from "@/redux/slices/configSlice";
+import {
+  setSchemaEditMode,
+  setScope,
+  setTenant,
+  setUserType,
+} from "@/redux/slices/configSlice";
 import { useSession } from "next-auth/react";
 import useConfigFetcher from "@/hooks/useConfigFetcher";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const { data: session = { user: {} } } = useSession();
-  const { tenant, userType, scope, page } = useSelector(
+  const { tenant, userType, scope, page, schemaEditMode } = useSelector(
     (state) => state.config
   );
   const { config, error, loading } = useConfigFetcher(tenant, userType, scope);
@@ -57,6 +69,23 @@ const Sidebar = () => {
       {userType && (
         <>
           <Box className="pt-2">
+            <div>
+              <FormControlLabel
+                value="start"
+                control={
+                  <Switch
+                    color="primary"
+                    checked={schemaEditMode} // Use checked to bind the state
+                    onChange={(e) => {
+                      console.log(e.target.checked);
+                      dispatch(setSchemaEditMode(e.target.checked));
+                    }}
+                  />
+                }
+                label="Edit Schema"
+                labelPlacement="start"
+              />
+            </div>
             <Tabs
               tabs={tabs}
               value={scope}

@@ -8,7 +8,7 @@ const valuetext = (value) => `${value}`;
 const RangeInput = ({ label, value, onChange, min, max, step, ...props }) => {
   return (
     <Box {...props} sx={{ width: "100%" }}>
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       <div className="p-2 pt-10">
         <Slider
           value={value}

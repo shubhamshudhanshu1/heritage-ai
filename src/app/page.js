@@ -23,11 +23,6 @@ export default function Home() {
         <button onClick={() => dispatch(increment())}>Increment</button>
         <button onClick={() => dispatch(decrement())}>Decrement</button>
       </div>
-      <div className="w-screen">
-        {schemas.map((schema) => {
-          return renderComponents(schema);
-        })}
-      </div>
     </main>
   );
 }

@@ -6,13 +6,13 @@ import CommonLabel from "../../common/label";
 const Input = ({ variant, label, type, value, onChange, ...props }) => {
   return (
     <div>
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       <TextField
         fullWidth
         variant={variant}
         type={type}
         value={value}
-        onChange={onChange}
+        onChange={(e) => onChange(e.target.value)}
         {...props}
       />
     </div>

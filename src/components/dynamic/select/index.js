@@ -6,7 +6,7 @@ import CommonLabel from "../../common/label";
 const Select = ({ label, value, onChange, options, variant, ...props }) => {
   return (
     <FormControl variant={variant} {...props} fullWidth>
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       <MuiSelect value={value} onChange={onChange}>
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>

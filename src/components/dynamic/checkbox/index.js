@@ -12,7 +12,7 @@ const Checkbox = ({ label, checked, onChange, ...props }) => {
         {...props}
         sx={{ padding: 0 }}
       />
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
     </div>
   );
 };

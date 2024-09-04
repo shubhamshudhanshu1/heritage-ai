@@ -29,7 +29,7 @@ const ColorPicker = ({ label, value, onChange, ...props }) => {
 
   return (
     <Box className="flex items-center justify-between" {...props}>
-      <CommonLabel>{label}</CommonLabel>
+      <CommonLabel info={props.info || ""}>{label}</CommonLabel>
       <div
         className="relative cursor-pointer border border-gray-300 p-1 rounded"
         onClick={handleClick}

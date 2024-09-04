@@ -1,7 +1,6 @@
-import { renderComponents } from "@/helper/utils";
-import { Button } from "@mui/material";
 import React, { useState } from "react";
 import AddSchema from "../addSchema";
+import SettingsRenderer from "@/components/common/settingsRenderer";
 
 let schemas = [
   {
@@ -64,9 +63,7 @@ function Settings() {
   return (
     <div>
       <div className="flex flex-col gap-4 mb-4">
-        {schemas.map((schema) => {
-          return renderComponents(schema);
-        })}
+        <SettingsRenderer settings={schemas} />
       </div>
       <AddSchema
         onClose={() => setModalOpen(false)}
