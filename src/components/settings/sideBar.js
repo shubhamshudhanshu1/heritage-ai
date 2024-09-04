@@ -6,13 +6,24 @@ import Tabs from "../common/tab";
 import GlobalSettings from "./global";
 import PageSettings from "./page";
 import { useDispatch, useSelector } from "react-redux";
-import { setScope, setUserType } from "@/redux/slices/configSlice";
+import { setScope, setTenant, setUserType } from "@/redux/slices/configSlice";
+import { useSession } from "next-auth/react";
+import useConfigFetcher from "@/hooks/useConfigFetcher";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
-  const { userType, scope, page } = useSelector((state) => state.config);
+  const { data: session = { user: {} } } = useSession();
+  const { tenant, userType, scope, page } = useSelector(
+    (state) => state.config
+  );
+  const { config, error, loading } = useConfigFetcher(tenant, userType, scope);
 
-  // const [userType, setUserType] = useState("");
+  React.useEffect(() => {
+    if (session.user.tenant) {
+      dispatch(setTenant(session.user.tenant));
+    }
+  }, [session.user.tenant]);
+
   const tabs = [
     {
       label: "Global Setting",
@@ -38,21 +49,23 @@ const Sidebar = () => {
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          <MenuItem value="tenant1"> FOS</MenuItem>
-          <MenuItem value="tenant2">Distributor</MenuItem>
-          <MenuItem value="tenant3">Retailer</MenuItem>
+          <MenuItem value="FOS"> FOS</MenuItem>
+          <MenuItem value="Distributor">Distributor</MenuItem>
+          <MenuItem value="Retailer">Retailer</MenuItem>
         </Select>
       </FormControl>
       {userType && (
-        <Box className="pt-2">
-          <Tabs
-            tabs={tabs}
-            value={scope}
-            onChange={(val) => {
-              dispatch(setScope(val));
-            }}
-          />
-        </Box>
+        <>
+          <Box className="pt-2">
+            <Tabs
+              tabs={tabs}
+              value={scope}
+              onChange={(newValue) => {
+                dispatch(setScope(tabs[newValue]?.id));
+              }}
+            />
+          </Box>
+        </>
       )}
     </Box>
   );

@@ -1,6 +1,6 @@
+// models/Config.js
 import mongoose from "mongoose";
 
-// Common Schemas
 const OptionSchema = new mongoose.Schema({
   value: { type: String, required: true },
   text: { type: String, required: true },
@@ -21,29 +21,26 @@ const PropsSchema = new mongoose.Schema({
   value: { type: mongoose.Schema.Types.Mixed, required: true },
 });
 
-// Reusable Sectional Schema
-const SectionalSchema = new mongoose.Schema({
+const BlockSchema = new mongoose.Schema({
   name: { type: String, required: true },
   label: { type: String, required: true },
   settings: [SettingSchema],
   props: [PropsSchema],
 });
 
-// Specific Schemas
-const BlockSchema = new mongoose.Schema({
-  ...SectionalSchema.obj, // Reuse SectionalSchema fields
-  blocks: [
-    new mongoose.Schema({
-      ...SectionalSchema.obj, // Reuse SectionalSchema fields
-    }),
-  ],
-});
-
-const SectionSchema = new SectionalSchema({
+const SectionSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  label: { type: String, required: true },
+  settings: [SettingSchema],
+  props: [PropsSchema],
   blocks: [BlockSchema],
 });
 
-const PageSchema = new SectionalSchema({
+const PageSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  label: { type: String, required: true },
+  settings: [SettingSchema],
+  props: [PropsSchema],
   sections: [SectionSchema],
 });
 

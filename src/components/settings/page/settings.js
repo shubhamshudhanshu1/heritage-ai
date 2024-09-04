@@ -1,7 +1,7 @@
 import { renderComponents } from "@/helper/utils";
 import { Button } from "@mui/material";
 import React, { useState } from "react";
-import AddSchemaModal from "./addSchemaModal";
+import AddSchema from "../addSchema";
 
 let schemas = [
   {
@@ -68,22 +68,10 @@ function Settings() {
           return renderComponents(schema);
         })}
       </div>
-
-      <AddSchemaModal
-        open={modalOpen}
+      <AddSchema
         onClose={() => setModalOpen(false)}
         onAddSchema={handleAddSchema}
       />
-
-      <Button
-        type="submit"
-        variant="outlined"
-        color="primary"
-        fullWidth
-        onClick={() => setModalOpen(true)}
-      >
-        Add Settings
-      </Button>
     </div>
   );
 }

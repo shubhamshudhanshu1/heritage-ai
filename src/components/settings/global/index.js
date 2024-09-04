@@ -1,7 +1,13 @@
 import React from "react";
+import AddSchema from "../addSchema";
 
 function GlobalSettings() {
-  return <div>GlobalSettings</div>;
+  const handleAddSchema = () => {};
+  return (
+    <div>
+      <AddSchema onClose={() => () => {}} onAddSchema={handleAddSchema} />
+    </div>
+  );
 }
 
 export default GlobalSettings;

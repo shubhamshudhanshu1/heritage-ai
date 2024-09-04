@@ -1,7 +1,7 @@
 import { Box, Button, FormControl, MenuItem, Select } from "@mui/material";
 import React, { useState } from "react";
 import CommonLabel from "../../common/label";
-import AddSchemaModal from "./addSchemaModal";
+import AddSchemaModal from "../addSchema";
 import Tabs from "../../common/tab";
 import Settings from "./settings";
 import Sections from "./sections";
