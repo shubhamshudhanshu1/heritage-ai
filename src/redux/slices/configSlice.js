@@ -147,9 +147,25 @@ const configSlice = createSlice({
       return initialState;
     },
     addSettings(state, action) {
-      const configCopy = { ...state.config };
-      configCopy.settings.push(action.payload);
-      state.config = configCopy;
+      state.config.settings.push(action.payload);
+    },
+    deleteSettings(state, action) {
+      const schemaId = action.payload;
+      state.config.settings = state.config.settings.filter(
+        (setting) => setting.id !== schemaId
+      );
+    },
+    overrideSettings(state, action) {
+      state.config.settings = action.payload;
+    },
+    editSettings(state, action) {
+      const { index, newSetting } = action.payload;
+      if (index !== -1) {
+        state.config.settings[index] = {
+          ...state.config.settings[index],
+          ...newSetting,
+        };
+      }
     },
     onChangeProp(state, action) {
       let { id, value } = action.payload;
@@ -221,6 +237,9 @@ export const {
   setPage,
   resetConfig,
   addSettings,
+  overrideSettings,
+  deleteSettings,
+  editSettings,
   onChangeProp,
   setSchemaEditMode,
 } = configSlice.actions;

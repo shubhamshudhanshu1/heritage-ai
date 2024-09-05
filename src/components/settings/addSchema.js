@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -18,17 +18,29 @@ const schemaTypes = [
   "image_picker",
 ];
 
-const AddSchema = ({ onAddSchema }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+let INITIAL_SCHEMA = {
+  type: "",
+  default: "",
+  id: "",
+  info: "",
+  label: "",
+  options: [],
+};
 
-  const [newSchema, setNewSchema] = useState({
-    type: "",
-    default: "",
-    id: "",
-    info: "",
-    label: "",
-    options: [], // options are used only for select type
-  });
+const AddSchema = ({
+  onAddSchema,
+  setModalOpen,
+  modalOpen,
+  defaultSchema = {},
+  onEditSchema,
+}) => {
+  const [newSchema, setNewSchema] = useState(INITIAL_SCHEMA);
+
+  useEffect(() => {
+    if (defaultSchema.id) {
+      setNewSchema(defaultSchema);
+    }
+  }, [defaultSchema]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +58,10 @@ const AddSchema = ({ onAddSchema }) => {
         variant="outlined"
         color="primary"
         fullWidth
-        onClick={() => setModalOpen(true)}
+        onClick={() => {
+          setNewSchema(INITIAL_SCHEMA);
+          setModalOpen(true);
+        }}
       >
         Add Settings
       </Button>
@@ -65,7 +80,7 @@ const AddSchema = ({ onAddSchema }) => {
           }}
         >
           <Typography variant="h6" mb={2}>
-            Add New Schema
+            {defaultSchema.id ? "Edit" : "Add"} Schema
           </Typography>
           <div className="flex flex-col gap-3 mb-4">
             <TextField
@@ -141,12 +156,16 @@ const AddSchema = ({ onAddSchema }) => {
             variant="contained"
             color="primary"
             onClick={() => {
+              if (defaultSchema.id) {
+                onEditSchema(newSchema);
+              } else {
+                onAddSchema(newSchema);
+              }
               onClose();
-              onAddSchema(newSchema);
             }}
             fullWidth
           >
-            Add Schema
+            Submit
           </Button>
         </Box>
       </Modal>
