@@ -2,10 +2,10 @@ import { renderComponents } from "@/helper/utils";
 import { onChangeProp } from "@/redux/slices/configSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import Draggable from "../draggable";
 // Function to reorder settings after drag-and-drop
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -37,54 +37,25 @@ function SettingsRenderer({
 
   if (schemaEditMode) {
     return (
-      <DragDropContext onDragEnd={dragEnded}>
-        <Droppable droppableId="settingsList">
-          {(provided) => (
-            <div
-              className="flex flex-col gap-4"
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-            >
-              {settings.map((setting, index) => (
-                <Draggable
-                  key={setting.id}
-                  draggableId={setting.id}
-                  index={index}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className="flex flex-row gap-2 items-center w-full bg-slate-50 p-4 rounded-sm"
-                    >
-                      <DragIndicatorIcon />
-                      <div className="w-full">{setting.label}</div>
-                      <div className="flex flex-row gap-2">
-                        <EditNoteOutlinedIcon
-                          onClick={() => {
-                            onEdit(index);
-                          }}
-                        />
-                        <CloseOutlinedIcon
-                          onClick={() => {
-                            onDelete(index);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
+      <Draggable
+        array={settings}
+        renderItem={(item, index) => (
+          <div className="flex flex-row gap-0 items-center w-full bg-slate-50 p-4 rounded-sm">
+            <DragIndicatorIcon />
+            <div className="w-full">{item.label}</div>
+            <div className="flex flex-row gap-2">
+              <EditNoteOutlinedIcon onClick={() => onEdit(index)} />
+              <CloseOutlinedIcon onClick={() => onDelete(index)} />
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+          </div>
+        )}
+        onDragEnd={(newArray) => {
+          console.log(newArray);
+        }}
+      />
     );
   }
 
-  // Normal render when not in schemaEditMode
   return (
     <div className="flex flex-col gap-4">
       {settings.map((setting) => {

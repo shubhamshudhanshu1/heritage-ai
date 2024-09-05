@@ -1,8 +1,21 @@
 import React, { useState } from "react";
 import LevelSettings from "./levelSettings";
 import Tabs from "../common/tab";
-import { FormControl, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  IconButton,
+  TextField,
+  Button,
+  Typography,
+} from "@mui/material";
 import CommonLabel from "../common/label";
+import EditIcon from "@mui/icons-material/Edit"; // Import the edit icon
+import Draggable from "../common/draggable";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 
 const levelConfig = {
   global: {
@@ -31,7 +44,8 @@ const levelConfig = {
 
 function Renderer({ object, level, path = [] }) {
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedChildIndex, setSelectedChildIndex] = useState(0); // Track selected index
+  const [selectedChildIndex, setSelectedChildIndex] = useState(0);
+  const [editedChild, setEditedChild] = useState({});
   const currentLevelConfig = levelConfig[level] || {};
   const childKey = currentLevelConfig.childKey;
   const childLevelConfig = levelConfig[childKey] || {};
@@ -46,10 +60,13 @@ function Renderer({ object, level, path = [] }) {
     const newSelectedIndex = childLevelConfig.options.findIndex(
       (option) => option.id === selectedId
     );
-    setSelectedChildIndex(newSelectedIndex); // Update selected index
+    setSelectedChildIndex(newSelectedIndex);
   };
 
-  console.log({ selectedChildIndex }, childLevelConfig.options);
+  const handleEditClick = (index) => {
+    setEditedChild(childItems[index]);
+  };
+
   return (
     <div>
       {currentLevelConfig.tabView ? (
@@ -72,7 +89,7 @@ function Renderer({ object, level, path = [] }) {
                     fullWidth
                     margin="normal"
                     required
-                    className="px-4"
+                    className="py-2"
                   >
                     <CommonLabel>Select {childKey}</CommonLabel>
                     <Select
@@ -107,21 +124,73 @@ function Renderer({ object, level, path = [] }) {
             },
           ]}
           value={activeTab}
-          onChange={(newValue) => {
-            handleTabChange(newValue);
-          }}
+          onChange={(newValue) => handleTabChange(newValue)}
         />
       ) : (
         <div>
           <LevelSettings levelJson={object} path={path} />
-          {childItems.map((childItem, index) => (
-            <Renderer
-              key={`${level}-${index}`} // Add a key for React reconciliation
-              object={childItem}
-              level={childKey}
-              path={[...path, childKey, index]} // Extend the path for the child
-            />
-          ))}
+          {editedChild.name ? (
+            <div className="mt-4">
+              <div
+                className=" bg-slate-50  p-4 flex flex-row gap-3 items-center cursor-pointer mb-4"
+                onClick={() => {
+                  setEditedChild({});
+                }}
+              >
+                <ArrowBackIosNewOutlinedIcon />
+                {editedChild.label}
+              </div>
+              {editedChild && (
+                <Renderer
+                  object={editedChild}
+                  level={childKey}
+                  path={[...path, childKey, selectedChildIndex]}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="mt-4">
+              <Typography
+                className="font-bold mb-2"
+                variant="p"
+                noWrap
+                component="div"
+              >
+                {childLevelConfig.label}
+              </Typography>
+              <Draggable
+                array={childItems}
+                renderItem={(childItem, index) => (
+                  <div
+                    key={`${level}-${index}`}
+                    onClick={() => handleEditClick(index)}
+                    className="flex flex-row gap-2 items-center justify-between w-full bg-slate-50 p-4 rounded-sm"
+                  >
+                    <div className="flex flex-row gap-2 items-center">
+                      <DragIndicatorIcon />
+                      <div>{childItem.label || `Child ${index + 1}`}</div>
+                    </div>
+                    <div className="flex flex-row gap-2 items-center">
+                      <CloseOutlinedIcon onClick={() => {}} />
+                    </div>
+                  </div>
+                )}
+                onDragEnd={(newArray) => {
+                  console.log(newArray);
+                }}
+              />
+              <Button
+                type="submit"
+                variant="outlined"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2 }}
+                onClick={() => {}}
+              >
+                Add {childLevelConfig.label}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
