@@ -1,4 +1,3 @@
-// app/api/config/[tenant]/[userType]/route.js
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Config from "@/models/Config";
@@ -16,8 +15,65 @@ export async function GET(request, { params }) {
   await connectToDatabase();
   const { tenant, userType } = params;
   try {
-    const configs = await Config.find({ tenant, userType });
-    return NextResponse.json(configs);
+    const config = await Config.findOne({ tenant, userType });
+    if (!config) {
+      return NextResponse.json({});
+    }
+    return NextResponse.json(config);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request, { params }) {
+  await connectToDatabase();
+  const { tenant, userType } = params;
+  const { page, settings, props } = await request.json();
+
+  try {
+    let config = await Config.findOne({ tenant, userType });
+
+    if (!config) {
+      config = new Config({
+        tenant,
+        userType,
+        settings: [],
+        props: {},
+        pages: [],
+      });
+    }
+
+    if (page) {
+      const pageConfig = config.pages.find((p) => p.name === page);
+      if (pageConfig) {
+        if (settings) {
+          pageConfig.settings = settings; // Overriding settings
+        }
+        if (props) {
+          pageConfig.props = { ...pageConfig.props.toObject(), ...props }; // Merging props
+        }
+      } else {
+        config.pages.push({
+          name: page,
+          settings: settings || [],
+          props: props || {},
+          sections: [],
+        });
+      }
+    } else {
+      if (settings) {
+        config.settings = settings; // Overriding settings
+      }
+      if (props) {
+        config.props = { ...config.props.toObject(), ...props }; // Merging props
+      }
+    }
+
+    let savedConfig = await config.save();
+    return NextResponse.json({
+      message: "Configuration updated successfully",
+      data: savedConfig,
+    });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   FormControl,
@@ -9,26 +9,23 @@ import {
   Switch,
 } from "@mui/material";
 import CommonLabel from "../common/label";
-import Tabs from "../common/tab";
-import GlobalSettings from "./global";
-import PageSettings from "./page";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setSchemaEditMode,
-  setScope,
   setTenant,
   setUserType,
 } from "@/redux/slices/configSlice";
 import { useSession } from "next-auth/react";
 import useConfigFetcher from "@/hooks/useConfigFetcher";
+import Renderer from "./renderer";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const { data: session = { user: {} } } = useSession();
-  const { tenant, userType, scope, page, schemaEditMode } = useSelector(
+  const { tenant, userType, schemaEditMode, config } = useSelector(
     (state) => state.config
   );
-  const { config, error, loading } = useConfigFetcher(tenant, userType, scope);
+  useConfigFetcher(tenant, userType);
 
   React.useEffect(() => {
     if (session.user.tenant) {
@@ -36,18 +33,6 @@ const Sidebar = () => {
     }
   }, [session.user.tenant]);
 
-  const tabs = [
-    {
-      label: "Global Setting",
-      content: <GlobalSettings />,
-      id: "global",
-    },
-    {
-      label: "Page Setting",
-      content: <PageSettings />,
-      id: "page",
-    },
-  ];
   return (
     <Box className="w-[400px] bg-white shadow-lg flex flex-col overflow-scroll py-4">
       <FormControl fullWidth margin="normal" required className="px-4">
@@ -68,31 +53,20 @@ const Sidebar = () => {
       </FormControl>
       {userType && (
         <>
-          <Box className="pt-2">
+          <Box className="p-4">
             <div>
-              <FormControlLabel
-                value="start"
-                control={
-                  <Switch
-                    color="primary"
-                    checked={schemaEditMode} // Use checked to bind the state
-                    onChange={(e) => {
-                      console.log(e.target.checked);
-                      dispatch(setSchemaEditMode(e.target.checked));
-                    }}
-                  />
-                }
-                label="Edit Schema"
-                labelPlacement="start"
+              <CommonLabel>Edit Schema</CommonLabel>
+              <Switch
+                color="primary"
+                checked={schemaEditMode}
+                onChange={(e) => {
+                  dispatch(setSchemaEditMode(e.target.checked));
+                }}
               />
             </div>
-            <Tabs
-              tabs={tabs}
-              value={scope}
-              onChange={(newValue) => {
-                dispatch(setScope(tabs[newValue]?.id));
-              }}
-            />
+            <div>
+              <Renderer object={config} level="global" path={[]} />
+            </div>
           </Box>
         </>
       )}

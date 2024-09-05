@@ -7,7 +7,6 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { useSelector, useDispatch } from "react-redux";
 
 const schemaTypes = [
   "select",

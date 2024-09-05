@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import settingsSchema from "../../../schema";
+import { getTarget } from "@/helper/utils";
 
 // Async thunks for API calls
 export const fetchConfig = createAsyncThunk(
   "config/fetchConfig",
-  async ({ tenant, userType, scope }, { rejectWithValue }) => {
+  async ({ tenant, userType }, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `/api/config/${tenant}/${userType}/${scope}`
-      );
+      const response = await fetch(`/api/config/${tenant}/${userType}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
@@ -23,21 +23,18 @@ export const addSchemaToConfig = createAsyncThunk(
   "config/addSchemaToConfig",
   async (_, { getState, rejectWithValue }) => {
     const state = getState();
-    const { tenant, userType, scope, settings, props } = state.config?.config;
+    const { tenant, userType, settings, props } = state.config?.config;
     try {
-      const response = await fetch(
-        `/api/config/${tenant}/${userType}/${scope}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            settings,
-            props,
-          }),
-        }
-      );
+      const response = await fetch(`/api/config/${tenant}/${userType}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          settings,
+          props,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
@@ -52,25 +49,19 @@ export const addSchemaToConfig = createAsyncThunk(
 
 export const updateSchemaInConfig = createAsyncThunk(
   "config/updateSchemaInConfig",
-  async (
-    { tenant, userType, scope, settings, props, page },
-    { rejectWithValue }
-  ) => {
+  async ({ tenant, userType, settings, props, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `/api/config/${tenant}/${userType}/${scope}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            page,
-            settings,
-            props,
-          }),
-        }
-      );
+      const response = await fetch(`/api/config/${tenant}/${userType}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          page,
+          settings,
+          props,
+        }),
+      });
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
@@ -83,20 +74,17 @@ export const updateSchemaInConfig = createAsyncThunk(
 
 export const deleteConfig = createAsyncThunk(
   "config/deleteConfig",
-  async ({ tenant, userType, scope, page }, { rejectWithValue }) => {
+  async ({ tenant, userType, page }, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `/api/config/${tenant}/${userType}/${scope}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            page,
-          }),
-        }
-      );
+      const response = await fetch(`/api/config/${tenant}/${userType}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          page,
+        }),
+      });
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
@@ -111,7 +99,6 @@ export const deleteConfig = createAsyncThunk(
 const initialState = {
   tenant: null,
   userType: null,
-  scope: "global",
   page: null,
   config: {
     settings: [],
@@ -137,41 +124,73 @@ const configSlice = createSlice({
     setUserType(state, action) {
       state.userType = action.payload;
     },
-    setScope(state, action) {
-      state.scope = action.payload;
-    },
     setPage(state, action) {
       state.page = action.payload;
     },
     resetConfig(state) {
       return initialState;
     },
-    addSettings(state, action) {
-      state.config.settings.push(action.payload);
-    },
-    deleteSettings(state, action) {
-      const schemaId = action.payload;
-      state.config.settings = state.config.settings.filter(
-        (setting) => setting.id !== schemaId
-      );
-    },
     overrideSettings(state, action) {
       state.config.settings = action.payload;
     },
-    editSettings(state, action) {
-      const { index, newSetting } = action.payload;
-      if (index !== -1) {
-        state.config.settings[index] = {
-          ...state.config.settings[index],
-          ...newSetting,
-        };
+    addSettings(state, action) {
+      const { path, newSetting } = action.payload;
+      const target = getTarget(state.config, path);
+      if (target && Array.isArray(target.settings)) {
+        target.settings.push(newSetting);
       }
     },
-    onChangeProp(state, action) {
-      let { id, value } = action.payload;
-      const configCopy = { ...state.config };
-      configCopy.props[id] = value;
-      state.config = configCopy;
+
+    // Delete a setting by index at the specified path
+    deleteSettings(state, action) {
+      const { path, index } = action.payload;
+      const target = getTarget(state.config, path);
+      if (target && Array.isArray(target.settings)) {
+        if (index >= 0 && index < target.settings.length) {
+          target.settings.splice(index, 1);
+        }
+      }
+    },
+
+    // Update a setting at a specified path and index
+    editSettings(state, action) {
+      const { path, index, updatedSetting } = action.payload;
+      const target = getTarget(state.config, path);
+      if (target && Array.isArray(target.settings)) {
+        if (target.settings[index]) {
+          target.settings[index] = {
+            ...target.settings[index],
+            ...updatedSetting,
+          };
+        }
+      }
+    },
+
+    // Override settings at the specified path
+    overrideSettings(state, action) {
+      const { path, settings } = action.payload;
+      const target = getTarget(state.config, path);
+      if (target) {
+        target.settings = settings;
+      }
+    },
+
+    // Add or update a property in the props object at the specified path
+    addOrUpdateProp(state, action) {
+      const { path, propKey, propValue } = action.payload;
+      const target = getTarget(state.config, path);
+      if (target && target.props) {
+        target.props[propKey] = propValue;
+      }
+    },
+
+    // Delete a property from the props object at the specified path
+    deleteProp(state, action) {
+      const { path, propKey } = action.payload;
+      const target = getTarget(state.config, path);
+      if (target && target.props && target.props.hasOwnProperty(propKey)) {
+        delete target.props[propKey];
+      }
     },
   },
   extraReducers: (builder) => {
@@ -182,7 +201,7 @@ const configSlice = createSlice({
       })
       .addCase(fetchConfig.fulfilled, (state, action) => {
         state.loading = false;
-        state.config = action.payload;
+        state.config = settingsSchema;
       })
       .addCase(fetchConfig.rejected, (state, action) => {
         state.loading = false;
@@ -233,15 +252,17 @@ const configSlice = createSlice({
 export const {
   setTenant,
   setUserType,
-  setScope,
   setPage,
   resetConfig,
-  addSettings,
-  overrideSettings,
-  deleteSettings,
-  editSettings,
   onChangeProp,
   setSchemaEditMode,
+
+  addSettings,
+  deleteSettings,
+  editSettings,
+  overrideSettings,
+  addOrUpdateProp,
+  deleteProp,
 } = configSlice.actions;
 
 export default configSlice.reducer;

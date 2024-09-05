@@ -50,7 +50,6 @@ const PageSchema = new mongoose.Schema({
 const ConfigSchema = new mongoose.Schema({
   tenant: { type: String, required: true },
   userType: { type: String, required: true },
-  scope: { type: String, required: true },
   settings: [SettingSchema],
   props: {
     type: Map,

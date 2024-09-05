@@ -11,3 +11,15 @@ export const renderComponents = (attribute = {}, args = {}) => {
   };
   return <CommonComponents {...props} {...args.props} key={`${type}`} />;
 };
+
+export const getTarget = (schema, path) => {
+  let target = schema;
+  for (const key of path) {
+    if (target[key]) {
+      target = target[key];
+    } else {
+      return null;
+    }
+  }
+  return target;
+};
