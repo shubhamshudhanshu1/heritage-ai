@@ -30,15 +30,25 @@ const levelConfig = {
 
 function Renderer({ object, level, path = [] }) {
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedChildIndex, setSelectedChildIndex] = useState(0);
+  const [selectedChildIndex, setSelectedChildIndex] = useState(0); // Track selected index
   const currentLevelConfig = levelConfig[level] || {};
   const childKey = currentLevelConfig.childKey;
   const childLevelConfig = levelConfig[childKey] || {};
   const childItems = object[childKey] || [];
+
   const handleTabChange = (newTabIndex) => {
     setActiveTab(newTabIndex);
   };
 
+  const handleSelectChange = (event) => {
+    const selectedId = event.target.value;
+    const newSelectedIndex = childLevelConfig.options.findIndex(
+      (option) => option.id === selectedId
+    );
+    setSelectedChildIndex(newSelectedIndex); // Update selected index
+  };
+
+  console.log({ selectedChildIndex }, childLevelConfig.options);
   return (
     <div>
       <Tabs
@@ -64,29 +74,31 @@ function Renderer({ object, level, path = [] }) {
                 >
                   <CommonLabel>Select {childKey}</CommonLabel>
                   <Select
-                    labelId="tenant-select-label"
-                    name="User Type"
-                    value={"home"}
-                    onChange={(e) => {}}
+                    labelId="child-select-label"
+                    name="Child Type"
+                    value={
+                      childLevelConfig.options?.[selectedChildIndex]?.id || ""
+                    }
+                    onChange={handleSelectChange}
                   >
                     <MenuItem value="">
                       <em>None</em>
                     </MenuItem>
-                    {childLevelConfig.options?.map((option) => {
-                      return (
-                        <MenuItem value={option.id}> {option.label}</MenuItem>
-                      );
-                    })}
+                    {childLevelConfig.options?.map((option, index) => (
+                      <MenuItem key={index} value={option.id}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
-                {childItems.map((childItem, index) => (
+                {childItems[selectedChildIndex] && (
                   <Renderer
-                    key={`${level}-${index}`}
-                    object={childItem}
+                    key={`${level}-${selectedChildIndex}`}
+                    object={childItems[selectedChildIndex]}
                     level={childKey}
-                    path={[...path, childKey, index]}
+                    path={[...path, childKey, selectedChildIndex]}
                   />
-                ))}
+                )}
               </div>
             ),
             id: 1,
