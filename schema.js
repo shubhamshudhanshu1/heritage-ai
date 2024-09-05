@@ -40,7 +40,7 @@ const settingsSchema = {
   },
   pages: [
     {
-      name: "cart_card_listing",
+      name: "home",
       label: "Cart Card Listing",
       settings: [
         {
@@ -126,7 +126,6 @@ const settingsSchema = {
         },
       ],
     },
-    {},
   ],
 };
 

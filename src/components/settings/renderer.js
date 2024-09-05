@@ -8,6 +8,7 @@ const levelConfig = {
   global: {
     label: "Global Settings",
     childKey: "pages",
+    tabView: true,
   },
   pages: {
     label: "Page Settings",
@@ -51,64 +52,78 @@ function Renderer({ object, level, path = [] }) {
   console.log({ selectedChildIndex }, childLevelConfig.options);
   return (
     <div>
-      <Tabs
-        tabs={[
-          {
-            label: "Settings",
-            content: (
-              <div>
-                <LevelSettings levelJson={object} path={path} />
-              </div>
-            ),
-            id: 0,
-          },
-          {
-            label: childLevelConfig.label,
-            content: (
-              <div>
-                <FormControl
-                  fullWidth
-                  margin="normal"
-                  required
-                  className="px-4"
-                >
-                  <CommonLabel>Select {childKey}</CommonLabel>
-                  <Select
-                    labelId="child-select-label"
-                    name="Child Type"
-                    value={
-                      childLevelConfig.options?.[selectedChildIndex]?.id || ""
-                    }
-                    onChange={handleSelectChange}
+      {currentLevelConfig.tabView ? (
+        <Tabs
+          tabs={[
+            {
+              label: "Settings",
+              content: (
+                <div>
+                  <LevelSettings levelJson={object} path={path} />
+                </div>
+              ),
+              id: 0,
+            },
+            {
+              label: childLevelConfig.label,
+              content: (
+                <div>
+                  <FormControl
+                    fullWidth
+                    margin="normal"
+                    required
+                    className="px-4"
                   >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    {childLevelConfig.options?.map((option, index) => (
-                      <MenuItem key={index} value={option.id}>
-                        {option.label}
+                    <CommonLabel>Select {childKey}</CommonLabel>
+                    <Select
+                      labelId="child-select-label"
+                      name="Child Type"
+                      value={
+                        childLevelConfig.options?.[selectedChildIndex]?.id || ""
+                      }
+                      onChange={handleSelectChange}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
                       </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                {childItems[selectedChildIndex] && (
-                  <Renderer
-                    key={`${level}-${selectedChildIndex}`}
-                    object={childItems[selectedChildIndex]}
-                    level={childKey}
-                    path={[...path, childKey, selectedChildIndex]}
-                  />
-                )}
-              </div>
-            ),
-            id: 1,
-          },
-        ]}
-        value={activeTab}
-        onChange={(newValue) => {
-          handleTabChange(newValue);
-        }}
-      />
+                      {childLevelConfig.options?.map((option, index) => (
+                        <MenuItem key={index} value={option.id}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {childItems[selectedChildIndex] && (
+                    <Renderer
+                      key={`${level}-${selectedChildIndex}`}
+                      object={childItems[selectedChildIndex]}
+                      level={childKey}
+                      path={[...path, childKey, selectedChildIndex]}
+                    />
+                  )}
+                </div>
+              ),
+              id: 1,
+            },
+          ]}
+          value={activeTab}
+          onChange={(newValue) => {
+            handleTabChange(newValue);
+          }}
+        />
+      ) : (
+        <div>
+          <LevelSettings levelJson={object} path={path} />
+          {childItems.map((childItem, index) => (
+            <Renderer
+              key={`${level}-${index}`} // Add a key for React reconciliation
+              object={childItem}
+              level={childKey}
+              path={[...path, childKey, index]} // Extend the path for the child
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
