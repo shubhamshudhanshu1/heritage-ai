@@ -2,6 +2,7 @@
 import React from "react";
 import {
   Box,
+  Button,
   FormControl,
   FormControlLabel,
   MenuItem,
@@ -14,6 +15,7 @@ import {
   setSchemaEditMode,
   setTenant,
   setUserType,
+  updateConfig,
 } from "@/redux/slices/configSlice";
 import { useSession } from "next-auth/react";
 import useConfigFetcher from "@/hooks/useConfigFetcher";
@@ -33,7 +35,7 @@ const Sidebar = () => {
     }
   }, [session.user.tenant]);
 
-  console.log({ config });
+  // console.log({ config, userType, tenant });
   return (
     <Box className="w-[400px] bg-white shadow-lg flex flex-col overflow-scroll py-4">
       <FormControl fullWidth margin="normal" required className="px-4">
@@ -73,6 +75,18 @@ const Sidebar = () => {
                 schemaEditMode={schemaEditMode}
               />
             </div>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={() => {
+                dispatch(updateConfig(config));
+              }}
+            >
+              Save Changes
+            </Button>
           </Box>
         </>
       )}

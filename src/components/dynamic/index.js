@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 
 const requireComponents = require.context("./", true, /index\.js$/);
 const keys = requireComponents.keys();
-console.log({ keys });
 const map = keys.reduce((acc, item) => {
   const type = item.replace(/^\.\//, "").replace(/\/index\.js$/, "");
   acc[type] = React.lazy(() => import(`./${type}`));

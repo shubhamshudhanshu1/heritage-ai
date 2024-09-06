@@ -33,7 +33,11 @@ function SettingsRenderer({
     );
     onChangeSettings(reorderedSettings);
   }
+  console.log({ settings });
 
+  if (!settings.length) {
+    return <div>No Settings found</div>;
+  }
   if (schemaEditMode) {
     return (
       <Draggable
@@ -49,7 +53,7 @@ function SettingsRenderer({
           </div>
         )}
         onDragEnd={(newArray) => {
-          console.log(newArray);
+          // console.log(newArray);
         }}
       />
     );

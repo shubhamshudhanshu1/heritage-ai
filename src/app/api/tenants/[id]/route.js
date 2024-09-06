@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import connectToDatabase from "../../../../lib/mongodb";
 import Tenant from "@/models/Tenant";
+import { connectToDatabase } from "@/helper/db";
 
 export async function GET({ params }) {
   await connectToDatabase();

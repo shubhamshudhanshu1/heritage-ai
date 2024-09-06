@@ -90,7 +90,7 @@ function Renderer({ object, level, path = [], schemaEditMode }) {
     setNewChild({ label: "", name: "" });
   };
 
-  console.log({ childItems, level });
+  // console.log({ childItems, level });
 
   return (
     <div>
@@ -210,7 +210,7 @@ function Renderer({ object, level, path = [], schemaEditMode }) {
                     </div>
                   )}
                   onDragEnd={(newArray) => {
-                    console.log(newArray);
+                    // console.log(newArray);
                   }}
                 />
                 {schemaEditMode && (

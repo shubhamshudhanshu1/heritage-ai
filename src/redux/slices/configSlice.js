@@ -18,13 +18,13 @@ export const fetchConfig = createAsyncThunk(
   }
 );
 
-export const addSchemaToConfig = createAsyncThunk(
-  "config/addSchemaToConfig",
+export const updateConfig = createAsyncThunk(
+  "config/updateConfig",
   async (_, { getState, rejectWithValue }) => {
     const state = getState();
-    const { tenant, userType, settings, props } = state.config?.config;
+    const { tenant, usertype, settings, props } = state.config?.config;
     try {
-      const response = await fetch(`/api/config/${tenant}/${userType}`, {
+      const response = await fetch(`/api/config/${tenant}/${usertype}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,54 +39,6 @@ export const addSchemaToConfig = createAsyncThunk(
         throw new Error(`Error: ${response.statusText}`);
       }
 
-      return await response.json();
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateSchemaInConfig = createAsyncThunk(
-  "config/updateSchemaInConfig",
-  async ({ tenant, userType, settings, props, page }, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`/api/config/${tenant}/${userType}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          page,
-          settings,
-          props,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-      return await response.json();
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteConfig = createAsyncThunk(
-  "config/deleteConfig",
-  async ({ tenant, userType, page }, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`/api/config/${tenant}/${userType}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          page,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
       return await response.json();
     } catch (error) {
       return rejectWithValue(error.message);
@@ -188,8 +140,7 @@ const configSlice = createSlice({
     addChild(state, action) {
       const { path, newChild, childKey } = action.payload;
       let target = getTarget(state.config, path);
-
-      console.log(JSON.parse(JSON.stringify(target)), path);
+      // console.log(JSON.parse(JSON.stringify(target)), path);
       if (target[childKey] && Array.isArray(target[childKey])) {
         target[childKey].push(newChild);
       } else if (target) {
@@ -232,48 +183,21 @@ const configSlice = createSlice({
       })
       .addCase(fetchConfig.fulfilled, (state, action) => {
         state.loading = false;
-        state.config = settingsSchema;
+        state.config = action.payload;
       })
       .addCase(fetchConfig.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(addSchemaToConfig.pending, (state) => {
+      .addCase(updateConfig.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(addSchemaToConfig.fulfilled, (state, action) => {
+      .addCase(updateConfig.fulfilled, (state, action) => {
         state.loading = false;
         state.config = action.payload.data;
       })
-      .addCase(addSchemaToConfig.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(updateSchemaInConfig.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateSchemaInConfig.fulfilled, (state, action) => {
-        state.loading = false;
-        if (state.config) {
-          state.config.settings = action.payload.settings;
-          state.config.props = action.payload.props;
-        }
-      })
-      .addCase(updateSchemaInConfig.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(deleteConfig.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteConfig.fulfilled, (state) => {
-        state.loading = false;
-        state.config = null;
-      })
-      .addCase(deleteConfig.rejected, (state, action) => {
+      .addCase(updateConfig.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
