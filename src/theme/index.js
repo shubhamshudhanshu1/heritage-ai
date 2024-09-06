@@ -1,4 +1,3 @@
-// src/theme/index.js
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
@@ -17,12 +16,11 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          margin: 0, // Set zero margin for TextField components
+          margin: 0,
         },
       },
     },
   },
-  // Add more customizations as needed
 });
 
 export default theme;

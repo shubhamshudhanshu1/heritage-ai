@@ -1,4 +1,3 @@
-// components/IframeComponent.js
 import React from "react";
 
 const IframeComponent = ({ src, title, width = "100%", height = "600px" }) => {

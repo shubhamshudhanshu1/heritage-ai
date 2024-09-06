@@ -1,4 +1,3 @@
-// components/Select.js
 import PropTypes from "prop-types";
 import { Select as MuiSelect, MenuItem, FormControl } from "@mui/material";
 import CommonLabel from "../../common/label";

@@ -1,7 +1,6 @@
 "use client";
-
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TextField,
   Button,
@@ -13,11 +12,20 @@ import {
   InputLabel,
 } from "@mui/material";
 import CommonLabel from "@/components/common/label";
+import { fetchTenants, selectAllTenants } from "@/redux/slices/tenantSlice";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [tenant, setTenant] = useState("");
+  const dispatch = useDispatch();
+  const tenants = useSelector(selectAllTenants);
+
+  useEffect(() => {
+    dispatch(fetchTenants());
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,12 +76,13 @@ export default function SignInPage() {
           value={tenant}
           onChange={(e) => setTenant(e.target.value)}
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value="tenant1">Tenant 1</MenuItem>
-          <MenuItem value="tenant2">Tenant 2</MenuItem>
-          <MenuItem value="tenant3">Tenant 3</MenuItem>
+          {tenants.map((tenant) => {
+            return (
+              <MenuItem key={tenant.tenantName} value={tenant.tenantName}>
+                {tenant.tenantName}
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
       <CommonLabel>Password</CommonLabel>

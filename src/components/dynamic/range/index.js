@@ -1,4 +1,3 @@
-// components/RangeInput.js
 import PropTypes from "prop-types";
 import { Slider, Box } from "@mui/material";
 import CommonLabel from "@/components/common/label";

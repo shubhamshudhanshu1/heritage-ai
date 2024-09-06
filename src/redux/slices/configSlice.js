@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import settingsSchema from "../../../schema";
 import { getTarget } from "@/helper/utils";
 
-// Async thunks for API calls
 export const fetchConfig = createAsyncThunk(
   "config/fetchConfig",
   async ({ tenant, userType }, { rejectWithValue }) => {
@@ -95,7 +94,6 @@ export const deleteConfig = createAsyncThunk(
   }
 );
 
-// Initial state
 const initialState = {
   tenant: null,
   userType: null,
@@ -110,7 +108,6 @@ const initialState = {
   schemaEditMode: false,
 };
 
-// Config slice
 const configSlice = createSlice({
   name: "config",
   initialState,
@@ -141,7 +138,6 @@ const configSlice = createSlice({
       }
     },
 
-    // Delete a setting by index at the specified path
     deleteSettings(state, action) {
       const { path, index } = action.payload;
       const target = getTarget(state.config, path);
@@ -152,7 +148,6 @@ const configSlice = createSlice({
       }
     },
 
-    // Update a setting at a specified path and index
     editSettings(state, action) {
       const { path, index, updatedSetting } = action.payload;
       const target = getTarget(state.config, path);
@@ -166,7 +161,6 @@ const configSlice = createSlice({
       }
     },
 
-    // Override settings at the specified path
     overrideSettings(state, action) {
       const { path, settings } = action.payload;
       const target = getTarget(state.config, path);
@@ -175,7 +169,6 @@ const configSlice = createSlice({
       }
     },
 
-    // Add or update a property in the props object at the specified path
     addOrUpdateProp(state, action) {
       const { path, propKey, propValue } = action.payload;
       const target = getTarget(state.config, path);
@@ -184,12 +177,50 @@ const configSlice = createSlice({
       }
     },
 
-    // Delete a property from the props object at the specified path
     deleteProp(state, action) {
       const { path, propKey } = action.payload;
       const target = getTarget(state.config, path);
       if (target && target.props && target.props.hasOwnProperty(propKey)) {
         delete target.props[propKey];
+      }
+    },
+
+    addChild(state, action) {
+      const { path, newChild, childKey } = action.payload;
+      let target = getTarget(state.config, path);
+
+      console.log(JSON.parse(JSON.stringify(target)), path);
+      if (target[childKey] && Array.isArray(target[childKey])) {
+        target[childKey].push(newChild);
+      } else if (target) {
+        target[childKey] = [newChild];
+      }
+    },
+    deleteChild(state, action) {
+      const { path, index } = action.payload;
+      const target = getTarget(state.config, path);
+      if (
+        target &&
+        Array.isArray(target) &&
+        index >= 0 &&
+        index < target.length
+      ) {
+        target.splice(index, 1);
+      }
+    },
+    updateChild(state, action) {
+      const { path, index, updatedChild } = action.payload;
+      const target = getTarget(state.config, path);
+      if (
+        target &&
+        Array.isArray(target) &&
+        index >= 0 &&
+        index < target.length
+      ) {
+        target[index] = {
+          ...target[index],
+          ...updatedChild,
+        };
       }
     },
   },
@@ -263,6 +294,10 @@ export const {
   overrideSettings,
   addOrUpdateProp,
   deleteProp,
+
+  addChild,
+  deleteChild,
+  updateChild,
 } = configSlice.actions;
 
 export default configSlice.reducer;

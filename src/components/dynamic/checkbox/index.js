@@ -1,4 +1,3 @@
-// components/Checkbox.js
 import PropTypes from "prop-types";
 import { Checkbox as MuiCheckbox } from "@mui/material";
 import CommonLabel from "@/components/common/label";

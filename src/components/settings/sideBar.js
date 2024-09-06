@@ -33,6 +33,7 @@ const Sidebar = () => {
     }
   }, [session.user.tenant]);
 
+  console.log({ config });
   return (
     <Box className="w-[400px] bg-white shadow-lg flex flex-col overflow-scroll py-4">
       <FormControl fullWidth margin="normal" required className="px-4">
@@ -65,7 +66,12 @@ const Sidebar = () => {
               />
             </div>
             <div>
-              <Renderer object={config} level="global" path={[]} />
+              <Renderer
+                object={config}
+                level="global"
+                path={[]}
+                schemaEditMode={schemaEditMode}
+              />
             </div>
           </Box>
         </>

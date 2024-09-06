@@ -6,7 +6,7 @@ import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import Draggable from "../draggable";
-// Function to reorder settings after drag-and-drop
+
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
@@ -24,7 +24,6 @@ function SettingsRenderer({
   const { schemaEditMode } = useSelector((state) => state.config);
   const dispatch = useDispatch();
 
-  // Handler for drag end event
   function dragEnded(result) {
     if (!result.destination) return;
     const reorderedSettings = reorder(
@@ -32,7 +31,7 @@ function SettingsRenderer({
       result.source.index,
       result.destination.index
     );
-    onChangeSettings(reorderedSettings); // Updates the settings order after drag-and-drop
+    onChangeSettings(reorderedSettings);
   }
 
   if (schemaEditMode) {
@@ -40,7 +39,7 @@ function SettingsRenderer({
       <Draggable
         array={settings}
         renderItem={(item, index) => (
-          <div className="flex flex-row gap-0 items-center w-full bg-slate-50 p-4 rounded-sm">
+          <div className="flex flex-row gap-0 bg-primary-50 items-center w-full p-4 rounded-md">
             <DragIndicatorIcon />
             <div className="w-full">{item.label}</div>
             <div className="flex flex-row gap-2">

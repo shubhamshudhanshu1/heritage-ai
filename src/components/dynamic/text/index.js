@@ -1,4 +1,3 @@
-// components/Input.js
 import PropTypes from "prop-types";
 import TextField from "@mui/material/TextField";
 import CommonLabel from "../../common/label";

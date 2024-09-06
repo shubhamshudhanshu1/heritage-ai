@@ -2,7 +2,6 @@ import React from "react";
 import { Tabs, Tab, Box, Divider } from "@mui/material";
 import PropTypes from "prop-types";
 
-// TabPanel component
 const TabPanel = ({ value, index, children }) => (
   <div
     role="tabpanel"
@@ -20,13 +19,11 @@ TabPanel.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// CustomTabs component
 const CustomTabs = ({ tabs, onChange, value }) => {
   const handleChange = (event, newValue) => {
     onChange(newValue);
   };
 
-  // Get the index of the selected tab
   const selectedIndex = tabs.findIndex((tab) => tab.id === value);
 
   return (

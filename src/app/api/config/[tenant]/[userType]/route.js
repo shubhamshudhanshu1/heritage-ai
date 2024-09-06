@@ -1,15 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Config from "@/models/Config";
-
-const connectToDatabase = async () => {
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-  }
-};
+import { connectToDatabase } from "@/helper/db";
 
 export async function GET(request, { params }) {
   await connectToDatabase();
@@ -47,10 +39,10 @@ export async function POST(request, { params }) {
       const pageConfig = config.pages.find((p) => p.name === page);
       if (pageConfig) {
         if (settings) {
-          pageConfig.settings = settings; // Overriding settings
+          pageConfig.settings = settings;
         }
         if (props) {
-          pageConfig.props = { ...pageConfig.props.toObject(), ...props }; // Merging props
+          pageConfig.props = { ...pageConfig.props.toObject(), ...props };
         }
       } else {
         config.pages.push({
@@ -62,10 +54,10 @@ export async function POST(request, { params }) {
       }
     } else {
       if (settings) {
-        config.settings = settings; // Overriding settings
+        config.settings = settings;
       }
       if (props) {
-        config.props = { ...config.props.toObject(), ...props }; // Merging props
+        config.props = { ...config.props.toObject(), ...props };
       }
     }
 

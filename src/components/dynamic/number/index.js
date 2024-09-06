@@ -1,4 +1,3 @@
-// components/NumberInput.js
 import PropTypes from "prop-types";
 import TextField from "@mui/material/TextField";
 import CommonLabel from "@/components/common/label";
@@ -6,7 +5,6 @@ import CommonLabel from "@/components/common/label";
 const NumberInput = ({ label, value, onChange, min, max, step, ...props }) => {
   const handleChange = (event) => {
     const { value } = event.target;
-    // Ensure the value is a valid number and within the specified range
     const numericValue = Number(value);
     if (
       !isNaN(numericValue) &&

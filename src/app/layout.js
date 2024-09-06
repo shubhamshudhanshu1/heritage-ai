@@ -13,7 +13,6 @@ export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
 
   getServerSession;
-  //get used d
   return (
     <html lang="en">
       <body>

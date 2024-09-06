@@ -23,3 +23,12 @@ export const getTarget = (schema, path) => {
   }
   return target;
 };
+
+export const updateAtPath = (obj, path, callback) => {
+  if (path.length === 0) return callback(obj);
+  const [key, ...rest] = path;
+  return {
+    ...obj,
+    [key]: updateAtPath(obj[key], rest, callback),
+  };
+};
