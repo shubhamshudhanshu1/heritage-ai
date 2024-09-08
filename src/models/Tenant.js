@@ -1,18 +1,13 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const tenantSchema = new Schema(
   {
-    tenantId: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
     tenantName: {
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     meta: {
       type: Map,

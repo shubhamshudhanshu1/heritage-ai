@@ -3,6 +3,7 @@ import counterSlice from "./slices/counterSlice";
 import userSlice from "./slices/userSlice";
 import configSlice from "./slices/configSlice";
 import tenantSlice from "./slices/tenantSlice";
+import settingSchema from "./slices/settingSchemaSlice";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     user: userSlice,
     config: configSlice,
     tenants: tenantSlice,
+    settingSchema: settingSchema,
   },
 });
 

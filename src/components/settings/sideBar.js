@@ -69,7 +69,7 @@ const Sidebar = () => {
             </div>
             <div>
               <Renderer
-                object={config}
+                rendererObject={config}
                 level="global"
                 path={[]}
                 schemaEditMode={schemaEditMode}

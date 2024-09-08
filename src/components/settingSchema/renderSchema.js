@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   addSettings,
   deleteSettings,
@@ -7,24 +7,34 @@ import {
   overrideSettings,
   addOrUpdateProp,
   deleteProp,
-  onChangeProp,
 } from "@/redux/slices/configSlice";
-import SettingsRenderer from "@/components/common/settingsRenderer";
-import AddSchema from "../settingSchema/addSchema";
+import SettingsRenderer from "../common/settingsRenderer";
+import AddSchema from "./addSchema";
 
-function LevelSettings({ levelJson, path = [] }) {
+function RenderSchema({
+  levelJson = {},
+  onChangeSettings = () => {},
+  onChangeProp = () => {},
+  path = [],
+  schemaEditMode = false,
+}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeSchemaIndex, setActiveSchemaIndex] = useState(null);
   const dispatch = useDispatch();
-  const { schemaEditMode } = useSelector((state) => state.config);
   const { settings = [], props = {} } = levelJson;
 
+  // Handler for adding new settings
   const handleAddSchema = (newSchema) => {
     dispatch(addSettings({ path, newSetting: newSchema }));
+    onChangeSettings([...settings, newSchema]);
   };
 
+  // Handler for editing existing settings
   const editSchema = (editedSchema) => {
     if (activeSchemaIndex !== null) {
+      const updatedSettings = settings.map((setting, index) =>
+        index === activeSchemaIndex ? editedSchema : setting
+      );
       dispatch(
         editSettings({
           path,
@@ -32,23 +42,35 @@ function LevelSettings({ levelJson, path = [] }) {
           updatedSetting: editedSchema,
         })
       );
+      onChangeSettings(updatedSettings);
     }
   };
 
+  // Handler for deleting settings
   const handleDeleteSetting = (index) => {
+    const updatedSettings = settings.filter((_, i) => i !== index);
     dispatch(deleteSettings({ path, index }));
+    onChangeSettings(updatedSettings);
   };
 
+  // Handler for overriding all settings
   const handleOverrideSettings = (newSettings) => {
     dispatch(overrideSettings({ path, settings: newSettings }));
+    onChangeSettings(newSettings);
   };
 
+  // Handler for adding or updating props
   const handleAddOrUpdateProp = (propKey, propValue) => {
+    const updatedProps = { ...props, [propKey]: propValue };
     dispatch(addOrUpdateProp({ path, propKey, propValue }));
+    onChangeProp(updatedProps);
   };
 
+  // Handler for deleting props
   const handleDeleteProp = (propKey) => {
+    const { [propKey]: _, ...updatedProps } = props;
     dispatch(deleteProp({ path, propKey }));
+    onChangeProp(updatedProps);
   };
 
   return (
@@ -68,26 +90,24 @@ function LevelSettings({ levelJson, path = [] }) {
           handleOverrideSettings(newSettings);
         }}
         onChangeProp={(key, value) => {
-          // dispatch(onChangeProp());
           handleAddOrUpdateProp(key, value);
         }}
         onDeleteProp={(key) => {
           handleDeleteProp(key);
         }}
+        readOnly={false}
       />
-      {schemaEditMode && (
-        <div className="mt-4">
-          <AddSchema
-            defaultSchema={settings[activeSchemaIndex] || {}}
-            onAddSchema={handleAddSchema}
-            modalOpen={modalOpen}
-            setModalOpen={setModalOpen}
-            onEditSchema={editSchema}
-          />
-        </div>
-      )}
+      <div className="mt-4">
+        <AddSchema
+          defaultSchema={settings[activeSchemaIndex] || {}}
+          onAddSchema={handleAddSchema}
+          modalOpen={modalOpen}
+          setModalOpen={setModalOpen}
+          onEditSchema={editSchema}
+        />
+      </div>
     </div>
   );
 }
 
-export default LevelSettings;
+export default RenderSchema;

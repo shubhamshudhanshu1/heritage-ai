@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LevelSettings from "./levelSettings";
 import Tabs from "../common/tab";
 import {
@@ -16,9 +16,8 @@ import Draggable from "../common/draggable";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
-import { useSelector } from "react-redux";
-import { addChild, deleteChild, updateChild } from "@/redux/slices/configSlice";
 import { useDispatch } from "react-redux";
+import { addChild, deleteChild, updateChild } from "@/redux/slices/configSlice";
 
 const levelConfig = {
   global: {
@@ -29,6 +28,7 @@ const levelConfig = {
   pages: {
     label: "Page Settings",
     childKey: "sections",
+    bgColor: "bg-slate-50",
     options: [
       { label: "Home", id: "home" },
       { label: "Cart Landing", id: "cart-landing" },
@@ -47,211 +47,195 @@ const levelConfig = {
   },
 };
 
-function Renderer({ object, level, path = [], schemaEditMode }) {
+function Renderer({ rendererObject = {}, level, path = [], schemaEditMode }) {
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedChildIndex, setSelectedChildIndex] = useState(0);
-  const [editedChild, setEditedChild] = useState({});
+  const [selectedChildIndex, setSelectedChildIndex] = useState(null);
   const [newChild, setNewChild] = useState({ label: "", name: "" });
-
+  const dispatch = useDispatch();
   const currentLevelConfig = levelConfig[level] || {};
   const childKey = currentLevelConfig.childKey;
   const childLevelConfig = levelConfig[childKey] || {};
-  const childItems = object[childKey] || [];
+  const childItems = rendererObject[childKey] || [];
 
-  const dispatch = useDispatch();
-  const handleTabChange = (newTabIndex) => {
-    setActiveTab(newTabIndex);
-  };
+  const editedChild = childItems[selectedChildIndex] || {};
 
-  const handleSelectChange = (event) => {
-    const selectedId = event.target.value;
-    const newSelectedIndex = childLevelConfig.options.findIndex(
-      (option) => option.id === selectedId
-    );
-    setSelectedChildIndex(newSelectedIndex);
-  };
+  console.log({
+    rendererObject,
+    level,
+    path,
+    currentLevelConfig,
+    childLevelConfig,
+    childKey,
+    childItems,
+    editedChild,
+    selectedChildIndex,
+  });
+
+  const handleTabChange = (newTabIndex) => setActiveTab(newTabIndex);
 
   const handleEditClick = (index) => {
-    setEditedChild(childItems[index]);
+    const selectedIndex = index;
+    setSelectedChildIndex(selectedIndex);
   };
 
   const handleAddChild = () => {
-    dispatch(addChild({ path: [...path], childKey: childKey, newChild }));
+    dispatch(addChild({ path: [...path], childKey, newChild }));
     setNewChild({ label: "", name: "" });
   };
 
   const handleUpdateChild = (index) => {
-    dispatch(updateChild({ path: [...path, childKey], index, newChild }));
+    dispatch(
+      updateChild({ path: [...path], childKey, index, updatedChild: newChild })
+    );
     setNewChild({ label: "", name: "" });
   };
 
   const handleDeleteChild = (index) => {
-    dispatch(deleteChild({ path: [...path, childKey], index, newChild }));
-    setNewChild({ label: "", name: "" });
+    dispatch(deleteChild({ path: [...path, childKey, index] }));
   };
 
-  // console.log({ childItems, level });
+  const renderCurrentLevelSettings = () => (
+    <div className="mt-3">
+      <LevelSettings levelJson={rendererObject} path={path} />
+    </div>
+  );
 
-  return (
-    <div>
-      {currentLevelConfig.tabView ? (
-        <Tabs
-          tabs={[
-            {
-              label: "Settings",
-              content: (
-                <div className="mt-3">
-                  <LevelSettings levelJson={object} path={path} />
-                </div>
-              ),
-              id: 0,
-            },
-            {
-              label: childLevelConfig.label,
-              content: (
-                <div>
-                  <FormControl
-                    fullWidth
-                    margin="normal"
-                    required
-                    className="py-2"
-                  >
-                    <CommonLabel>Select {childKey}</CommonLabel>
-                    <Select
-                      labelId="child-select-label"
-                      name="Child Type"
-                      value={
-                        childLevelConfig.options?.[selectedChildIndex]?.id || ""
-                      }
-                      onChange={handleSelectChange}
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      {childLevelConfig.options?.map((option, index) => (
-                        <MenuItem key={index} value={option.id}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  {childItems[selectedChildIndex] && (
-                    <Renderer
-                      key={`${level}-${selectedChildIndex}`}
-                      object={childItems[selectedChildIndex]}
-                      level={childKey}
-                      path={[...path, childKey, selectedChildIndex]}
-                      schemaEditMode={schemaEditMode}
-                    />
-                  )}
-                </div>
-              ),
-              id: 1,
-            },
-          ]}
-          value={activeTab}
-          onChange={(newValue) => handleTabChange(newValue)}
-        />
-      ) : (
-        <div>
-          <LevelSettings levelJson={object} path={path} />
-          <Typography
-            className="font-bold mt-4 my-2"
-            variant="p"
-            noWrap
-            component="div"
-          >
-            {childLevelConfig.label}
-          </Typography>
-          <div className={`${childLevelConfig.bgColor} p-2 py-4 rounded-lg`}>
-            {editedChild.name ? (
-              <div>
+  const addNewChild = () => {
+    if (!childKey) {
+      return null;
+    }
+    return (
+      <div className="mt-4">
+        <Typography className="font-bold text-sm" variant="p">
+          Add new {childKey}
+        </Typography>
+        <div className="flex flex-row gap-4 mt-2">
+          <FormControl fullWidth required>
+            <CommonLabel>Label</CommonLabel>
+            <TextField
+              fullWidth
+              value={newChild.label}
+              onChange={(e) =>
+                setNewChild({ ...newChild, label: e.target.value })
+              }
+            />
+          </FormControl>
+          <FormControl fullWidth required>
+            <CommonLabel>Name</CommonLabel>
+            <TextField
+              fullWidth
+              value={newChild.name}
+              onChange={(e) =>
+                setNewChild({ ...newChild, name: e.target.value })
+              }
+            />
+          </FormControl>
+        </div>
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          onClick={handleAddChild}
+          sx={{ mt: 2 }}
+        >
+          Add {childKey}
+        </Button>
+      </div>
+    );
+  };
+  const renderChildList = () => {
+    return (
+      <div className="">
+        <>
+          {childItems.length ? (
+            <Draggable
+              array={childItems}
+              renderItem={(childItem, index) => (
                 <div
-                  className="pb-4 flex flex-row gap-3 items-center cursor-pointer text-primary"
-                  onClick={() => {
-                    setEditedChild({});
-                  }}
+                  key={`${level}-${index}`}
+                  onClick={() => handleEditClick(index)}
+                  className="flex flex-row gap-2 items-center justify-between w-full bg-primary-50 p-4 rounded-sm"
                 >
-                  <ArrowBackIosNewOutlinedIcon />
-                  <span className="border-b-2 border-primary">
-                    Editing {editedChild.label || childKey}
-                  </span>
-                </div>
-                {editedChild && (
-                  <Renderer
-                    object={editedChild}
-                    level={childKey}
-                    path={[...path, childKey, selectedChildIndex]}
-                    schemaEditMode={schemaEditMode}
-                  />
-                )}
-              </div>
-            ) : (
-              <div>
-                <Draggable
-                  array={childItems}
-                  renderItem={(childItem, index) => (
-                    <div
-                      key={`${level}-${index}`}
-                      onClick={() => handleEditClick(index)}
-                      className="flex flex-row gap-2 items-center justify-between w-full bg-primary-50 p-4 rounded-sm"
-                    >
-                      <div className="flex flex-row gap-2 items-center">
-                        <DragIndicatorIcon />
-                        <div>{childItem.label || `Child ${index + 1}`}</div>
-                      </div>
-                      <div className="flex flex-row gap-2 items-center">
-                        <CloseOutlinedIcon
-                          onClick={() => {
-                            handleDeleteChild(index);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  onDragEnd={(newArray) => {
-                    // console.log(newArray);
-                  }}
-                />
-                {schemaEditMode && (
-                  <div className="mt-4">
-                    <Typography variant="h6">Add New {childKey}</Typography>
-                    <div className="flex flex-row gap-3">
-                      <TextField
-                        fullWidth
-                        label="Label"
-                        value={newChild.label}
-                        onChange={(e) =>
-                          setNewChild({ ...newChild, label: e.target.value })
-                        }
-                        margin="normal"
-                      />
-                      <TextField
-                        fullWidth
-                        label="Name"
-                        value={newChild.name}
-                        onChange={(e) =>
-                          setNewChild({ ...newChild, name: e.target.value })
-                        }
-                        margin="normal"
-                      />
-                    </div>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      fullWidth
-                      onClick={handleAddChild}
-                      sx={{ mt: 2 }}
-                    >
-                      Add {childKey}
-                    </Button>
+                  <div className="flex flex-row gap-2 items-center">
+                    <DragIndicatorIcon />
+                    <div>{childItem.label || `Child ${index + 1}`}</div>
                   </div>
-                )}
-              </div>
+                  <CloseOutlinedIcon
+                    onClick={() => handleDeleteChild(index)}
+                    className="cursor-pointer"
+                  />
+                </div>
+              )}
+              onDragEnd={(newArray) => {
+                // Handle reordering here if needed
+              }}
+            />
+          ) : childKey ? (
+            <div>No {childKey}</div>
+          ) : null}
+        </>
+        {schemaEditMode && addNewChild()}
+      </div>
+    );
+  };
+
+  const renderChildrens = () => {
+    return (
+      <div className={`${childLevelConfig.bgColor} p-3 my-2 rounded-lg`}>
+        {editedChild.name ? (
+          <div>
+            <div
+              className="pb-4 flex flex-row gap-3 items-center cursor-pointer text-primary"
+              onClick={() => setSelectedChildIndex(null)}
+            >
+              <ArrowBackIosNewOutlinedIcon />
+              <span className="border-b-2 border-primary">
+                Editing {editedChild.label || childKey}
+              </span>
+            </div>
+            {editedChild && (
+              <Renderer
+                rendererObject={editedChild}
+                level={childKey}
+                path={[...path, childKey, selectedChildIndex]}
+                schemaEditMode={schemaEditMode}
+              />
             )}
           </div>
-        </div>
-      )}
+        ) : (
+          renderChildList()
+        )}
+      </div>
+    );
+  };
+
+  if (currentLevelConfig.tabView) {
+    return (
+      <Tabs
+        tabs={[
+          {
+            label: "Settings",
+            content: renderCurrentLevelSettings(),
+            id: 0,
+          },
+          {
+            label: childLevelConfig.label,
+            content: renderChildrens(),
+            id: 1,
+          },
+        ]}
+        value={activeTab}
+        onChange={handleTabChange}
+      />
+    );
+  }
+  return (
+    <div>
+      {renderCurrentLevelSettings()}
+      <Typography className="font-bold mt-4 my-2" variant="p" component="div">
+        {childLevelConfig.label}
+      </Typography>
+      {renderChildrens()}
     </div>
   );
 }

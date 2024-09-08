@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import settingsSchema from "../../../schema";
-import { getTarget } from "@/helper/utils";
+import {
+  addChildUtil,
+  deleteChildUtil,
+  getTarget,
+  getTargetAndClone,
+  updateChildAtIndexUtil,
+} from "@/helper/utils";
 
 export const fetchConfig = createAsyncThunk(
   "config/fetchConfig",
@@ -22,9 +28,12 @@ export const updateConfig = createAsyncThunk(
   "config/updateConfig",
   async (_, { getState, rejectWithValue }) => {
     const state = getState();
-    const { tenant, usertype, settings, props } = state.config?.config;
+    const { tenant, userType } = state.config;
+    console.log(state.config, "state.config");
+    const { settings, props, pages = [] } = state.config?.config;
+
     try {
-      const response = await fetch(`/api/config/${tenant}/${usertype}`, {
+      const response = await fetch(`/api/config/${tenant}/${userType}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,6 +41,7 @@ export const updateConfig = createAsyncThunk(
         body: JSON.stringify({
           settings,
           props,
+          pages,
         }),
       });
 
@@ -139,42 +149,24 @@ const configSlice = createSlice({
 
     addChild(state, action) {
       const { path, newChild, childKey } = action.payload;
-      let target = getTarget(state.config, path);
-      // console.log(JSON.parse(JSON.stringify(target)), path);
-      if (target[childKey] && Array.isArray(target[childKey])) {
-        target[childKey].push(newChild);
-      } else if (target) {
-        target[childKey] = [newChild];
-      }
+      state.config = addChildUtil(state.config, path, childKey, newChild);
     },
     deleteChild(state, action) {
-      const { path, index } = action.payload;
-      const target = getTarget(state.config, path);
-      if (
-        target &&
-        Array.isArray(target) &&
-        index >= 0 &&
-        index < target.length
-      ) {
-        target.splice(index, 1);
-      }
+      const { path } = action.payload;
+      state.config = deleteChildUtil(state.config, path);
     },
     updateChild(state, action) {
-      const { path, index, updatedChild } = action.payload;
-      const target = getTarget(state.config, path);
-      if (
-        target &&
-        Array.isArray(target) &&
-        index >= 0 &&
-        index < target.length
-      ) {
-        target[index] = {
-          ...target[index],
-          ...updatedChild,
-        };
-      }
+      const { path, index, childKey, updatedChild } = action.payload;
+      state.config = updateChildAtIndexUtil(
+        state.config,
+        path,
+        childKey,
+        index,
+        updatedChild
+      );
     },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchConfig.pending, (state) => {

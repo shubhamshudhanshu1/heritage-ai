@@ -5,7 +5,7 @@ const OptionSchema = new mongoose.Schema({
   text: { type: String, required: true },
 });
 
-const SettingSchema = new mongoose.Schema({
+export const SettingSchema = new mongoose.Schema({
   id: { type: String, required: true },
   type: { type: String, required: true },
   label: { type: String, required: true },

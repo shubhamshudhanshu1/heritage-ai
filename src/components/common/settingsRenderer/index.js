@@ -20,10 +20,10 @@ function SettingsRenderer({
   onEdit = () => {},
   onDelete = () => {},
   onChangeSettings = () => {},
+  schemaEditMode,
+  onChangeProp,
+  readOnly = false,
 }) {
-  const { schemaEditMode } = useSelector((state) => state.config);
-  const dispatch = useDispatch();
-
   function dragEnded(result) {
     if (!result.destination) return;
     const reorderedSettings = reorder(
@@ -33,7 +33,6 @@ function SettingsRenderer({
     );
     onChangeSettings(reorderedSettings);
   }
-  console.log({ settings });
 
   if (!settings.length) {
     return <div>No Settings found</div>;
@@ -43,7 +42,7 @@ function SettingsRenderer({
       <Draggable
         array={settings}
         renderItem={(item, index) => (
-          <div className="flex flex-row gap-0 bg-primary-50 items-center w-full p-4 rounded-md">
+          <div className="flex flex-row gap-0 bg-white items-center w-full p-4 rounded-md">
             <DragIndicatorIcon />
             <div className="w-full">{item.label}</div>
             <div className="flex flex-row gap-2">
@@ -52,9 +51,7 @@ function SettingsRenderer({
             </div>
           </div>
         )}
-        onDragEnd={(newArray) => {
-          // console.log(newArray);
-        }}
+        onDragEnd={dragEnded}
       />
     );
   }
@@ -66,9 +63,12 @@ function SettingsRenderer({
           return (
             <div className="w-full" key={setting.id}>
               {renderComponents(setting, {
-                value: props[setting.id],
-                onChange: (val) => {
-                  dispatch(onChangeProp({ id: setting.id, value: val }));
+                props: {
+                  value: props[setting.id],
+                  readOnly,
+                  onChange: (val) => {
+                    onChangeProp({ id: setting.id, value: val });
+                  },
                 },
               })}
             </div>

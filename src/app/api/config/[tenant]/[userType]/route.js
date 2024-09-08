@@ -20,47 +20,23 @@ export async function GET(request, { params }) {
 export async function POST(request, { params }) {
   await connectToDatabase();
   const { tenant, userType } = params;
-  const { page, settings, props } = await request.json();
+  const { pages, settings, props } = await request.json();
 
   try {
     let config = await Config.findOne({ tenant, userType });
-
     if (!config) {
       config = new Config({
         tenant,
         userType,
-        settings: [],
-        props: {},
-        pages: [],
+        settings,
+        props,
+        pages,
       });
-    }
-
-    if (page) {
-      const pageConfig = config.pages.find((p) => p.name === page);
-      if (pageConfig) {
-        if (settings) {
-          pageConfig.settings = settings;
-        }
-        if (props) {
-          pageConfig.props = { ...pageConfig.props.toObject(), ...props };
-        }
-      } else {
-        config.pages.push({
-          name: page,
-          settings: settings || [],
-          props: props || {},
-          sections: [],
-        });
-      }
     } else {
-      if (settings) {
-        config.settings = settings;
-      }
-      if (props) {
-        config.props = { ...config.props.toObject(), ...props };
-      }
+      config.settings = settings;
+      config.props = props;
+      config.pages = pages;
     }
-
     let savedConfig = await config.save();
     return NextResponse.json({
       message: "Configuration updated successfully",

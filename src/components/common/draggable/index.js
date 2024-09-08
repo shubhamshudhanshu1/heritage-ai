@@ -32,7 +32,7 @@ function Draggable({ array, renderItem, onDragEnd }) {
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
-            {array.map((item, index) => (
+            {array.map((item = {}, index) => (
               <DndDraggable
                 key={item.id || item.name}
                 draggableId={item.id || item.name}

@@ -107,6 +107,11 @@ const Drawer = styled(MuiDrawer, {
 
 let publicRoutes = ["/auth/signin"];
 
+export const listItemsConfig = [
+  { text: "Theme", route: "/theme", icon: <InboxIcon /> },
+  { text: "Schema", route: "/settingSchema", icon: <MailIcon /> },
+];
+
 export default function ClientLayout({ children, session }) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
@@ -173,58 +178,32 @@ export default function ClientLayout({ children, session }) {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                  {["Theme"].map((text, index) => (
+                  {listItemsConfig.map((item, index) => (
                     <ListItem
-                      key={text}
+                      key={item.text}
                       disablePadding
                       sx={{ display: "block" }}
                     >
                       <ListItemButton
                         sx={[
-                          {
-                            minHeight: 48,
-                            px: 2.5,
-                          },
+                          { minHeight: 48, px: 2.5 },
                           open
-                            ? {
-                                justifyContent: "initial",
-                              }
-                            : {
-                                justifyContent: "center",
-                              },
+                            ? { justifyContent: "initial" }
+                            : { justifyContent: "center" },
                         ]}
-                        onClick={() => {
-                          router.push("/settings");
-                        }}
+                        onClick={() => router.push(item.route)}
                       >
                         <ListItemIcon
                           sx={[
-                            {
-                              minWidth: 0,
-                              justifyContent: "center",
-                            },
-                            open
-                              ? {
-                                  mr: 3,
-                                }
-                              : {
-                                  mr: "auto",
-                                },
+                            { minWidth: 0, justifyContent: "center" },
+                            open ? { mr: 3 } : { mr: "auto" },
                           ]}
                         >
-                          {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                          {item.icon}
                         </ListItemIcon>
                         <ListItemText
-                          primary={text}
-                          sx={[
-                            open
-                              ? {
-                                  opacity: 1,
-                                }
-                              : {
-                                  opacity: 0,
-                                },
-                          ]}
+                          primary={item.text}
+                          sx={[open ? { opacity: 1 } : { opacity: 0 }]}
                         />
                       </ListItemButton>
                     </ListItem>
