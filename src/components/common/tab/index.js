@@ -20,13 +20,10 @@ TabPanel.propTypes = {
 };
 
 const CustomTabs = ({ tabs, onChange, value }) => {
-  // Find the index corresponding to the current id (value)
   const selectedIndex = tabs.findIndex((tab) => tab.id === value);
-
   const handleChange = (event, newIndex) => {
-    // Convert the index to the corresponding id
     const newValue = tabs[newIndex].id;
-    onChange(newValue); // Call the onChange handler with the id
+    onChange(newValue);
   };
 
   return (
@@ -60,7 +57,7 @@ CustomTabs.propTypes = {
     })
   ).isRequired,
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired, // `value` is now a string id
+  value: PropTypes.string.isRequired,
 };
 
 export default CustomTabs;

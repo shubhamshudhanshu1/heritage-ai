@@ -25,6 +25,8 @@ import { Provider, useSelector } from "react-redux";
 import Logout from "@/components/logout";
 import { useRouter, usePathname, redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const drawerWidth = 240;
 
@@ -133,6 +135,17 @@ export default function ClientLayout({ children, session }) {
     <SessionProvider>
       <Provider store={store}>
         <ThemeProvider theme={theme}>
+          <ToastContainer
+            position="bottom-left"
+            autoClose={3000} // Default timeout set to 3 seconds
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
           {isPublicRoute ? (
             <Box className="w-screen h-screen flex flex-col space-between items-center align-middle pt-20">
               {children}

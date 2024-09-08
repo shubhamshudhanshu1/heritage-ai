@@ -21,7 +21,6 @@ const ColorPicker = ({ label, value, onChange, ...props }) => {
 
   const handleColorChange = (newColor) => {
     setColor(newColor.hex);
-    // onChange(newColor.hex);
   };
 
   const open = Boolean(anchorEl);

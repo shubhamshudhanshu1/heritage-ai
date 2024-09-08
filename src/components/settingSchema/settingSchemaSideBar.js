@@ -3,13 +3,19 @@ import React, { useState, useEffect } from "react";
 import Tabs from "../common/tab";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSettingSchemas } from "@/redux/slices/settingSchemaSlice";
+import {
+  deleteSettingSchema,
+  fetchSettingSchemas,
+  saveSettingSchema,
+} from "@/redux/slices/settingSchemaSlice";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 import RenderSchema from "./renderSchema";
 import { Box, Button, FormControl, TextField, Typography } from "@mui/material";
 import CommonLabel from "../common/label";
 import { useSession } from "next-auth/react";
+import { toast } from "react-toastify";
 
 const SideBarFooter = ({ children }) => {
   return (
@@ -25,7 +31,7 @@ const SideBarHeader = ({ children }) => {
   );
 };
 
-const Sidebar = (props) => {
+const Sidebar = () => {
   const [activeTab, setActiveTab] = useState("page");
   const [editingSchema, setEditingSchema] = useState(null);
   const dispatch = useDispatch();
@@ -34,13 +40,8 @@ const Sidebar = (props) => {
   const tenant = useSelector((state) => state.config.tenant);
 
   useEffect(() => {
-    if (session.user.tenant) {
-      dispatch(
-        fetchSettingSchemas({
-          tenantName: session.user.tenant,
-          type: activeTab,
-        })
-      );
+    if (session.user.tenant && activeTab) {
+      fetchSchemas(session.user.tenant, activeTab);
     }
   }, [session.user.tenant, activeTab, dispatch]);
 
@@ -53,18 +54,49 @@ const Sidebar = (props) => {
     }));
   };
 
+  const isFormValid = () => {
+    return editingSchema?.name && editingSchema?.slug;
+  };
+
+  const onSaveSchema = () => {
+    if (!isFormValid()) {
+      toast.error("Please fill all required fields.");
+      return;
+    }
+    dispatch(saveSettingSchema(editingSchema))
+      .then(async (res) => {
+        fetchSchemas();
+        setEditingSchema(null);
+        toast.success("Updated successfully!");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const fetchSchemas = (tenantName = session.user.tenant, type = activeTab) => {
+    dispatch(
+      fetchSettingSchemas({
+        tenantName,
+        type,
+      })
+    );
+  };
+
   const handleAddNewItem = () => {
     setEditingSchema({
       name: "",
       type: activeTab,
       slug: "",
-      tenant,
+      tenantName: session.user.tenant,
       settings: [],
     });
   };
 
-  const handleDeleteItem = (index) => {
-    // Implement deletion logic
+  const handleDeleteItem = (id) => {
+    dispatch(deleteSettingSchema(id)).then((res) => {
+      toast.success("Deleted successfully!");
+    });
   };
 
   const renderAddNewItemForm = () => (
@@ -83,21 +115,19 @@ const Sidebar = (props) => {
 
   const renderTabContent = () => {
     return (
-      <div className="mt-4">
+      <div className="mt-4 flex flex-col gap-4">
         {settings.length ? (
-          settings.map((setting, index) => (
+          settings.map((item, index) => (
             <div
               key={`${activeTab}-${index}`}
-              className="flex flex-row gap-2 items-center justify-between w-full bg-primary-50 p-4 rounded-sm"
+              className="flex flex-row gap-0 bg-white items-center w-full p-4 rounded-md"
             >
-              <div className="flex flex-row gap-2 items-center">
-                <DragIndicatorIcon />
-                <div>{setting.label || `Item ${index + 1}`}</div>
+              <DragIndicatorIcon />
+              <div className="w-full">{item.name}</div>
+              <div className="flex flex-row gap-2">
+                <EditNoteOutlinedIcon onClick={() => setEditingSchema(item)} />
+                <CloseOutlinedIcon onClick={() => handleDeleteItem(item._id)} />
               </div>
-              <CloseOutlinedIcon
-                onClick={() => handleDeleteItem(index)}
-                className="cursor-pointer"
-              />
             </div>
           ))
         ) : (
@@ -151,9 +181,10 @@ const Sidebar = (props) => {
         levelJson={editingSchema}
         path={[]}
         schemaEditMode={true}
-        onChangeSettings={(newSettings) =>
-          handleValueChange("settings", newSettings)
-        }
+        onChangeSettings={(newSettings) => {
+          console.log({ newSettings });
+          handleValueChange("settings", newSettings);
+        }}
       />
     </div>
   );
@@ -180,11 +211,19 @@ const Sidebar = (props) => {
       <div className="p-4 flex-grow bg-slate-100">
         {editingSchema ? renderEditingContent() : renderTab()}
       </div>
-      <SideBarFooter>
-        <Button variant="contained" color="primary" fullWidth>
-          Save Changes
-        </Button>
-      </SideBarFooter>
+      {editingSchema ? (
+        <SideBarFooter>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={!isFormValid()}
+            onClick={() => onSaveSchema()}
+          >
+            Save Changes
+          </Button>
+        </SideBarFooter>
+      ) : null}
     </Box>
   );
 };

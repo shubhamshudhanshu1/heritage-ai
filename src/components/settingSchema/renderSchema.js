@@ -23,13 +23,11 @@ function RenderSchema({
   const dispatch = useDispatch();
   const { settings = [], props = {} } = levelJson;
 
-  // Handler for adding new settings
   const handleAddSchema = (newSchema) => {
     dispatch(addSettings({ path, newSetting: newSchema }));
     onChangeSettings([...settings, newSchema]);
   };
 
-  // Handler for editing existing settings
   const editSchema = (editedSchema) => {
     if (activeSchemaIndex !== null) {
       const updatedSettings = settings.map((setting, index) =>
@@ -46,27 +44,23 @@ function RenderSchema({
     }
   };
 
-  // Handler for deleting settings
   const handleDeleteSetting = (index) => {
     const updatedSettings = settings.filter((_, i) => i !== index);
     dispatch(deleteSettings({ path, index }));
     onChangeSettings(updatedSettings);
   };
 
-  // Handler for overriding all settings
   const handleOverrideSettings = (newSettings) => {
     dispatch(overrideSettings({ path, settings: newSettings }));
     onChangeSettings(newSettings);
   };
 
-  // Handler for adding or updating props
   const handleAddOrUpdateProp = (propKey, propValue) => {
     const updatedProps = { ...props, [propKey]: propValue };
     dispatch(addOrUpdateProp({ path, propKey, propValue }));
     onChangeProp(updatedProps);
   };
 
-  // Handler for deleting props
   const handleDeleteProp = (propKey) => {
     const { [propKey]: _, ...updatedProps } = props;
     dispatch(deleteProp({ path, propKey }));

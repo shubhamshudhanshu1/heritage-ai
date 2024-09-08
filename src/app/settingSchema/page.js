@@ -6,13 +6,6 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 function Schema() {
-  const { data: session = { user: {} } } = useSession();
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (session.user.tenant)
-      dispatch(fetchSettingSchemas({ tenantName: session.user.tenant }));
-  }, [session.user.tenant]);
   return <SettingSchemaSidebar />;
 }
 

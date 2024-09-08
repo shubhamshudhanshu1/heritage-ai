@@ -31,7 +31,7 @@ let INITIAL_SCHEMA = {
   options: [],
 };
 
-let INITIAL_OPTIONS = [{ label: "", value: "" }];
+let INITIAL_OPTIONS = [];
 
 const AddSchema = ({
   onAddSchema,
@@ -59,6 +59,10 @@ const AddSchema = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setErrors((s) => {
+      delete s[name];
+      return s;
+    });
     setNewSchema((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -91,13 +95,12 @@ const AddSchema = ({
 
   const onClose = () => {
     setModalOpen(false);
-    setOptions(INITIAL_OPTIONS); // Reset options on close
-    setErrors({}); // Clear errors on close
+    setOptions(INITIAL_OPTIONS);
+    setErrors({});
   };
 
   const handleSubmit = () => {
-    if (!validateForm()) return; // Prevent submission if validation fails
-
+    if (!validateForm()) return;
     const updatedSchema = {
       ...newSchema,
       options,

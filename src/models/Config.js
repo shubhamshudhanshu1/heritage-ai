@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const OptionSchema = new mongoose.Schema({
   value: { type: String, required: true },
-  text: { type: String, required: true },
+  label: { type: String, required: true },
 });
 
 export const SettingSchema = new mongoose.Schema({

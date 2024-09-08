@@ -166,9 +166,7 @@ function Renderer({ rendererObject = {}, level, path = [], schemaEditMode }) {
                   />
                 </div>
               )}
-              onDragEnd={(newArray) => {
-                // Handle reordering here if needed
-              }}
+              onDragEnd={(newArray) => {}}
             />
           ) : childKey ? (
             <div>No {childKey}</div>

@@ -68,7 +68,6 @@ function LevelSettings({ levelJson, path = [] }) {
           handleOverrideSettings(newSettings);
         }}
         onChangeProp={(key, value) => {
-          // dispatch(onChangeProp());
           handleAddOrUpdateProp(key, value);
         }}
         onDeleteProp={(key) => {

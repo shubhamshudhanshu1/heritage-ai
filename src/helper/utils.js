@@ -51,10 +51,8 @@ export const addChildUtil = (schema, path, childKey, newChild) => {
 
   if (target) {
     if (Array.isArray(target[childKey])) {
-      // If the key already exists as an array, push the new child
       _.set(schema, [...path, childKey], [...target[childKey], newChild]);
     } else {
-      // If the key doesn't exist or is not an array, set it as an array with the new child
       _.set(schema, [...path, childKey], [newChild]);
     }
   }
@@ -77,11 +75,9 @@ export const updateChildAtIndexUtil = (
   const target = _.get(schema, [...path, childKey]);
 
   if (Array.isArray(target) && index < target.length) {
-    // Create a new array with the updated child at the specified index
     const updatedArray = [...target];
     updatedArray[index] = updatedChild;
 
-    // Set the updated array back to the schema at the given path
     _.set(schema, [...path, childKey], updatedArray);
   }
 

@@ -27,11 +27,11 @@ const theme = createTheme({
       styleOverrides: {
         input: {
           "&:-webkit-autofill": {
-            WebkitBoxShadow: "0 0 0 1000px transparent inset", // Transparent autofill background
-            WebkitTextFillColor: "inherit", // Keep text color as is during autofill
+            WebkitBoxShadow: "0 0 0 1000px transparent inset",
+            WebkitTextFillColor: "inherit",
           },
           "&::selection": {
-            backgroundColor: "transparent", // Transparent selection background
+            backgroundColor: "transparent",
           },
         },
       },
@@ -39,7 +39,7 @@ const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         input: {
-          padding: "10px", // Adjust padding here
+          padding: "10px",
         },
       },
     },

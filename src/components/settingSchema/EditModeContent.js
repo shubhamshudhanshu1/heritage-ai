@@ -1,4 +1,3 @@
-// EditModeContent.js
 import React, { useState } from "react";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -14,13 +13,10 @@ const EditModeContent = ({ activeTab, setEditingSchema, ...props }) => {
   const [newItem, setNewItem] = useState("");
 
   const handleAddNewItem = () => {
-    // Implement the logic to add a new item
     setEditingSchema({ name: "", type: activeTab, slug: "", settings: [] });
   };
 
-  const handleDeleteItem = (index) => {
-    // Implement the logic to delete an item
-  };
+  const handleDeleteItem = (index) => {};
 
   const renderAddNewItemForm = () => (
     <div className="mt-4">

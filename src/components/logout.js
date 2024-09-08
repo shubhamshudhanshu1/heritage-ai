@@ -22,9 +22,7 @@ function Logout({ username }) {
     setName(name);
   }, [username]);
 
-  const onLogout = () => {
-    // logOutUser();
-  };
+  const onLogout = () => {};
 
   const handleClick = async (event) => {
     await signOut();

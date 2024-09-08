@@ -35,7 +35,6 @@ const Sidebar = () => {
     }
   }, [session.user.tenant]);
 
-  // console.log({ config, userType, tenant });
   return (
     <Box className="w-[400px] bg-white shadow-lg flex flex-col overflow-scroll py-4">
       <FormControl fullWidth margin="normal" required className="px-4">

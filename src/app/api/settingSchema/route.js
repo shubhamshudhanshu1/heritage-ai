@@ -1,17 +1,22 @@
 import { connectToDatabase } from "@/helper/db";
 import SettingSchema from "@/models/SettingSchema";
 
-// GET handler
 export async function GET(request) {
   try {
-    const url = new URL(request.url); // Use request.nextUrl instead in Next.js App Router
+    const url = new URL(request.url);
+
+    let slug = url.searchParams.get("slug");
+
     const params = {
       tenantName: url.searchParams.get("tenantName"),
-      slug: url.searchParams.get("slug"),
       type: url.searchParams.get("type"),
     };
 
-    await connectToDatabase(); // Connect to database
+    if (slug) {
+      params.slug = slug;
+    }
+
+    await connectToDatabase();
     const data = await SettingSchema.find(params);
 
     return new Response(JSON.stringify(data), {
@@ -26,26 +31,51 @@ export async function GET(request) {
   }
 }
 
-// POST handler
 export async function POST(request) {
   try {
-    const { name, slug, route, type, tenant, settings } = await request.json();
+    const { _id, name, slug, route, type, tenantName, settings } =
+      await request.json();
 
-    await connectToDatabase(); // Connect to database
-    const newSetting = new SettingSchema({
-      name,
-      slug,
-      route,
-      type,
-      tenant,
-      settings,
-    });
-    const savedSetting = await newSetting.save();
+    await connectToDatabase();
 
-    return new Response(JSON.stringify(savedSetting), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    let response;
+    if (_id) {
+      const updatedSetting = await SettingSchema.findByIdAndUpdate(
+        _id,
+        { name, slug, route, type, tenantName, settings },
+        { new: true }
+      );
+
+      if (!updatedSetting) {
+        return new Response(JSON.stringify({ message: "Setting not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      response = new Response(JSON.stringify(updatedSetting), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } else {
+      const newSetting = new SettingSchema({
+        name,
+        slug,
+        route,
+        type,
+        tenantName,
+        settings,
+      });
+
+      const savedSetting = await newSetting.save();
+
+      response = new Response(JSON.stringify(savedSetting), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return response;
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
@@ -54,49 +84,9 @@ export async function POST(request) {
   }
 }
 
-// PUT handler
-export async function PUT(request) {
-  try {
-    const url = new URL(request.url); // Use request.nextUrl instead in Next.js App Router
-    const id = url.searchParams.get("id");
-
-    if (!id) {
-      return new Response(JSON.stringify({ message: "ID is required" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const updates = await request.json();
-
-    await connectToDatabase(); // Connect to database
-    const updatedSetting = await SettingSchema.findByIdAndUpdate(id, updates, {
-      new: true,
-    });
-
-    if (!updatedSetting) {
-      return new Response(JSON.stringify({ message: "Setting not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify(updatedSetting), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-}
-
-// DELETE handler
 export async function DELETE(request) {
   try {
-    const url = new URL(request.url); // Use request.nextUrl instead in Next.js App Router
+    const url = new URL(request.url);
     const id = url.searchParams.get("id");
 
     if (!id) {
@@ -106,7 +96,7 @@ export async function DELETE(request) {
       });
     }
 
-    await connectToDatabase(); // Connect to database
+    await connectToDatabase();
     const deletedSetting = await SettingSchema.findByIdAndDelete(id);
 
     if (!deletedSetting) {
