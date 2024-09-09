@@ -1,9 +1,5 @@
-"use client";
-import SettingSchemaSidebar from "@/components/settingSchema/settingSchemaSideBar";
-import { fetchSettingSchemas } from "@/redux/slices/settingSchemaSlice";
-import { useSession } from "next-auth/react";
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import SettingSchemaSidebar from "@/components/settingSchema/Sidebar";
+import React from "react";
 
 function Schema() {
   return <SettingSchemaSidebar />;

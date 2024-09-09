@@ -9,7 +9,7 @@ import {
   deleteProp,
 } from "@/redux/slices/configSlice";
 import SettingsRenderer from "../common/settingsRenderer";
-import AddSchema from "./addSchema";
+import AddSchema from "./AddSchema";
 
 function RenderSchema({
   levelJson = {},

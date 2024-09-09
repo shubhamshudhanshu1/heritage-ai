@@ -10,7 +10,7 @@ import {
   onChangeProp,
 } from "@/redux/slices/configSlice";
 import SettingsRenderer from "@/components/common/settingsRenderer";
-import AddSchema from "../settingSchema/addSchema";
+import AddSchema from "../settingSchema/AddSchema";
 
 function LevelSettings({ levelJson, path = [] }) {
   const [modalOpen, setModalOpen] = useState(false);

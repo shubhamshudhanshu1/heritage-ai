@@ -136,15 +136,11 @@ export default function ClientLayout({ children, session }) {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <ToastContainer
-            position="bottom-left"
-            autoClose={3000} // Default timeout set to 3 seconds
-            hideProgressBar={false}
+            position="bottom-right"
+            autoClose={1000}
+            hideProgressBar={true}
             newestOnTop={false}
             closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
           />
           {isPublicRoute ? (
             <Box className="w-screen h-screen flex flex-col space-between items-center align-middle pt-20">

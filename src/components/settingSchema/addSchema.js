@@ -217,7 +217,7 @@ const AddSchema = ({
             {newSchema.type === "select" && (
               <>
                 <Typography variant="subtitle1" gutterBottom>
-                  Add Options
+                  Options
                 </Typography>
                 {options.map((option, index) => (
                   <div
@@ -256,7 +256,7 @@ const AddSchema = ({
                   onClick={addNewOptionRow}
                   fullWidth
                 >
-                  Add Another Option
+                  Add Option
                 </Button>
               </>
             )}
