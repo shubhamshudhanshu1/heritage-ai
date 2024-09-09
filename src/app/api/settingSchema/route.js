@@ -6,11 +6,14 @@ export async function GET(request) {
     const url = new URL(request.url);
 
     let slug = url.searchParams.get("slug");
-
+    let type = url.searchParams.get("type");
     const params = {
       tenantName: url.searchParams.get("tenantName"),
-      type: url.searchParams.get("type"),
     };
+
+    if (type) {
+      params.type = type;
+    }
 
     if (slug) {
       params.slug = slug;

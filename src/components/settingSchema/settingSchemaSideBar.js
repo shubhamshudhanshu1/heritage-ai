@@ -16,8 +16,9 @@ import { Box, Button, FormControl, TextField, Typography } from "@mui/material";
 import CommonLabel from "../common/label";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
+import GlobalSettings from "./globalSettings";
 
-const SideBarFooter = ({ children }) => {
+export const SideBarFooter = ({ children }) => {
   return (
     <div className="sticky bottom-0 z-50 bg-white p-4 shadow-sm">
       {children}
@@ -36,16 +37,23 @@ const Sidebar = () => {
   const [editingSchema, setEditingSchema] = useState(null);
   const dispatch = useDispatch();
   const { data: session = { user: {} } } = useSession();
-  const settings = useSelector((state) => state.settingSchema.data);
-  const tenant = useSelector((state) => state.config.tenant);
+  const { data: settings, loading } = useSelector(
+    (state) => state.settingSchema
+  );
 
+  const isGlobal = activeTab === "global";
+
+  const editingPage = !isGlobal && editingSchema;
   useEffect(() => {
     if (session.user.tenant && activeTab) {
       fetchSchemas(session.user.tenant, activeTab);
     }
   }, [session.user.tenant, activeTab, dispatch]);
 
-  const handleTabChange = (newTab) => setActiveTab(newTab);
+  const handleTabChange = (newTab) => {
+    setEditingSchema(null);
+    setActiveTab(newTab);
+  };
 
   const handleValueChange = (key, value) => {
     setEditingSchema((prevSchema) => ({
@@ -58,12 +66,13 @@ const Sidebar = () => {
     return editingSchema?.name && editingSchema?.slug;
   };
 
-  const onSaveSchema = () => {
-    if (!isFormValid()) {
+  const onSaveSchema = (isValid = false, payload) => {
+    if (!isValid && !isFormValid()) {
       toast.error("Please fill all required fields.");
       return;
     }
-    dispatch(saveSettingSchema(editingSchema))
+    dispatch(saveSettingSchema(payload || editingSchema))
+      .unwrap()
       .then(async (res) => {
         fetchSchemas();
         setEditingSchema(null);
@@ -99,21 +108,44 @@ const Sidebar = () => {
     });
   };
 
-  const renderAddNewItemForm = () => (
-    <div className="mt-4">
-      <Button
-        variant="outlined"
-        color="primary"
-        fullWidth
-        onClick={handleAddNewItem}
-        sx={{ mt: 2 }}
-      >
-        Add {activeTab === "page" ? "Page" : "Section"}
-      </Button>
-    </div>
-  );
+  const renderAddNewItemForm = () => {
+    if (isGlobal) {
+      return null;
+    }
+    return (
+      <div className="mt-4">
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          onClick={handleAddNewItem}
+          sx={{ mt: 2 }}
+        >
+          Add {activeTab}
+        </Button>
+      </div>
+    );
+  };
 
   const renderTabContent = () => {
+    if (loading) {
+      return <div className="mt-4 flex flex-col gap-4">Fetching...</div>;
+    }
+    if (isGlobal) {
+      return (
+        <div className="mt-4 flex flex-col gap-4">
+          <RenderSchema
+            levelJson={{ ...settings[0], ...editingSchema } || {}}
+            path={[]}
+            schemaEditMode={true}
+            onChangeSettings={(newSettings) => {
+              console.log({ newSettings });
+              handleValueChange("settings", newSettings);
+            }}
+          />
+        </div>
+      );
+    }
     return (
       <div className="mt-4 flex flex-col gap-4">
         {settings.length ? (
@@ -130,9 +162,9 @@ const Sidebar = () => {
               </div>
             </div>
           ))
-        ) : (
-          <div>No {activeTab === "page" ? "Pages" : "Sections"} found.</div>
-        )}
+        ) : !isGlobal ? (
+          <div>No {activeTab} settings found.</div>
+        ) : null}
         {renderAddNewItemForm()}
       </div>
     );
@@ -141,6 +173,11 @@ const Sidebar = () => {
   const renderTab = () => (
     <Tabs
       tabs={[
+        {
+          label: "Global",
+          content: renderTabContent(),
+          id: "global",
+        },
         { label: "Pages", content: renderTabContent(), id: "page" },
         { label: "Sections", content: renderTabContent(), id: "section" },
       ]}
@@ -177,6 +214,7 @@ const Sidebar = () => {
           />
         </FormControl>
       </div>
+      <CommonLabel>Settings</CommonLabel>
       <RenderSchema
         levelJson={editingSchema}
         path={[]}
@@ -192,7 +230,7 @@ const Sidebar = () => {
   return (
     <Box className="w-[350px] h-full bg-white shadow-lg flex flex-col overflow-y-auto">
       <SideBarHeader>
-        {editingSchema ? (
+        {editingPage ? (
           <div
             className="flex flex-row gap-3 items-center cursor-pointer"
             onClick={() => setEditingSchema(null)}
@@ -209,9 +247,9 @@ const Sidebar = () => {
         )}
       </SideBarHeader>
       <div className="p-4 flex-grow bg-slate-100">
-        {editingSchema ? renderEditingContent() : renderTab()}
+        {editingPage ? renderEditingContent() : renderTab()}
       </div>
-      {editingSchema ? (
+      {editingPage ? (
         <SideBarFooter>
           <Button
             variant="contained"
@@ -219,6 +257,26 @@ const Sidebar = () => {
             fullWidth
             disabled={!isFormValid()}
             onClick={() => onSaveSchema()}
+          >
+            Save Changes
+          </Button>
+        </SideBarFooter>
+      ) : isGlobal ? (
+        <SideBarFooter>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={() => {
+              onSaveSchema(true, {
+                tenantName: session.user.tenant,
+                slug: "global",
+                name: "global",
+                type: activeTab,
+                ...settings[0],
+                ...editingSchema,
+              });
+            }}
           >
             Save Changes
           </Button>

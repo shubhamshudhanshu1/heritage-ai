@@ -4,6 +4,7 @@ const initialState = {
   data: [],
   status: "idle",
   error: null,
+  loading: false,
 };
 
 const API_URL = "/api/settingSchema";
@@ -67,14 +68,17 @@ const settingSchemaSlice = createSlice({
     builder
       .addCase(fetchSettingSchemas.pending, (state) => {
         state.status = "loading";
+        state.loading = true;
       })
       .addCase(fetchSettingSchemas.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.data = action.payload;
+        state.loading = false;
       })
       .addCase(fetchSettingSchemas.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+        state.loading = false;
       })
       .addCase(saveSettingSchema.fulfilled, (state, action) => {})
       .addCase(deleteSettingSchema.fulfilled, (state, action) => {

@@ -9,7 +9,7 @@ const settingSchema = new Schema(
     route: { type: String, unique: true },
     type: {
       type: String,
-      enum: ["section", "page"],
+      enum: ["section", "page", "global"],
       required: true,
     },
     tenantName: {

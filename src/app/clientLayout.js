@@ -21,7 +21,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import theme from "../theme/index";
 import store from "@/redux/store";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import Logout from "@/components/logout";
 import { useRouter, usePathname, redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
@@ -110,7 +110,7 @@ const Drawer = styled(MuiDrawer, {
 let publicRoutes = ["/auth/signin"];
 
 export const listItemsConfig = [
-  { text: "Theme", route: "/theme", icon: <InboxIcon /> },
+  { text: "Config", route: "/config", icon: <InboxIcon /> },
   { text: "Schema", route: "/settingSchema", icon: <MailIcon /> },
 ];
 
