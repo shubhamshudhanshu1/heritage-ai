@@ -1,6 +1,20 @@
 import mongoose from "mongoose";
-import { SettingSchema } from "./Config";
 const { Schema } = mongoose;
+
+const OptionSchema = new mongoose.Schema({
+  value: { type: String, required: true },
+  label: { type: String, required: true },
+});
+
+const SettingSchema = new mongoose.Schema({
+  id: { type: String, required: true },
+  type: { type: String, required: true },
+  label: { type: String, required: true },
+  default: { type: mongoose.Schema.Types.Mixed, required: true },
+  info: { type: String, default: "" },
+  category: { type: String, default: "" },
+  options: [OptionSchema],
+});
 
 // Assuming SettingSchema is defined somewhere else and is being imported
 const settingSchema = new Schema(

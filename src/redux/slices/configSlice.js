@@ -29,9 +29,7 @@ export const updateConfig = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     const state = getState();
     const { tenant, userType } = state.config;
-    console.log(state.config, "state.config");
     const { settings, props, pages = [] } = state.config?.config;
-
     try {
       const response = await fetch(`/api/config/${tenant}/${userType}`, {
         method: "POST",
@@ -61,9 +59,7 @@ const initialState = {
   userType: null,
   page: null,
   config: {
-    settings: [],
     props: {},
-    sections: [],
   },
   loading: false,
   error: null,

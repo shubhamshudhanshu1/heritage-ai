@@ -115,6 +115,8 @@ const SettingSchemaSidebar = () => {
     setDeleteModalOpen(false);
   };
 
+  console.log({ isGlobal });
+
   const renderTabContent = () => {
     if (fetchingSchema) {
       return <div className="mt-4">Fetching...</div>;
@@ -152,7 +154,7 @@ const SettingSchemaSidebar = () => {
         onBackClick={() => setEditingSchema(null)}
       />
       <div className="flex-grow overflow-y-auto p-4">
-        {isEditing ? (
+        {isEditing && !isGlobal ? (
           renderTabContent()
         ) : (
           <Tabs

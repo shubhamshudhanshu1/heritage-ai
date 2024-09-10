@@ -83,3 +83,19 @@ export const updateChildAtIndexUtil = (
 
   return schema;
 };
+
+export function segregateByTypeAndSlug(data) {
+  return data.reduce((acc, item) => {
+    const { type, slug } = item;
+
+    // Initialize the type key if it doesn't exist
+    if (!acc[type]) {
+      acc[type] = {};
+    }
+
+    // Assign the item to its slug within the type
+    acc[type][slug] = item;
+
+    return acc;
+  }, {});
+}

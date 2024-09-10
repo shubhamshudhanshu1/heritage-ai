@@ -12,7 +12,7 @@ const SidebarHeader = ({ isEditing, activeTab, onBackClick, title = "" }) => {
         >
           <ArrowBackIosNewOutlinedIcon />
           <Typography className="font-bold text-sm" variant="h6">
-            Editing {activeTab}
+            {title || `Editing ${activeTab}`}
           </Typography>
         </div>
       ) : (

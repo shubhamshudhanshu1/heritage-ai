@@ -91,15 +91,17 @@ function RenderSchema({
         }}
         readOnly={false}
       />
-      <div className="mt-4">
-        <AddSchema
-          defaultSchema={settings[activeSchemaIndex] || {}}
-          onAddSchema={handleAddSchema}
-          modalOpen={modalOpen}
-          setModalOpen={setModalOpen}
-          onEditSchema={editSchema}
-        />
-      </div>
+      {schemaEditMode ? (
+        <div className="mt-4">
+          <AddSchema
+            defaultSchema={settings[activeSchemaIndex] || {}}
+            onAddSchema={handleAddSchema}
+            modalOpen={modalOpen}
+            setModalOpen={setModalOpen}
+            onEditSchema={editSchema}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

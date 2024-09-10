@@ -4,7 +4,7 @@ import RenderSchema from "./RenderSchema";
 import SettingListItem from "./SettingsListItem";
 
 const TabContent = ({
-  settings,
+  settings = [],
   activeTab,
   onEdit,
   onDelete,
@@ -22,7 +22,7 @@ const TabContent = ({
         <RenderSchema
           levelJson={{ ...settings[0], ...editingSchema } || {}}
           path={[]}
-          schemaEditMode={true}
+          schemaEditMode={false}
           onChangeSettings={(newSettings) =>
             handleValueChange("settings", newSettings)
           }

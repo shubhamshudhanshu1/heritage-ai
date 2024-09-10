@@ -1,4 +1,5 @@
 import { fetchSettingSchemasApi } from "@/helper/serverCall";
+import { segregateByTypeAndSlug, updateChildAtIndexUtil } from "@/helper/utils";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -6,6 +7,7 @@ const initialState = {
   status: "idle",
   error: null,
   loading: false,
+  schemaMap: {},
 };
 
 const API_URL = "/api/settingSchema";
@@ -68,6 +70,7 @@ const settingSchemaSlice = createSlice({
       })
       .addCase(fetchSettingSchemas.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.schemaMap = segregateByTypeAndSlug(action.payload);
         state.data = action.payload;
         state.loading = false;
       })

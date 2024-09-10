@@ -3,11 +3,19 @@ import { connectToDatabase } from "@/helper/db";
 import Tenant from "@/models/Tenant";
 import UserType from "@/models/UserType";
 
-export async function GET() {
+export async function GET(request) {
   await connectToDatabase();
 
+  const { searchParams } = request.nextUrl;
+  const tenantId = searchParams.get("tenantId");
+  const tenantName = searchParams.get("tenantName");
+
+  const filter = {};
+  if (tenantId) filter.tenantId = id;
+  if (tenantName) filter.tenantName = tenantName;
+
   try {
-    const tenants = await Tenant.find({});
+    const tenants = await Tenant.find(filter).populate("userTypes");
     return NextResponse.json({ success: true, data: tenants });
   } catch (error) {
     return NextResponse.json(
