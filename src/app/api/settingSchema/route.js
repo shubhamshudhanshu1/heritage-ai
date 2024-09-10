@@ -1,5 +1,6 @@
 import { connectToDatabase } from "@/helper/db";
 import SettingSchema from "@/models/SettingSchema";
+import mongoose from "mongoose";
 
 export async function GET(request) {
   try {
@@ -7,10 +8,11 @@ export async function GET(request) {
 
     let slug = url.searchParams.get("slug");
     let type = url.searchParams.get("type");
-    const params = {
-      tenantName: url.searchParams.get("tenantName"),
-    };
-
+    let tenantName = url.searchParams.get("tenantName");
+    let params = {};
+    if (tenantName) {
+      params.tenantName = tenantName;
+    }
     if (type) {
       params.type = type;
     }
@@ -20,7 +22,7 @@ export async function GET(request) {
     }
 
     await connectToDatabase();
-    const data = await SettingSchema.find(params);
+    const data = await SettingSchema.find(params).populate("blocks");
 
     return new Response(JSON.stringify(data), {
       status: 200,
@@ -36,16 +38,29 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { _id, name, slug, route, type, tenantName, settings } =
-      await request.json();
+    const {
+      _id,
+      name,
+      slug,
+      route,
+      type,
+      tenantName,
+      settings,
+      blocks = [],
+    } = await request.json();
 
     await connectToDatabase();
 
+    const blockIds = blocks.map(
+      (block) => new mongoose.Types.ObjectId(block._id)
+    );
+
     let response;
+
     if (_id) {
       const updatedSetting = await SettingSchema.findByIdAndUpdate(
         _id,
-        { name, slug, route, type, tenantName, settings },
+        { name, slug, route, type, tenantName, settings, blocks: blockIds },
         { new: true }
       );
 
@@ -68,6 +83,7 @@ export async function POST(request) {
         type,
         tenantName,
         settings,
+        blocks: blockIds,
       });
 
       const savedSetting = await newSetting.save();

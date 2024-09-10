@@ -1,3 +1,4 @@
+import { fetchSettingSchemasApi } from "@/helper/serverCall";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -12,12 +13,7 @@ const API_URL = "/api/settingSchema";
 export const fetchSettingSchemas = createAsyncThunk(
   "settingSchema/fetchSettingSchemas",
   async (params) => {
-    const queryParams = new URLSearchParams(params).toString();
-    const response = await fetch(`${API_URL}?${queryParams}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch setting schemas");
-    }
-    return response.json();
+    return fetchSettingSchemasApi(params);
   }
 );
 

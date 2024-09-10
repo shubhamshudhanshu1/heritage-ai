@@ -24,10 +24,15 @@ const DeleteConfirmationModal = ({ open, onClose, onConfirm }) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onClose} color="primary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={onConfirm} color="secondary" autoFocus>
+        <Button
+          onClick={onConfirm}
+          color="primary"
+          variant="outlined"
+          autoFocus
+        >
           Delete
         </Button>
       </DialogActions>
