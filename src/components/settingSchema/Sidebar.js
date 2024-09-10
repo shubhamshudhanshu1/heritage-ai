@@ -79,6 +79,7 @@ const SettingSchemaSidebar = () => {
       };
     }
     dispatch(saveSettingSchema(payload))
+      .unwrap()
       .then(() => {
         fetchSchemas();
         setEditingSchema(null);
@@ -108,6 +109,7 @@ const SettingSchemaSidebar = () => {
 
   const confirmDeleteItem = () => {
     dispatch(deleteSettingSchema(deleteItemId))
+      .unwrap()
       .then(() => fetchSchemas())
       .catch(() => toast.error("Failed to delete"));
     setDeleteModalOpen(false);

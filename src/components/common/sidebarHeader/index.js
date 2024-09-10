@@ -2,7 +2,7 @@ import React from "react";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 import { Typography } from "@mui/material";
 
-const SidebarHeader = ({ isEditing, activeTab, onBackClick }) => {
+const SidebarHeader = ({ isEditing, activeTab, onBackClick, title = "" }) => {
   return (
     <div className="sticky top-0 z-50 bg-white p-4 shadow-sm">
       {isEditing ? (
@@ -17,7 +17,7 @@ const SidebarHeader = ({ isEditing, activeTab, onBackClick }) => {
         </div>
       ) : (
         <Typography className="font-bold text-sm" variant="h6">
-          Setting Schema
+          {title || "Setting Schema"}
         </Typography>
       )}
     </div>

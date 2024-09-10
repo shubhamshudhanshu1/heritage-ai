@@ -145,6 +145,7 @@ const SettingSchemaSidebar = () => {
   return (
     <div className="w-[400px] h-screen bg-slate-100 shadow-lg flex flex-col">
       <SidebarHeader
+        title="Configurations"
         isEditing={isEditing}
         activeTab={activeTab}
         onBackClick={() => setEditingSchema(null)}
