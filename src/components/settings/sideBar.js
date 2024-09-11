@@ -8,7 +8,11 @@ import { fetchSettingSchemas } from "@/redux/slices/settingSchemaSlice";
 import { FormControl, MenuItem, Select } from "@mui/material";
 import CommonLabel from "../common/label";
 import { fetchTenantByFilters } from "@/redux/slices/tenantSlice";
-import { fetchConfig, setUserType } from "@/redux/slices/configSlice";
+import {
+  fetchConfig,
+  setUserType,
+  updateConfig,
+} from "@/redux/slices/configSlice";
 import Renderer from "./renderer";
 
 const SettingSchemaSidebar = () => {
@@ -35,13 +39,13 @@ const SettingSchemaSidebar = () => {
     }
   }, [tenantName]);
 
-  const onSaveSchema = () => {};
+  const onSaveSchema = () => {
+    dispatch(updateConfig());
+  };
 
   const fetchSchemas = (tenantName) => {
     dispatch(fetchSettingSchemas({ tenantName }));
   };
-
-  console.log({ config });
 
   const renderUserTypeSelection = () => {
     return (

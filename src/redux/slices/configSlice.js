@@ -28,19 +28,14 @@ export const updateConfig = createAsyncThunk(
   "config/updateConfig",
   async (_, { getState, rejectWithValue }) => {
     const state = getState();
-    const { tenant, userType } = state.config;
-    const { settings, props, pages = [] } = state.config?.config;
+    const { tenant, userType, config } = state.config;
     try {
       const response = await fetch(`/api/config/${tenant}/${userType}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          settings,
-          props,
-          pages,
-        }),
+        body: JSON.stringify(config),
       });
 
       if (!response.ok) {

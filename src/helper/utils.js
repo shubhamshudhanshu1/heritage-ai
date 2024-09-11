@@ -1,3 +1,4 @@
+import { current } from "@reduxjs/toolkit";
 import CommonComponents from "../components/dynamic";
 import _ from "lodash";
 
@@ -67,30 +68,21 @@ export const updateChildAtIndexUtil = (
 };
 
 export const addOrUpdateChildPropUtil = (schema, path, propKey, propValue) => {
-  // Get the target child using the provided path
-  const target = _.get(schema, path);
-
+  const target = path.length === 0 ? schema : _.get(schema, path);
   if (target) {
-    // Ensure the props object exists
     if (!target.props) {
       target.props = {};
     }
-    // Add or update the prop key with the given value
     target.props[propKey] = propValue;
   }
-
   return schema;
 };
 
 export const deleteChildPropUtil = (schema, path, propKey) => {
-  // Get the target child using the provided path
   const target = _.get(schema, path);
-
   if (target && target.props && target.props.hasOwnProperty(propKey)) {
-    // Delete the prop key from the props object
     delete target.props[propKey];
   }
-
   return schema;
 };
 

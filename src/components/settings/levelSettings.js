@@ -44,7 +44,6 @@ function LevelSettings({ levelJson, path = [] }) {
   };
 
   const handleAddOrUpdateProp = (propKey, propValue) => {
-    console.log({ propKey, propValue });
     dispatch(addOrUpdateProp({ path, propKey, propValue }));
   };
 
