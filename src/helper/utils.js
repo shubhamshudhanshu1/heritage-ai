@@ -1,4 +1,3 @@
-import { cloneDeep } from "lodash";
 import CommonComponents from "../components/dynamic";
 import _ from "lodash";
 
@@ -24,31 +23,8 @@ export const getTarget = (schema, path) => {
   return target;
 };
 
-export const getTargetAndClone = (schema, path) => {
-  let target = schema;
-  for (let i = 0; i < path.length; i++) {
-    const key = path[i];
-    if (!target[key]) {
-      return { target: null, newSchema };
-    }
-    target = cloneDeep(target[key]);
-  }
-
-  return { target, schema };
-};
-
-export const updateAtPath = (obj, path, callback) => {
-  if (path.length === 0) return callback(obj);
-  const [key, ...rest] = path;
-  return {
-    ...obj,
-    [key]: updateAtPath(obj[key], rest, callback),
-  };
-};
-
 export const addChildUtil = (schema, path, childKey, newChild) => {
-  const target = _.get(schema, path);
-
+  const target = path.length === 0 ? schema : _.get(schema, path);
   if (target) {
     if (Array.isArray(target[childKey])) {
       _.set(schema, [...path, childKey], [...target[childKey], newChild]);
@@ -56,12 +32,21 @@ export const addChildUtil = (schema, path, childKey, newChild) => {
       _.set(schema, [...path, childKey], [newChild]);
     }
   }
-
   return schema;
 };
-
 export const deleteChildUtil = (schema, path) => {
-  _.unset(schema, path);
+  const parentPath = path.slice(0, -1);
+  const keyToRemove = path[path.length - 1];
+  const target = _.get(schema, parentPath);
+  if (Array.isArray(target)) {
+    _.set(
+      schema,
+      parentPath,
+      target.filter((_, index) => index !== keyToRemove)
+    );
+  } else {
+    _.unset(schema, path);
+  }
   return schema;
 };
 
@@ -73,12 +58,37 @@ export const updateChildAtIndexUtil = (
   updatedChild
 ) => {
   const target = _.get(schema, [...path, childKey]);
-
   if (Array.isArray(target) && index < target.length) {
     const updatedArray = [...target];
     updatedArray[index] = updatedChild;
-
     _.set(schema, [...path, childKey], updatedArray);
+  }
+  return schema;
+};
+
+export const addOrUpdateChildPropUtil = (schema, path, propKey, propValue) => {
+  // Get the target child using the provided path
+  const target = _.get(schema, path);
+
+  if (target) {
+    // Ensure the props object exists
+    if (!target.props) {
+      target.props = {};
+    }
+    // Add or update the prop key with the given value
+    target.props[propKey] = propValue;
+  }
+
+  return schema;
+};
+
+export const deleteChildPropUtil = (schema, path, propKey) => {
+  // Get the target child using the provided path
+  const target = _.get(schema, path);
+
+  if (target && target.props && target.props.hasOwnProperty(propKey)) {
+    // Delete the prop key from the props object
+    delete target.props[propKey];
   }
 
   return schema;
@@ -87,15 +97,10 @@ export const updateChildAtIndexUtil = (
 export function segregateByTypeAndSlug(data) {
   return data.reduce((acc, item) => {
     const { type, slug } = item;
-
-    // Initialize the type key if it doesn't exist
     if (!acc[type]) {
       acc[type] = {};
     }
-
-    // Assign the item to its slug within the type
     acc[type][slug] = item;
-
     return acc;
   }, {});
 }

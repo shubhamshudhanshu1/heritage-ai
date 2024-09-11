@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const UserTypeSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  description: { type: String },
+  label: { type: String, required: true },
 });
 
 const UserType =

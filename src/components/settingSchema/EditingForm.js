@@ -82,7 +82,6 @@ const EditingForm = ({
                   let filteredBlocks = editingSchema.blocks.filter((ele, i) => {
                     return i !== index;
                   });
-                  console.log(filteredBlocks);
                   handleValueChange("blocks", filteredBlocks);
                 }}
               />

@@ -1,10 +1,10 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import settingsSchema from "../../../schema";
+import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import {
   addChildUtil,
+  addOrUpdateChildPropUtil,
+  deleteChildPropUtil,
   deleteChildUtil,
   getTarget,
-  getTargetAndClone,
   updateChildAtIndexUtil,
 } from "@/helper/utils";
 
@@ -85,9 +85,6 @@ const configSlice = createSlice({
     resetConfig(state) {
       return initialState;
     },
-    overrideSettings(state, action) {
-      state.config.settings = action.payload;
-    },
     addSettings(state, action) {
       const { path, newSetting } = action.payload;
       const target = getTarget(state.config, path);
@@ -105,7 +102,6 @@ const configSlice = createSlice({
         }
       }
     },
-
     editSettings(state, action) {
       const { path, index, updatedSetting } = action.payload;
       const target = getTarget(state.config, path);
@@ -118,7 +114,6 @@ const configSlice = createSlice({
         }
       }
     },
-
     overrideSettings(state, action) {
       const { path, settings } = action.payload;
       const target = getTarget(state.config, path);
@@ -127,22 +122,22 @@ const configSlice = createSlice({
       }
     },
 
+    //props crud
     addOrUpdateProp(state, action) {
       const { path, propKey, propValue } = action.payload;
-      const target = getTarget(state.config, path);
-      if (target && target.props) {
-        target.props[propKey] = propValue;
-      }
+      state.config = addOrUpdateChildPropUtil(
+        state.config,
+        path,
+        propKey,
+        propValue
+      );
     },
-
     deleteProp(state, action) {
       const { path, propKey } = action.payload;
-      const target = getTarget(state.config, path);
-      if (target && target.props && target.props.hasOwnProperty(propKey)) {
-        delete target.props[propKey];
-      }
+      state.config = deleteChildPropUtil(state.config, path, propKey);
     },
 
+    // children crud
     addChild(state, action) {
       const { path, newChild, childKey } = action.payload;
       state.config = addChildUtil(state.config, path, childKey, newChild);

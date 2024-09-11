@@ -64,7 +64,7 @@ function SettingsRenderer({
             <div className="w-full" key={setting.id}>
               {renderComponents(setting, {
                 props: {
-                  value: props[setting.id],
+                  value: props[setting.id] || setting.default,
                   readOnly,
                   onChange: (val) => {
                     onChangeProp({ id: setting.id, value: val });

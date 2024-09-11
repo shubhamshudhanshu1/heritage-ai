@@ -115,8 +115,6 @@ const SettingSchemaSidebar = () => {
     setDeleteModalOpen(false);
   };
 
-  console.log({ isGlobal });
-
   const renderTabContent = () => {
     if (fetchingSchema) {
       return <div className="mt-4">Fetching...</div>;

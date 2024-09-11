@@ -2,13 +2,15 @@ import PropTypes from "prop-types";
 import { Checkbox as MuiCheckbox } from "@mui/material";
 import CommonLabel from "@/components/common/label";
 
-const Checkbox = ({ label, checked, onChange, ...props }) => {
+const Checkbox = ({ label, value, onChange, ...props }) => {
   return (
     <div className="flex flex-row items-center justify-start gap-2">
       <MuiCheckbox
-        checked={checked}
-        onChange={onChange}
+        onChange={(e) => {
+          onChange(e.target.checked);
+        }}
         {...props}
+        checked={value}
         sx={{ padding: 0 }}
       />
       <CommonLabel info={props.info || ""}>{label}</CommonLabel>

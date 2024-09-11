@@ -1,5 +1,5 @@
 import IframeComponent from "@/components/common/iframe";
-import Sidebar from "@/components/config/Sidebar";
+import Sidebar from "@/components/settings/sideBar";
 import React from "react";
 
 function Settings() {

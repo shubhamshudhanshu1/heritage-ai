@@ -1,42 +1,50 @@
 "use client";
-import React from "react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormControlLabel,
-  MenuItem,
-  Select,
-  Switch,
-} from "@mui/material";
-import CommonLabel from "../common/label";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setSchemaEditMode,
-  setTenant,
-  setUserType,
-  updateConfig,
-} from "@/redux/slices/configSlice";
 import { useSession } from "next-auth/react";
-import useConfigFetcher from "@/hooks/useConfigFetcher";
+import SidebarHeader from "../common/sidebarHeader";
+import SidebarFooter from "../common/sidebarFooter";
+import { fetchSettingSchemas } from "@/redux/slices/settingSchemaSlice";
+import { FormControl, MenuItem, Select } from "@mui/material";
+import CommonLabel from "../common/label";
+import { fetchTenantByFilters } from "@/redux/slices/tenantSlice";
+import { fetchConfig, setUserType } from "@/redux/slices/configSlice";
 import Renderer from "./renderer";
 
-const Sidebar = () => {
-  const dispatch = useDispatch();
+const SettingSchemaSidebar = () => {
   const { data: session = { user: {} } } = useSession();
-  const { tenant, userType, schemaEditMode, config } = useSelector(
-    (state) => state.config
-  );
-  useConfigFetcher(tenant, userType);
+  const { schemaMap } = useSelector((state) => state.settingSchema);
+  const { userType, config } = useSelector((state) => state.config);
+  const { currentTenantDetails } = useSelector((state) => state.tenants);
 
-  React.useEffect(() => {
-    if (session.user.tenant) {
-      dispatch(setTenant(session.user.tenant));
+  const dispatch = useDispatch();
+
+  let userTypes = currentTenantDetails.userTypes || [];
+
+  let tenantName = session.user?.tenant;
+
+  useEffect(() => {
+    if (tenantName && userType)
+      dispatch(fetchConfig({ tenant: tenantName, userType }));
+  }, [userType, tenantName]);
+
+  useEffect(() => {
+    if (tenantName) {
+      fetchSchemas(tenantName);
+      dispatch(fetchTenantByFilters({ tenantName }));
     }
-  }, [session.user.tenant]);
+  }, [tenantName]);
 
-  return (
-    <Box className="w-[400px] bg-white shadow-lg flex flex-col overflow-scroll py-4">
+  const onSaveSchema = () => {};
+
+  const fetchSchemas = (tenantName) => {
+    dispatch(fetchSettingSchemas({ tenantName }));
+  };
+
+  console.log({ config });
+
+  const renderUserTypeSelection = () => {
+    return (
       <FormControl fullWidth margin="normal" required className="px-4">
         <CommonLabel>User Type</CommonLabel>
         <Select
@@ -45,52 +53,40 @@ const Sidebar = () => {
           value={userType}
           onChange={(e) => dispatch(setUserType(e.target.value))}
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value="FOS"> FOS</MenuItem>
-          <MenuItem value="Distributor">Distributor</MenuItem>
-          <MenuItem value="Retailer">Retailer</MenuItem>
+          {userTypes.map((ele) => {
+            return <MenuItem value={ele.name}> {ele.name}</MenuItem>;
+          })}
         </Select>
       </FormControl>
-      {userType && (
-        <>
-          <Box className="p-4">
-            <div>
-              <CommonLabel>Edit Schema</CommonLabel>
-              <Switch
-                color="primary"
-                checked={schemaEditMode}
-                onChange={(e) => {
-                  dispatch(setSchemaEditMode(e.target.checked));
-                }}
-              />
-            </div>
-            <div>
-              <Renderer
-                rendererObject={config}
-                level="global"
-                path={[]}
-                schemaEditMode={schemaEditMode}
-              />
-            </div>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => {
-                dispatch(updateConfig(config));
-              }}
-            >
-              Save Changes
-            </Button>
-          </Box>
-        </>
-      )}
-    </Box>
+    );
+  };
+
+  console.log({ schemaMap });
+
+  return (
+    <div className="w-[400px] h-screen bg-slate-100 shadow-lg flex flex-col">
+      <SidebarHeader title={"Configurations"} onBackClick={() => {}} />
+      {renderUserTypeSelection()}
+      <div className="flex-grow overflow-y-auto p-4">
+        {userType ? (
+          <Renderer
+            rendererObject={{
+              ...config,
+              settings: schemaMap.global?.global?.settings || [],
+            }}
+            level="global"
+            path={[]}
+            schemaEditMode={false}
+          />
+        ) : null}
+      </div>
+      <SidebarFooter
+        onSave={onSaveSchema}
+        text={"Save Changes"}
+        isFormValid={true}
+      />
+    </div>
   );
 };
 
-export default Sidebar;
+export default SettingSchemaSidebar;

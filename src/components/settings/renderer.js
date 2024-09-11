@@ -1,23 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import LevelSettings from "./levelSettings";
 import Tabs from "../common/tab";
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  IconButton,
-  TextField,
-  Button,
-  Typography,
-} from "@mui/material";
-import CommonLabel from "../common/label";
-import EditIcon from "@mui/icons-material/Edit";
+import { FormControl, Button, Typography } from "@mui/material";
 import Draggable from "../common/draggable";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 import { useDispatch } from "react-redux";
-import { addChild, deleteChild, updateChild } from "@/redux/slices/configSlice";
+import { addChild, deleteChild } from "@/redux/slices/configSlice";
+import SelectSchema from "../settingSchema/SelectSchema";
 
 const levelConfig = {
   global: {
@@ -51,6 +42,7 @@ function Renderer({ rendererObject = {}, level, path = [], schemaEditMode }) {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedChildIndex, setSelectedChildIndex] = useState(null);
   const [newChild, setNewChild] = useState({ label: "", name: "" });
+  const [addingChild, setAddingChild] = useState(null);
   const dispatch = useDispatch();
   const currentLevelConfig = levelConfig[level] || {};
   const childKey = currentLevelConfig.childKey;
@@ -81,13 +73,7 @@ function Renderer({ rendererObject = {}, level, path = [], schemaEditMode }) {
   const handleAddChild = () => {
     dispatch(addChild({ path: [...path], childKey, newChild }));
     setNewChild({ label: "", name: "" });
-  };
-
-  const handleUpdateChild = (index) => {
-    dispatch(
-      updateChild({ path: [...path], childKey, index, updatedChild: newChild })
-    );
-    setNewChild({ label: "", name: "" });
+    setAddingChild(null);
   };
 
   const handleDeleteChild = (index) => {
@@ -106,40 +92,56 @@ function Renderer({ rendererObject = {}, level, path = [], schemaEditMode }) {
     }
     return (
       <div className="mt-4">
-        <Typography className="font-bold text-sm" variant="p">
-          Add new {childKey}
-        </Typography>
-        <div className="flex flex-row gap-4 mt-2">
-          <FormControl fullWidth required>
-            <CommonLabel>Label</CommonLabel>
-            <TextField
-              fullWidth
-              value={newChild.label}
-              onChange={(e) =>
-                setNewChild({ ...newChild, label: e.target.value })
-              }
-            />
-          </FormControl>
-          <FormControl fullWidth required>
-            <CommonLabel>Name</CommonLabel>
-            <TextField
-              fullWidth
-              value={newChild.name}
-              onChange={(e) =>
-                setNewChild({ ...newChild, name: e.target.value })
-              }
-            />
-          </FormControl>
-        </div>
-        <Button
-          variant="outlined"
-          color="primary"
-          fullWidth
-          onClick={handleAddChild}
-          sx={{ mt: 2 }}
-        >
-          Add {childKey}
-        </Button>
+        {addingChild && (
+          <div className="mb-4">
+            <FormControl fullWidth required className="mb-2">
+              <SelectSchema
+                apiParams={{ type: childKey.slice(0, -1) }}
+                label={`Select ${childKey}`}
+                onItemChange={(item) => {
+                  setNewChild(item);
+                }}
+              />
+            </FormControl>
+            <div className="flex flex-row gap-2">
+              <Button
+                variant="outlined"
+                color="primary"
+                fullWidth
+                onClick={() => {
+                  setAddingChild(null);
+                  setNewChild(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={addingChild.type}
+                onClick={() => {
+                  handleAddChild();
+                }}
+              >
+                Add {childKey}
+              </Button>
+            </div>
+          </div>
+        )}
+        {!addingChild && (
+          <div
+            className="cursor-pointer border border-gray-300 w-full text-center py-2"
+            onClick={() => {
+              setAddingChild({
+                slug: "",
+                defaultCount: 1,
+              });
+            }}
+          >
+            + Add {childKey}
+          </div>
+        )}
       </div>
     );
   };
@@ -150,36 +152,45 @@ function Renderer({ rendererObject = {}, level, path = [], schemaEditMode }) {
           {childItems.length ? (
             <Draggable
               array={childItems}
-              renderItem={(childItem, index) => (
-                <div
-                  key={`${level}-${index}`}
-                  onClick={() => handleEditClick(index)}
-                  className="flex flex-row gap-2 items-center justify-between w-full bg-primary-50 p-4 rounded-sm"
-                >
-                  <div className="flex flex-row gap-2 items-center">
-                    <DragIndicatorIcon />
-                    <div>{childItem.label || `Child ${index + 1}`}</div>
+              renderItem={(childItem, index) => {
+                if (!childItems) {
+                  return null;
+                }
+                return (
+                  <div
+                    key={`${level}-${index}-${childItem.slug}`}
+                    onClick={() => handleEditClick(index)}
+                    className="flex flex-row gap-2 items-center justify-between w-full bg-primary-50 p-4 rounded-sm"
+                  >
+                    <div className="flex flex-row gap-2 items-center">
+                      <DragIndicatorIcon />
+                      <div>
+                        {childItem.label ||
+                          childItem.name ||
+                          `Child ${index + 1}`}
+                      </div>
+                    </div>
+                    <CloseOutlinedIcon
+                      onClick={() => handleDeleteChild(index)}
+                      className="cursor-pointer"
+                    />
                   </div>
-                  <CloseOutlinedIcon
-                    onClick={() => handleDeleteChild(index)}
-                    className="cursor-pointer"
-                  />
-                </div>
-              )}
+                );
+              }}
               onDragEnd={(newArray) => {}}
             />
           ) : childKey ? (
             <div>No {childKey}</div>
           ) : null}
         </>
-        {schemaEditMode && addNewChild()}
+        {addNewChild()}
       </div>
     );
   };
 
   const renderChildrens = () => {
     return (
-      <div className={`${childLevelConfig.bgColor} p-3 my-2 rounded-lg`}>
+      <div className={`my-2 rounded-lg`}>
         {editedChild.name ? (
           <div>
             <div

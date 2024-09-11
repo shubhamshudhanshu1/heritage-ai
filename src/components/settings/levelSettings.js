@@ -44,13 +44,13 @@ function LevelSettings({ levelJson, path = [] }) {
   };
 
   const handleAddOrUpdateProp = (propKey, propValue) => {
+    console.log({ propKey, propValue });
     dispatch(addOrUpdateProp({ path, propKey, propValue }));
   };
 
   const handleDeleteProp = (propKey) => {
     dispatch(deleteProp({ path, propKey }));
   };
-
   return (
     <div>
       <SettingsRenderer
@@ -67,8 +67,9 @@ function LevelSettings({ levelJson, path = [] }) {
         onChangeSettings={(newSettings) => {
           handleOverrideSettings(newSettings);
         }}
-        onChangeProp={(key, value) => {
-          handleAddOrUpdateProp(key, value);
+        onChangeProp={(arg) => {
+          let { id, value } = arg;
+          handleAddOrUpdateProp(id, value);
         }}
         onDeleteProp={(key) => {
           handleDeleteProp(key);
