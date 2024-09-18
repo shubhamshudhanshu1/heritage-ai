@@ -72,6 +72,8 @@ const ImageUpload = ({ label, onImageUpload, preview, ...props }) => {
             <Image
               src={selectedImage}
               alt="Selected"
+              width={100}
+              height={100}
               style={{
                 width: "100%",
                 height: "100%",

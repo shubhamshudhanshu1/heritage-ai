@@ -24,6 +24,7 @@ export async function GET(request) {
     );
   }
 }
+
 export async function POST(request) {
   await connectToDatabase();
   const body = await request.json();

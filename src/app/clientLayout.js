@@ -20,13 +20,13 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import theme from "../theme/index";
-import store from "@/redux/store";
 import { Provider } from "react-redux";
-import Logout from "@/components/logout";
 import { useRouter, usePathname, redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import store from "@/redux/store";
+import Logout from "../components/logout";
 
 const drawerWidth = 240;
 
@@ -131,6 +131,8 @@ export default function ClientLayout({ children, session }) {
     redirect("/auth/signin");
   }
 
+  let allowedModules = session?.user?.role?.allowedModules || [];
+
   return (
     <SessionProvider>
       <Provider store={store}>
@@ -167,7 +169,7 @@ export default function ClientLayout({ children, session }) {
                       <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                      Admin - {session.user.tenant}
+                      Admin - {session?.user?.tenant}
                     </Typography>
                   </Toolbar>
                   <div>
@@ -187,9 +189,9 @@ export default function ClientLayout({ children, session }) {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                  {listItemsConfig.map((item, index) => (
+                  {allowedModules.map((item, index) => (
                     <ListItem
-                      key={item.text}
+                      key={item.name}
                       disablePadding
                       sx={{ display: "block" }}
                     >
@@ -208,10 +210,11 @@ export default function ClientLayout({ children, session }) {
                             open ? { mr: 3 } : { mr: "auto" },
                           ]}
                         >
-                          {item.icon}
+                          {/* {item.icon} */}
+                          <InboxIcon />
                         </ListItemIcon>
                         <ListItemText
-                          primary={item.text}
+                          primary={item.name}
                           sx={[open ? { opacity: 1 } : { opacity: 0 }]}
                         />
                       </ListItemButton>

@@ -25,7 +25,7 @@ const SettingSchemaSidebar = () => {
 
   let userTypes = currentTenantDetails.userTypes || [];
 
-  let tenantName = session.user?.tenant;
+  let tenantName = session?.user?.tenant;
 
   useEffect(() => {
     if (tenantName && userType)

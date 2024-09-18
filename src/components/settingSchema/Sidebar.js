@@ -28,7 +28,7 @@ const SettingSchemaSidebar = () => {
     (state) => state.settingSchema
   );
 
-  let tenantName = session.user?.tenant;
+  let tenantName = session?.user?.tenant;
 
   const isGlobal = activeTab === "global";
   const isEditing = editingSchema !== null;
@@ -70,7 +70,7 @@ const SettingSchemaSidebar = () => {
 
     if (isGlobal) {
       payload = {
-        tenantName: session.user.tenant,
+        tenantName: session?.user?.tenant,
         slug: "global",
         name: "global",
         type: activeTab,
