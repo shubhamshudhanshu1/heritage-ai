@@ -1,8 +1,5 @@
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
-import Role from "@/models/Role";
-import Module from "@/models/Module";
-
 import { connectToDatabase } from "@/helper/db";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -17,44 +14,30 @@ export const authOptions = {
       },
       authorize: async (credentials) => {
         await connectToDatabase();
-        let user;
-        const { email, password, isRegistering } = credentials;
-        if (isRegistering) {
-          const existingUser = await User.findOne({ email });
-          if (existingUser) {
-            throw new Error("User already exists! Please signin to continue.");
-          }
-          const hashedPassword = await bcrypt.hash(password, 10);
-          const userRole = await Role.findOne({ roleName: "USER" });
-          const newUser = new User({
-            email,
-            password: hashedPassword,
-            role: userRole._id,
+        try {
+          const user = await User.findOne({
+            email: credentials.email,
+          }).populate({
+            path: "role",
+            populate: {
+              path: "allowedModules",
+              model: "Module",
+            },
           });
-          await newUser.save();
-          return newUser;
-        } else {
-          try {
-            user = await User.findOne({
-              email,
-            }).populate({
-              path: "role",
-              populate: {
-                path: "allowedModules", // Populate allowedModules within role
-                model: "Module", // Model name for the referenced schema
-              },
-            });
-          } catch (err) {
-            console.log(err);
-          }
           if (!user) {
+            console.log("User not found");
             throw new Error("No user found with the provided email.");
           }
-          const isPasswordValid = await bcrypt.compare(password, user.password);
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password.trim(),
+            user.password.trim()
+          );
           if (!isPasswordValid) {
             throw new Error("Invalid credentials.");
           }
           return user;
+        } catch (err) {
+          throw new Error("An error occurred during authorization.");
         }
       },
     }),

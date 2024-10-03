@@ -10,10 +10,13 @@ import { useSelector } from "react-redux";
 export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState(""); // For registration
-  const [isRegister, setIsRegister] = useState(false); // Toggle between login/register
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isRegister, setIsRegister] = useState(false);
   const dispatch = useDispatch();
   const tenants = useSelector(selectAllTenants);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // dispatch(fetchTenants());
@@ -35,6 +38,10 @@ export default function AuthPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -44,7 +51,8 @@ export default function AuthPage() {
         body: JSON.stringify({
           email,
           password,
-          name, // Send name for registration
+          firstName,
+          lastName,
         }),
       });
       if (response.ok) {
@@ -54,10 +62,12 @@ export default function AuthPage() {
           callbackUrl: "/settings",
         });
       } else {
-        console.log("Registration failed");
+        const data = await response.json();
+        setError(data.message || "Registration failed");
       }
     } catch (err) {
       console.log(err);
+      setError("An error occurred during registration");
     }
   };
 
@@ -79,15 +89,25 @@ export default function AuthPage() {
       </Typography>
       {isRegister && (
         <>
-          <CommonLabel>Name</CommonLabel>
+          <CommonLabel>First Name</CommonLabel>
           <TextField
-            name="name"
+            name="firstName"
             type="text"
             fullWidth
             margin="normal"
             required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <CommonLabel>Last Name</CommonLabel>
+          <TextField
+            name="lastName"
+            type="text"
+            fullWidth
+            margin="normal"
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
         </>
       )}
@@ -111,6 +131,21 @@ export default function AuthPage() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      {isRegister && (
+        <>
+          <CommonLabel>Confirm Password</CommonLabel>
+          <TextField
+            name="confirmPassword"
+            type="password"
+            fullWidth
+            margin="normal"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </>
+      )}
+      {error && <Typography color="error">{error}</Typography>}
       <Button
         type="submit"
         variant="contained"
