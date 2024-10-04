@@ -10,6 +10,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
     tenants: [{ type: Schema.Types.ObjectId, ref: "Tenant" }],
+    mobileNumber: { type: String, required: true, unique: true },
     role: { type: Schema.Types.ObjectId, ref: "Role", required: true },
   },
   {

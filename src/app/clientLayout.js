@@ -27,6 +27,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import store from "@/redux/store";
 import Logout from "../components/logout";
+import GroupIcon from "@mui/icons-material/Group";
+import AddBusinessIcon from "@mui/icons-material/AddBusiness";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const drawerWidth = 240;
 
@@ -107,8 +110,13 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
-let publicRoutes = ["/auth/signin"];
+let publicRoutes = ["/auth/signin", "/auth/register"];
 
+const icons = {
+  Tenants: <AddBusinessIcon />,
+  People: <GroupIcon />,
+  Config: <SettingsIcon />,
+};
 export const listItemsConfig = [
   { text: "Config", route: "/config", icon: <InboxIcon /> },
   { text: "Schema", route: "/settingSchema", icon: <MailIcon /> },
@@ -210,8 +218,7 @@ export default function ClientLayout({ children, session }) {
                             open ? { mr: 3 } : { mr: "auto" },
                           ]}
                         >
-                          {/* {item.icon} */}
-                          <InboxIcon />
+                          {icons[item.name]}
                         </ListItemIcon>
                         <ListItemText
                           primary={item.name}

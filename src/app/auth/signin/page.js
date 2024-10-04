@@ -1,80 +1,91 @@
 "use client";
 import { signIn } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
 import CommonLabel from "@/components/common/label";
-import { selectAllTenants } from "@/redux/slices/tenantSlice";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [isRegister, setIsRegister] = useState(false);
-  const dispatch = useDispatch();
-  const tenants = useSelector(selectAllTenants);
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
   const [error, setError] = useState("");
+  const [loginMethod, setLoginMethod] = useState("email"); // Default to email
 
-  useEffect(() => {
-    // dispatch(fetchTenants());
-  }, []);
-
-  const handleSignIn = async (e) => {
-    e.preventDefault();
+  const sendOtp = async () => {
     try {
-      const result = await signIn("credentials", {
-        redirect: true,
-        email,
-        password,
-        callbackUrl: "/settings",
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          lastName,
-        }),
+        body: JSON.stringify({ mobileNumber: mobile }),
       });
       if (response.ok) {
-        await signIn("credentials", {
-          email,
-          password,
-          callbackUrl: "/settings",
-        });
+        setIsOtpSent(true);
       } else {
         const data = await response.json();
-        setError(data.message || "Registration failed");
+        setError(data.message || "Failed to send OTP");
       }
     } catch (err) {
       console.log(err);
-      setError("An error occurred during registration");
+      setError("An error occurred while sending OTP");
+    }
+  };
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+
+    if (loginMethod === "email") {
+      // Email and password sign-in
+      try {
+        const res = await signIn("credentials", {
+          redirect: false, // Change to false for manual handling
+          email,
+          password,
+        });
+        if (!res.ok) {
+          setError(res.error); // Show error message
+        } else {
+          // Successful sign-in, redirect to desired page
+          window.location.href = "/"; // Redirect manually after successful sign-in
+        }
+      } catch (err) {
+        console.log(err);
+        setError("Invalid login credentials");
+      }
+    } else {
+      // Mobile and OTP sign-in
+      if (!isOtpSent) {
+        sendOtp(); // Send OTP
+      } else {
+        // Verify OTP
+        try {
+          const res = await signIn("credentials", {
+            redirect: false, // Change to false for manual handling
+            mobile,
+            otp,
+          });
+
+          if (!res.ok) {
+            setError(res.error); // Show error message
+          } else {
+            // Successful sign-in, redirect to desired page
+            window.location.href = "/"; // Redirect manually after successful sign-in
+          }
+        } catch (err) {
+          console.log(err);
+          setError("OTP verification failed");
+        }
+      }
     }
   };
 
   return (
     <Box
       component="form"
-      onSubmit={isRegister ? handleRegister : handleSignIn}
+      onSubmit={handleSignIn}
       sx={{
         p: 4,
         bgcolor: "background.paper",
@@ -85,67 +96,74 @@ export default function AuthPage() {
       }}
     >
       <Typography variant="h5" component="h2" gutterBottom>
-        {isRegister ? "Register" : "Sign In"}
+        {loginMethod === "email" ? "Sign In with Email" : "Sign In with Mobile"}
       </Typography>
-      {isRegister && (
+
+      {loginMethod === "email" ? (
         <>
-          <CommonLabel>First Name</CommonLabel>
+          <CommonLabel>Email</CommonLabel>
           <TextField
-            name="firstName"
-            type="text"
+            name="email"
+            type="email"
             fullWidth
             margin="normal"
             required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <CommonLabel>Last Name</CommonLabel>
+          <CommonLabel>Password</CommonLabel>
           <TextField
-            name="lastName"
-            type="text"
-            fullWidth
-            margin="normal"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </>
-      )}
-      <CommonLabel>Email</CommonLabel>
-      <TextField
-        name="email"
-        type="email"
-        fullWidth
-        margin="normal"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <CommonLabel>Password</CommonLabel>
-      <TextField
-        name="password"
-        type="password"
-        fullWidth
-        margin="normal"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      {isRegister && (
-        <>
-          <CommonLabel>Confirm Password</CommonLabel>
-          <TextField
-            name="confirmPassword"
+            name="password"
             type="password"
             fullWidth
             margin="normal"
             required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </>
+      ) : (
+        <>
+          <CommonLabel>Mobile Number</CommonLabel>
+          <TextField
+            name="mobile"
+            type="tel"
+            fullWidth
+            margin="normal"
+            required
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
+            disabled={isOtpSent} // Disable input after OTP is sent
+          />
+          {isOtpSent && (
+            <>
+              <CommonLabel>OTP</CommonLabel>
+              <TextField
+                name="otp"
+                type="text"
+                fullWidth
+                margin="normal"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+            </>
+          )}
+          {!isOtpSent && (
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={sendOtp} // Trigger sending OTP
+            >
+              Send OTP
+            </Button>
+          )}
+        </>
       )}
+
       {error && <Typography color="error">{error}</Typography>}
+
       <Button
         type="submit"
         variant="contained"
@@ -153,17 +171,24 @@ export default function AuthPage() {
         fullWidth
         sx={{ mt: 2 }}
       >
-        {isRegister ? "Register" : "Sign In"}
+        {loginMethod === "email" ? "Sign In" : "Verify OTP & Sign In"}
       </Button>
+
       <Button
         variant="text"
         fullWidth
-        onClick={() => setIsRegister(!isRegister)}
+        onClick={() =>
+          setLoginMethod(loginMethod === "email" ? "mobile" : "email")
+        }
         sx={{ mt: 1 }}
       >
-        {isRegister
-          ? "Already have an account? Sign In"
-          : "Don't have an account? Register"}
+        {loginMethod === "email"
+          ? "Sign in with Mobile and OTP"
+          : "Sign in with Email and Password"}
+      </Button>
+
+      <Button variant="text" fullWidth href="/auth/register" sx={{ mt: 1 }}>
+        Don't have an account? Register
       </Button>
     </Box>
   );

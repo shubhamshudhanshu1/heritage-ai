@@ -1,19 +1,18 @@
+// helper/db.js
 import mongoose from "mongoose";
 
 export const connectToDatabase = async () => {
-  if (mongoose.connections[0].readyState) {
-    return;
-  }
+  if (mongoose.connection.readyState >= 1) return;
 
-  const { MONGODB_URI } = process.env;
-  if (!MONGODB_URI) {
-    throw new Error(
-      "Please define the MONGO_URI environment variable inside .env.local"
-    );
+  try {
+    console.log("Connecting to database...");
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to database.");
+  } catch (error) {
+    console.error("Database connection error:", error);
+    throw new Error("Failed to connect to the database");
   }
-
-  await mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
 };

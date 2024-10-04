@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 import Role from "@/models/Role";
 
 export async function POST(request) {
-  const { email, password, lastName, firstName } = await request.json();
+  const { email, password, lastName, firstName, mobileNumber } =
+    await request.json();
   try {
     await connectToDatabase();
     const existingUser = await User.findOne({ email });
@@ -17,12 +18,12 @@ export async function POST(request) {
     }
     const hashedPassword = await hash(password, 12);
     const userRole = await Role.findOne({ roleName: "USER" });
-    console.log({ userRole });
     const newUser = await User.create({
       email,
       password: hashedPassword,
       lastName,
       firstName,
+      mobileNumber,
       role: userRole._id,
     });
     return NextResponse.json(
