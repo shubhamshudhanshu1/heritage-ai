@@ -31,6 +31,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { blue, grey } from "@mui/material/colors"; // Import colors
 import WidgetsIcon from "@mui/icons-material/Widgets";
 import CallToActionIcon from "@mui/icons-material/CallToAction";
+import WidgetsIcon from "@mui/icons-material/Widgets";
+import CategoryIcon from "@mui/icons-material/Category";
 
 const drawerWidth = 240;
 
@@ -107,6 +109,8 @@ const icons = {
   Config: <SettingsIcon />,
   Blocks: <WidgetsIcon />,
   Components: <CallToActionIcon />,
+  Orders: <WidgetsIcon />,
+  Products: <CategoryIcon />,
 };
 
 // Menu items configuration
@@ -164,7 +168,8 @@ export default function ClientLayout({ children, session }) {
                           marginRight: 5,
                         },
                         open && { display: "none" },
-                      ]}>
+                      ]}
+                    >
                       <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
@@ -192,7 +197,8 @@ export default function ClientLayout({ children, session }) {
                     <ListItem
                       key={item.name}
                       disablePadding
-                      sx={{ display: "block" }}>
+                      sx={{ display: "block" }}
+                    >
                       <ListItemButton
                         sx={[
                           { minHeight: 48, px: 2.5 },
