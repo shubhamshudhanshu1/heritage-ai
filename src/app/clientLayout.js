@@ -145,11 +145,11 @@ export default function ClientLayout({ children, session }) {
             closeOnClick
           />
           {isPublicRoute ? (
-            <Box className="w-screen h-screen flex flex-col space-between items-center align-middle pt-20">
+            <Box className="w-screen h-screen flex flex-col space-between items-center align-middle pt-20 bg-inherit">
               {children}
             </Box>
           ) : (
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: "flex" }} className="bg-inherit">
               <CssBaseline />
               <AppBar position="fixed" open={open}>
                 <div className="flex justify-between items-center px-4">
@@ -164,8 +164,7 @@ export default function ClientLayout({ children, session }) {
                           marginRight: 5,
                         },
                         open && { display: "none" },
-                      ]}
-                    >
+                      ]}>
                       <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
@@ -193,8 +192,7 @@ export default function ClientLayout({ children, session }) {
                     <ListItem
                       key={item.name}
                       disablePadding
-                      sx={{ display: "block" }}
-                    >
+                      sx={{ display: "block" }}>
                       <ListItemButton
                         sx={[
                           { minHeight: 48, px: 2.5 },
