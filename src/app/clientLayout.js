@@ -31,7 +31,6 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { blue, grey } from "@mui/material/colors"; // Import colors
 import WidgetsIcon from "@mui/icons-material/Widgets";
 import CallToActionIcon from "@mui/icons-material/CallToAction";
-import WidgetsIcon from "@mui/icons-material/Widgets";
 import CategoryIcon from "@mui/icons-material/Category";
 
 const drawerWidth = 240;
