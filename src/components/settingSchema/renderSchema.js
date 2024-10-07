@@ -17,6 +17,7 @@ function RenderSchema({
   onChangeProp = () => {},
   path = [],
   schemaEditMode = false,
+  disableAdd = false,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeSchemaIndex, setActiveSchemaIndex] = useState(null);
@@ -91,15 +92,17 @@ function RenderSchema({
         }}
         readOnly={false}
       />
-      <div className="mt-4">
-        <AddSchema
-          defaultSchema={settings[activeSchemaIndex] || {}}
-          onAddSchema={handleAddSchema}
-          modalOpen={modalOpen}
-          setModalOpen={setModalOpen}
-          onEditSchema={editSchema}
-        />
-      </div>
+      {disableAdd ? null : (
+        <div className="mt-4">
+          <AddSchema
+            defaultSchema={settings[activeSchemaIndex] || {}}
+            onAddSchema={handleAddSchema}
+            modalOpen={modalOpen}
+            setModalOpen={setModalOpen}
+            onEditSchema={editSchema}
+          />
+        </div>
+      )}
     </div>
   );
 }

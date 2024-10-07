@@ -7,7 +7,7 @@ import {
   deleteSettingSchema, // Assuming a delete action is in the same slice.
 } from "@/redux/slices/settingSchemaSlice"; // Adjust the import if needed
 import { Button, Modal, TextField, Box, Typography } from "@mui/material";
-// import RenderSchema from "./../components/";
+import RenderSchema from "./../../components/settingSchema/RenderSchema";
 
 function Components() {
   const dispatch = useDispatch();
@@ -90,12 +90,11 @@ function Components() {
 
   return (
     <div>
-      <Typography variant="h4">Setting Schemas</Typography>
+      <Typography variant="h6">Components</Typography>
       {fetchingSchema ? (
         <p>Loading...</p>
       ) : (
         <div>
-          {/* Display schemas */}
           {settings
             ?.filter((schema) => schema.type === "section")
             .map((schema) => (
@@ -110,22 +109,20 @@ function Components() {
                   Tenant: {schema.tenantName}
                 </Typography>
 
-                {/* Display Settings Array */}
                 {schema.settings.length > 0 ? (
-                  <div>{settings.label}</div>
+                  <RenderSchema
+                    levelJson={{ settings: schema.settings }}
+                    path={[]}
+                    schemaEditMode={false}
+                    onChangeSettings={(newSettings) =>
+                      handleValueChange("settings", newSettings)
+                    }
+                    disableAdd={true}
+                  />
                 ) : (
-                  // <RenderSchema
-                  //   levelJson={editingSchema}
-                  //   path={[]}
-                  //   schemaEditMode={true}
-                  //   onChangeSettings={(newSettings) =>
-                  //     handleValueChange("settings", newSettings)
-                  //   }
-                  // />
                   <Typography variant="body2">No settings available</Typography>
                 )}
 
-                {/* Edit and Delete Buttons */}
                 <Button
                   variant="outlined"
                   color="primary"
@@ -146,12 +143,10 @@ function Components() {
         </div>
       )}
 
-      {/* Button to open modal */}
       <Button variant="contained" color="primary" onClick={handleOpenModal}>
         Add New Schema
       </Button>
 
-      {/* Modal for adding/editing a schema */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           sx={{
@@ -166,7 +161,7 @@ function Components() {
           }}
         >
           <Typography variant="h6" mb={2}>
-            {isEditing ? "Edit Schema" : "Add New Schema"}
+            {isEditing ? "Edit Component" : "Add Component"}
           </Typography>
           <TextField
             label="Name"
@@ -192,6 +187,19 @@ function Components() {
             fullWidth
             margin="normal"
           />
+          {newSchema.settings.length > 0 ? (
+            <RenderSchema
+              levelJson={{ settings: newSchema.settings }}
+              path={[]}
+              schemaEditMode={false}
+              onChangeSettings={(newSettings) =>
+                handleValueChange("settings", newSettings)
+              }
+              disableAdd={false}
+            />
+          ) : (
+            <Typography variant="body2">No settings available</Typography>
+          )}
 
           <Button
             variant="contained"
