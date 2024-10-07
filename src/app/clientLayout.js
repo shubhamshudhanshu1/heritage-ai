@@ -17,8 +17,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import theme from "../theme/index";
 import { Provider } from "react-redux";
 import { useRouter, usePathname, redirect } from "next/navigation";
@@ -30,9 +28,13 @@ import Logout from "../components/logout";
 import GroupIcon from "@mui/icons-material/Group";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { blue, grey } from "@mui/material/colors"; // Import colors
+import WidgetsIcon from "@mui/icons-material/Widgets";
+import CallToActionIcon from "@mui/icons-material/CallToAction";
 
 const drawerWidth = 240;
 
+// Drawer styling
 const openedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {
@@ -64,81 +66,71 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
-})(({ theme }) => ({
+})(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(["width", "margin"], {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
 }));
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
-})(({ theme }) => ({
+})(({ theme, open }) => ({
   width: drawerWidth,
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
+  ...(open
+    ? {
         ...openedMixin(theme),
         "& .MuiDrawer-paper": openedMixin(theme),
-      },
-    },
-    {
-      props: ({ open }) => !open,
-      style: {
+      }
+    : {
         ...closedMixin(theme),
         "& .MuiDrawer-paper": closedMixin(theme),
-      },
-    },
-  ],
+      }),
 }));
 
-let publicRoutes = ["/auth/signin", "/auth/register"];
-
+// Icons mapping
 const icons = {
   Tenants: <AddBusinessIcon />,
   People: <GroupIcon />,
   Config: <SettingsIcon />,
+  Blocks: <WidgetsIcon />,
+  Components: <CallToActionIcon />,
 };
+
+// Menu items configuration
 export const listItemsConfig = [
-  { text: "Config", route: "/config", icon: <InboxIcon /> },
-  { text: "Schema", route: "/settingSchema", icon: <MailIcon /> },
+  { text: "Config", route: "/config", icon: <AddBusinessIcon /> },
+  { text: "Schema", route: "/settingSchema", icon: <SettingsIcon /> },
 ];
+
+let publicRoutes = ["/auth/signin", "/auth/register"];
 
 export default function ClientLayout({ children, session }) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
   const router = useRouter();
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
+  // Redirect to login if not authenticated
   let isPublicRoute = publicRoutes.includes(pathname);
   if (!isPublicRoute && !session) {
     redirect("/auth/signin");
   }
 
+  // Get allowed modules from session
   let allowedModules = session?.user?.role?.allowedModules || [];
 
   return (
@@ -197,7 +189,7 @@ export default function ClientLayout({ children, session }) {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                  {allowedModules.map((item, index) => (
+                  {allowedModules.map((item) => (
                     <ListItem
                       key={item.name}
                       disablePadding
@@ -218,7 +210,13 @@ export default function ClientLayout({ children, session }) {
                             open ? { mr: 3 } : { mr: "auto" },
                           ]}
                         >
-                          {icons[item.name]}
+                          {React.cloneElement(icons[item.name], {
+                            style: {
+                              color: pathname.includes(item.route)
+                                ? blue[500]
+                                : grey[700], // Active route gets blue, inactive grey
+                            },
+                          })}
                         </ListItemIcon>
                         <ListItemText
                           primary={item.name}
@@ -231,7 +229,9 @@ export default function ClientLayout({ children, session }) {
               </Drawer>
               <Box component="main" className="overflow-hidden w-full">
                 <DrawerHeader />
-                <div style={{ height: "calc(100vh - 64px)" }}>{children}</div>
+                <div style={{ height: "calc(100vh - 64px)", padding: "20px" }}>
+                  {children}
+                </div>
               </Box>
             </Box>
           )}

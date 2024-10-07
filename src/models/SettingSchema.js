@@ -29,7 +29,7 @@ const settingSchema = new Schema(
     },
     tenantName: {
       type: String,
-      required: true,
+      required: false,
     },
     settings: [SettingSchema],
     blocks: [{ type: Schema.Types.ObjectId, ref: "SettingSchema" }],
