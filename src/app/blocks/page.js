@@ -1,7 +1,11 @@
 import React from "react";
-
-function Blocks() {
-  return <div>Blocks</div>;
+import SchemaPage from "./../../components/schemaPage";
+function Components() {
+  return (
+    <div>
+      <SchemaPage type="block" title="Block" />
+    </div>
+  );
 }
 
-export default Blocks;
+export default Components;
