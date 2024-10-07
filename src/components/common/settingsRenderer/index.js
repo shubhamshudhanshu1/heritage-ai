@@ -22,7 +22,7 @@ function SettingsRenderer({
   onChangeSettings = () => {},
   schemaEditMode,
   onChangeProp,
-  readOnly = false,
+  isCardView = false,
 }) {
   function dragEnded(result) {
     if (!result.destination) return;
@@ -36,6 +36,22 @@ function SettingsRenderer({
 
   if (!settings.length) {
     return <div>No Settings found</div>;
+  }
+
+  if (isCardView) {
+    return (
+      <div className="flex flex-col gap-4">
+        {settings.map((item, index) => (
+          <div
+            key={index}
+            className="flex flex-col gap-0 bg-primary-50 w-full p-4 rounded-md"
+          >
+            <div className="w-full">{item.label}</div>
+            <div className="flex flex-row gap-2">{item.type}</div>
+          </div>
+        ))}
+      </div>
+    );
   }
   if (schemaEditMode) {
     return (
@@ -67,7 +83,7 @@ function SettingsRenderer({
                   value: props.hasOwnProperty(setting.id)
                     ? props[setting.id]
                     : setting.default,
-                  readOnly,
+                  readOnly: !schemaEditMode,
                   onChange: (val) => {
                     onChangeProp({ id: setting.id, value: val });
                   },

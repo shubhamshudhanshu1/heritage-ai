@@ -232,7 +232,13 @@ export default function ClientLayout({ children, session }) {
               </Drawer>
               <Box component="main" className="overflow-hidden w-full">
                 <DrawerHeader />
-                <div style={{ height: "calc(100vh - 64px)", padding: "20px" }}>
+                <div
+                  style={{
+                    height: "calc(100vh - 64px)",
+                    padding: "20px",
+                    overflow: "scroll",
+                  }}
+                >
                   {children}
                 </div>
               </Box>

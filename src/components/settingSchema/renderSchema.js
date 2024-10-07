@@ -17,7 +17,7 @@ function RenderSchema({
   onChangeProp = () => {},
   path = [],
   schemaEditMode = false,
-  disableAdd = false,
+  isCardView,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeSchemaIndex, setActiveSchemaIndex] = useState(null);
@@ -90,9 +90,9 @@ function RenderSchema({
         onDeleteProp={(key) => {
           handleDeleteProp(key);
         }}
-        readOnly={false}
+        isCardView={isCardView}
       />
-      {disableAdd ? null : (
+      {schemaEditMode && (
         <div className="mt-4">
           <AddSchema
             defaultSchema={settings[activeSchemaIndex] || {}}

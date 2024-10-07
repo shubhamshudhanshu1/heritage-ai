@@ -4,9 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchSettingSchemas,
   saveSettingSchema,
-  deleteSettingSchema, // Assuming a delete action is in the same slice.
-} from "@/redux/slices/settingSchemaSlice"; // Adjust the import if needed
-import { Button, Modal, TextField, Box, Typography } from "@mui/material";
+  deleteSettingSchema,
+} from "@/redux/slices/settingSchemaSlice";
+import {
+  Button,
+  Modal,
+  TextField,
+  Box,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import RenderSchema from "./../../components/settingSchema/RenderSchema";
 
 function Components() {
@@ -20,18 +29,16 @@ function Components() {
   const [newSchema, setNewSchema] = useState({
     name: "",
     slug: "",
-    type: "section", // default to "section"
+    type: "section",
     tenantName: "",
     settings: [],
     blocks: [],
   });
 
-  // Fetch schemas on component load
   useEffect(() => {
     dispatch(fetchSettingSchemas({}));
   }, [dispatch]);
 
-  // Handle modal open/close
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -47,22 +54,23 @@ function Components() {
     });
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     setNewSchema({ ...newSchema, [e.target.name]: e.target.value });
   };
 
-  // Handle Add or Edit schema
   const handleSaveSchema = () => {
     if (isEditing) {
-      dispatch(saveSettingSchema({ ...newSchema, _id: editId })); // Pass ID for editing
+      dispatch(saveSettingSchema({ ...newSchema, _id: editId })).then(() => {
+        dispatch(fetchSettingSchemas({}));
+      });
     } else {
-      dispatch(saveSettingSchema(newSchema)); // No ID, creating new
+      dispatch(saveSettingSchema(newSchema)).then(() => {
+        dispatch(fetchSettingSchemas({}));
+      });
     }
     handleCloseModal();
   };
 
-  // Handle Edit Button Click
   const handleEditSchema = (schema) => {
     setNewSchema({
       name: schema.name,
@@ -77,20 +85,24 @@ function Components() {
     handleOpenModal();
   };
 
-  // Handle Delete Button Click
   const handleDeleteSchema = (id) => {
     if (window.confirm("Are you sure you want to delete this schema?")) {
-      dispatch(deleteSettingSchema(id));
+      dispatch(deleteSettingSchema(id)).then(() => {
+        dispatch(fetchSettingSchemas({}));
+      });
     }
   };
 
-  const handleValueChange = (settingsArr) => {
-    console.log(settingsArr);
+  const handleValueChange = (key, value) => {
+    setNewSchema({ ...newSchema, [key]: value });
   };
 
   return (
     <div>
-      <Typography variant="h6">Components</Typography>
+      <div className="w-full flex flex-row justify-between">
+        <Typography variant="h6">Components</Typography>
+        <Button onClick={handleOpenModal}>Add Component</Button>
+      </div>
       {fetchingSchema ? (
         <p>Loading...</p>
       ) : (
@@ -102,50 +114,42 @@ function Components() {
                 key={schema._id}
                 sx={{ border: "1px solid #ddd", padding: 2, margin: 2 }}
               >
-                <Typography variant="h6">{schema.name}</Typography>
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="h6">{schema.name}</Typography>
+                  <Box>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditSchema(schema)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleDeleteSchema(schema._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+
                 <Typography variant="body2">{schema.slug}</Typography>
                 <Typography variant="body2">Type: {schema.type}</Typography>
-                <Typography variant="body2">
-                  Tenant: {schema.tenantName}
+                <Typography className="mt-4" variant="body">
+                  Settings
                 </Typography>
-
-                {schema.settings.length > 0 ? (
-                  <RenderSchema
-                    levelJson={{ settings: schema.settings }}
-                    path={[]}
-                    schemaEditMode={false}
-                    onChangeSettings={(newSettings) =>
-                      handleValueChange("settings", newSettings)
-                    }
-                    disableAdd={true}
-                  />
-                ) : (
-                  <Typography variant="body2">No settings available</Typography>
-                )}
-
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleEditSchema(schema)}
-                  sx={{ marginRight: 2 }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => handleDeleteSchema(schema._id)}
-                >
-                  Delete
-                </Button>
+                <RenderSchema
+                  levelJson={{ settings: schema.settings }}
+                  path={[]}
+                  schemaEditMode={false}
+                  onChangeSettings={(newSettings) =>
+                    handleValueChange("settings", newSettings)
+                  }
+                  isCardView={true}
+                />
               </Box>
             ))}
         </div>
       )}
-
-      <Button variant="contained" color="primary" onClick={handleOpenModal}>
-        Add New Schema
-      </Button>
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
@@ -179,27 +183,17 @@ function Components() {
             fullWidth
             margin="normal"
           />
-          <TextField
-            label="Tenant Name"
-            name="tenantName"
-            value={newSchema.tenantName}
-            onChange={handleInputChange}
-            fullWidth
-            margin="normal"
-          />
-          {newSchema.settings.length > 0 ? (
+          <div className="my-4">
+            <Typography variant="body">Settings</Typography>
             <RenderSchema
               levelJson={{ settings: newSchema.settings }}
               path={[]}
-              schemaEditMode={false}
+              schemaEditMode={true}
               onChangeSettings={(newSettings) =>
                 handleValueChange("settings", newSettings)
               }
-              disableAdd={false}
             />
-          ) : (
-            <Typography variant="body2">No settings available</Typography>
-          )}
+          </div>
 
           <Button
             variant="contained"

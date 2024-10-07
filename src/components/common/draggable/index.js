@@ -12,7 +12,7 @@ function reorder(array, startIndex, endIndex) {
   return result;
 }
 
-function Draggable({ array, renderItem, onDragEnd }) {
+function Draggable({ array = [], renderItem, onDragEnd }) {
   function handleDragEnd(result) {
     if (!result.destination) return;
     const reorderedArray = reorder(
