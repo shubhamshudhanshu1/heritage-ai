@@ -32,6 +32,7 @@ import { blue, grey } from "@mui/material/colors"; // Import colors
 import WidgetsIcon from "@mui/icons-material/Widgets";
 import CallToActionIcon from "@mui/icons-material/CallToAction";
 import CategoryIcon from "@mui/icons-material/Category";
+import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 const drawerWidth = 240;
 
@@ -110,6 +111,7 @@ const icons = {
   Components: <CallToActionIcon />,
   Orders: <WidgetsIcon />,
   Products: <CategoryIcon />,
+  Pages: <FileOpenIcon />,
 };
 
 // Menu items configuration
@@ -213,13 +215,16 @@ export default function ClientLayout({ children, session }) {
                             open ? { mr: 3 } : { mr: "auto" },
                           ]}
                         >
-                          {React.cloneElement(icons[item.name], {
-                            style: {
-                              color: pathname.includes(item.route)
-                                ? blue[500]
-                                : grey[700], // Active route gets blue, inactive grey
-                            },
-                          })}
+                          {React.cloneElement(
+                            icons[item.name] || <WidgetsIcon />,
+                            {
+                              style: {
+                                color: pathname.includes(item.route)
+                                  ? blue[500]
+                                  : grey[700], // Active route gets blue, inactive grey
+                              },
+                            }
+                          )}
                         </ListItemIcon>
                         <ListItemText
                           primary={item.name}

@@ -17,6 +17,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RenderSchema from "./settingSchema/RenderSchema";
+import ChildList from "./settingSchema/childList";
 
 function Schema({ type, title }) {
   const dispatch = useDispatch();
@@ -36,8 +37,8 @@ function Schema({ type, title }) {
   });
 
   useEffect(() => {
-    dispatch(fetchSettingSchemas({}));
-  }, [dispatch]);
+    dispatch(fetchSettingSchemas({ type }));
+  }, [type]);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => {
@@ -133,7 +134,6 @@ function Schema({ type, title }) {
                 </Box>
 
                 <Typography variant="body2">{schema.slug}</Typography>
-                {/* <Typography variant="body2">Type: {schema.type}</Typography> */}
                 <Typography className="mt-4" variant="body">
                   Settings
                 </Typography>
@@ -194,6 +194,26 @@ function Schema({ type, title }) {
               }
             />
           </div>
+
+          <ChildList
+            label={"Blocks"}
+            type={"block"}
+            onChildArrayChange={(arr) => {
+              console.log({ arr });
+            }}
+            dataArr={newSchema.blocks}
+          />
+
+          {type === "page" && (
+            <ChildList
+              label={"Sections"}
+              type={"section"}
+              onChildArrayChange={(arr) => {
+                console.log({ arr });
+              }}
+              dataArr={newSchema.sections}
+            />
+          )}
 
           <Button
             variant="contained"

@@ -22,7 +22,9 @@ export async function GET(request) {
     }
 
     await connectToDatabase();
-    const data = await SettingSchema.find(params).populate("blocks");
+    const data = await SettingSchema.find(params)
+      .populate("blocks")
+      .populate("sections");
 
     return new Response(JSON.stringify(data), {
       status: 200,

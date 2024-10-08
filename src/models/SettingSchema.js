@@ -32,6 +32,7 @@ const settingSchema = new Schema(
       required: false,
     },
     settings: [SettingSchema],
+    sections: [{ type: Schema.Types.ObjectId, ref: "SettingSchema" }],
     blocks: [{ type: Schema.Types.ObjectId, ref: "SettingSchema" }],
   },
   { timestamps: true }
