@@ -20,26 +20,26 @@ const UpdateTenant = () => {
   const [tenantData, setTenantData] = useState({
     tenantName: "",
     description: "",
-    adminUsers: [],
-    userTypes: [],
+    adminUsers: [], // This will store user IDs
+    userTypes: [], // Each user type will have a name and a label
   });
 
-  const [users, setUsers] = useState([]);
-  const [settings, setSettings] = useState([]);
-  const [userTypeInput, setUserTypeInput] = useState("");
-  const [selectedPages, setSelectedPages] = useState([]);
+  const [users, setUsers] = useState([]); // Store user data with both ID and email
+  const [settings, setSettings] = useState([]); // Store page data with both ID and name
+  const [userTypeInput, setUserTypeInput] = useState({ name: "", label: "" });
+  const [selectedPages, setSelectedPages] = useState([]); // Store page IDs
 
   useEffect(() => {
     const fetchUsers = async () => {
       const response = await fetch("/api/user");
       const data = await response.json();
-      setUsers(data.data);
+      setUsers(data.data); // Now store full user data (with IDs)
     };
 
     const fetchSettingSchemas = async (apiParams = {}) => {
       try {
         const response = await fetchSettingSchemasApi(apiParams);
-        setSettings(response);
+        setSettings(response); // Now store full settings data (with IDs)
       } catch (error) {
         console.error("Failed to fetch items:", error);
       }
@@ -64,27 +64,30 @@ const UpdateTenant = () => {
     setTenantData({ ...tenantData, [name]: value });
   };
 
-  const handleAddAdminUser = (email) => {
+  const handleAddAdminUser = (userId) => {
     setTenantData((prev) => ({
       ...prev,
-      adminUsers: [...prev.adminUsers, email],
+      adminUsers: [...prev.adminUsers, userId],
     }));
   };
 
-  const handleRemoveAdminUser = (email) => {
+  const handleRemoveAdminUser = (userId) => {
     setTenantData((prev) => ({
       ...prev,
-      adminUsers: prev.adminUsers.filter((user) => user !== email),
+      adminUsers: prev.adminUsers.filter((user) => user !== userId),
     }));
   };
 
   const handleAddUserType = () => {
-    if (userTypeInput) {
+    if (userTypeInput.name && userTypeInput.label) {
       setTenantData((prev) => ({
         ...prev,
-        userTypes: [...prev.userTypes, { name: userTypeInput }],
+        userTypes: [
+          ...prev.userTypes,
+          { name: userTypeInput.name, label: userTypeInput.label },
+        ],
       }));
-      setUserTypeInput("");
+      setUserTypeInput({ name: "", label: "" });
     }
   };
 
@@ -97,7 +100,16 @@ const UpdateTenant = () => {
 
   const handleSubmit = async () => {
     try {
-      const updatedData = { ...tenantData, pages: selectedPages };
+      // Prepare tenant data, including page IDs and user IDs for the API request
+      const updatedData = {
+        ...tenantData,
+        pages: selectedPages, // Page IDs
+        adminUsers: tenantData.adminUsers, // User IDs
+        userTypes: tenantData.userTypes.map((type) => ({
+          name: type.name,
+          label: type.label,
+        })),
+      };
 
       const response = await fetch(`/api/tenants/${tenantId}`, {
         method: "PUT",
@@ -117,6 +129,8 @@ const UpdateTenant = () => {
       console.error("Error updating tenant:", error);
     }
   };
+
+  console.log({ users });
 
   return (
     <Box sx={{ p: 4 }}>
@@ -147,11 +161,15 @@ const UpdateTenant = () => {
       </Typography>
       <Autocomplete
         multiple
-        options={Array.isArray(users) ? users?.map((user) => user.email) : []}
-        value={tenantData.adminUsers || []}
-        onChange={(e, newValue) =>
-          setTenantData({ ...tenantData, adminUsers: newValue })
-        }
+        options={users || []}
+        getOptionLabel={(option) => option.email}
+        value={tenantData.users}
+        onChange={(e, newValue) => {
+          setTenantData({
+            ...tenantData,
+            adminUsers: newValue,
+          });
+        }}
         renderInput={(params) => <TextField {...params} label="Admin Users" />}
       />
 
@@ -161,7 +179,7 @@ const UpdateTenant = () => {
 
       {tenantData.userTypes?.map((userType, index) => (
         <Box key={index} mb={2} className="flex flex-row justify-between">
-          <Typography variant="body1">{userType.name}</Typography>
+          <Typography variant="body1">{userType.label}</Typography>
           <IconButton onClick={() => handleRemoveUserType(index)}>
             <CloseOutlinedIcon />
           </IconButton>
@@ -169,13 +187,23 @@ const UpdateTenant = () => {
       ))}
       <div className="flex flex-row justify-between items-center gap-2">
         <TextField
-          label="User Type"
-          value={userTypeInput}
-          onChange={(e) => setUserTypeInput(e.target.value)}
+          label="User Type Name"
+          value={userTypeInput.name}
+          onChange={(e) =>
+            setUserTypeInput({ ...userTypeInput, name: e.target.value })
+          }
           fullWidth
           margin="normal"
         />
-
+        <TextField
+          label="User Type Label"
+          value={userTypeInput.label}
+          onChange={(e) =>
+            setUserTypeInput({ ...userTypeInput, label: e.target.value })
+          }
+          fullWidth
+          margin="normal"
+        />
         <Button
           variant="outlined"
           startIcon={<AddCircleIcon />}
@@ -192,9 +220,8 @@ const UpdateTenant = () => {
 
       <Autocomplete
         multiple
-        options={
-          Array.isArray(settings) ? settings?.map((schema) => schema.name) : []
-        }
+        options={settings || []}
+        getOptionLabel={(option) => option.name}
         value={selectedPages}
         onChange={(e, newValue) => setSelectedPages(newValue)}
         renderInput={(params) => <TextField {...params} label="Pages" />}

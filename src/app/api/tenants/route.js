@@ -12,6 +12,7 @@ export async function GET(request) {
   const filter = {};
   if (tenantId) filter._id = tenantId;
   if (tenantName) filter.tenantName = tenantName;
+
   try {
     const tenants = await Tenant.find(filter).populate("userTypes");
     return NextResponse.json({ success: true, data: tenants });
@@ -33,47 +34,56 @@ export async function POST(request) {
       { status: 400 }
     );
   }
+
   try {
+    const tenant = await Tenant.findOne({ tenantName: body.tenantName });
+
     const userTypes = await Promise.all(
       body.userTypes.map(async (type) => {
+        // Check if userType already exists for this tenant
         let userType = await UserType.findOne({
           name: type.name,
-          label: type.label,
+          tenantId: tenant ? tenant._id : null, // Ensure the userType is tenant-specific
         });
 
-        if (!userType) {
-          userType = await UserType.create(type);
+        if (userType) {
+          // Update existing userType if it exists
+          userType = await UserType.findByIdAndUpdate(
+            userType._id,
+            { ...type }, // Update fields if necessary
+            { new: true }
+          );
+        } else {
+          // Create a new userType if it doesn't exist
+          userType = await UserType.create({
+            ...type,
+            tenantId: tenant ? tenant._id : null, // Associate with the tenant
+          });
         }
 
         return userType._id;
       })
     );
 
-    try {
-      const tenant = await Tenant.findOneAndUpdate(
-        { tenantName: body.tenantName },
-        {
-          ...body,
-          userTypes,
-        },
-        {
-          new: true,
-          upsert: true,
-          setDefaultsOnInsert: true,
-        }
-      );
-      return NextResponse.json(
-        { success: true, data: tenant },
-        { status: 200 }
-      );
-    } catch (err) {
-      console.log(err);
-      return NextResponse.json(
-        { success: false, error: err.message },
-        { status: 400 }
-      );
-    }
+    const updatedTenant = await Tenant.findOneAndUpdate(
+      { tenantName: body.tenantName },
+      {
+        ...body,
+        userTypes, // Associate the userTypes with the tenant
+      },
+      {
+        new: true,
+        upsert: true, // Create the tenant if it doesn't exist
+        setDefaultsOnInsert: true,
+      }
+    ).populate("userTypes");
+
+    return NextResponse.json(
+      { success: true, data: updatedTenant },
+      { status: 200 }
+    );
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 400 }
