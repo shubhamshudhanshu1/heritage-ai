@@ -9,6 +9,7 @@ const tenantSchema = new Schema(
       trim: true,
       unique: true,
     },
+    adminUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     meta: {
       type: Map,
       of: Schema.Types.Mixed,

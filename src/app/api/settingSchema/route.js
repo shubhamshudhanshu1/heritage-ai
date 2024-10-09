@@ -49,20 +49,35 @@ export async function POST(request) {
       tenantName,
       settings,
       blocks = [],
+      sections = [], // Adding sections here
     } = await request.json();
 
     await connectToDatabase();
 
+    // Convert blocks and sections to ObjectId
     const blockIds = blocks.map(
       (block) => new mongoose.Types.ObjectId(block._id)
+    );
+    const sectionIds = sections.map(
+      (section) => new mongoose.Types.ObjectId(section._id)
     );
 
     let response;
 
     if (_id) {
+      // Update existing schema
       const updatedSetting = await SettingSchema.findByIdAndUpdate(
         _id,
-        { name, slug, route, type, tenantName, settings, blocks: blockIds },
+        {
+          name,
+          slug,
+          route,
+          type,
+          tenantName,
+          settings,
+          blocks: blockIds,
+          sections: sectionIds, // Adding sections in the update
+        },
         { new: true }
       );
 
@@ -78,6 +93,7 @@ export async function POST(request) {
         headers: { "Content-Type": "application/json" },
       });
     } else {
+      // Create new schema
       const newSetting = new SettingSchema({
         name,
         slug,
@@ -86,6 +102,7 @@ export async function POST(request) {
         tenantName,
         settings,
         blocks: blockIds,
+        sections: sectionIds, // Adding sections in the creation
       });
 
       const savedSetting = await newSetting.save();

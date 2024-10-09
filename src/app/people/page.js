@@ -1,28 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers } from "@/redux/slices/userSlice"; // Adjust the import path
 import ChangeUserRole from "./ChangeUserRole";
 
-async function fetchUsers() {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
-      {
-        cache: "no-store",
-      }
-    );
-    const data = await response?.json();
-    if (data.success) {
-      return data.data || [];
-    } else {
-      throw new Error("Failed to fetch users");
-    }
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
-}
+const People = () => {
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((state) => state.user); // Get users, loading, and error from Redux state
 
-const People = async () => {
-  const users = await fetchUsers();
+  useEffect(() => {
+    dispatch(fetchUsers()); // Dispatch the action to fetch users
+  }, [dispatch]);
+
+  // Loading state
+  if (loading) return <div className="p-10">Loading...</div>;
+
+  // Error state
+  if (error) return <div className="p-10 text-red-500">Error: {error}</div>;
 
   return (
     <div className="p-10">

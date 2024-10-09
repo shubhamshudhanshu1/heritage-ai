@@ -12,7 +12,9 @@ import {
   CircularProgress,
   Alert,
   Button,
+  IconButton,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { fetchTenants } from "@/redux/slices/tenantSlice";
 import { useRouter } from "next/navigation";
 
@@ -20,12 +22,17 @@ const Tenants = () => {
   const dispatch = useDispatch();
   const { tenants, loading, error } = useSelector((state) => state.tenants);
   const router = useRouter();
+
   useEffect(() => {
     dispatch(fetchTenants());
   }, [dispatch]);
 
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
+
+  const handleEditTenant = (tenantId) => {
+    router.push(`/tenants/updateTenant?tenantId=${tenantId}`);
+  };
 
   return (
     <div>
@@ -45,16 +52,33 @@ const Tenants = () => {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
+              <TableCell>Sub-Domain</TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Admin Users</TableCell>
+              <TableCell>User Types</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {tenants.map((tenant) => (
               <TableRow key={tenant._id}>
                 <TableCell>{tenant.tenantId}</TableCell>
+                <TableCell>{tenant.subDomain}</TableCell>
                 <TableCell>{tenant.tenantName}</TableCell>
-                <TableCell>{tenant.email}</TableCell>
+                <TableCell>{tenant.description}</TableCell>
+                <TableCell>{tenant.adminUsers?.join(", ")}</TableCell>
+                <TableCell>
+                  {tenant.userTypes?.map((type) => type.name).join(", ")}
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleEditTenant(tenant._id)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

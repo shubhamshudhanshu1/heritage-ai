@@ -33,6 +33,7 @@ function Schema({ type, title }) {
     type: type,
     tenantName: "",
     settings: [],
+    sections: [],
     blocks: [],
   });
 
@@ -51,6 +52,7 @@ function Schema({ type, title }) {
       type: type,
       tenantName: "",
       settings: [],
+      sections: [],
       blocks: [],
     });
   };
@@ -79,6 +81,7 @@ function Schema({ type, title }) {
       type: schema.type,
       tenantName: schema.tenantName,
       settings: schema.settings || [],
+      sections: schema.sections || [],
       blocks: schema.blocks || [],
     });
     setIsEditing(true);
@@ -134,7 +137,7 @@ function Schema({ type, title }) {
                 </Box>
 
                 <Typography variant="body2">{schema.slug}</Typography>
-                <Typography className="mt-4" variant="body">
+                <Typography className="font-bold text-sm my-2" variant="h6">
                   Settings
                 </Typography>
                 <RenderSchema
@@ -162,6 +165,8 @@ function Schema({ type, title }) {
             padding: 4,
             boxShadow: 24,
             outline: "none",
+            maxHeight: "90vh",
+            overflow: "scroll",
           }}
         >
           <Typography variant="h6" mb={2}>
@@ -184,7 +189,9 @@ function Schema({ type, title }) {
             margin="normal"
           />
           <div className="my-4">
-            <Typography variant="body">Settings</Typography>
+            <Typography className="font-bold text-sm my-2" variant="h6">
+              Settings
+            </Typography>
             <RenderSchema
               levelJson={{ settings: newSchema.settings }}
               path={[]}
@@ -194,13 +201,10 @@ function Schema({ type, title }) {
               }
             />
           </div>
-
           <ChildList
             label={"Blocks"}
             type={"block"}
-            onChildArrayChange={(arr) => {
-              console.log({ arr });
-            }}
+            onChildArrayChange={(arr) => handleValueChange("blocks", arr)}
             dataArr={newSchema.blocks}
           />
 
@@ -208,9 +212,7 @@ function Schema({ type, title }) {
             <ChildList
               label={"Sections"}
               type={"section"}
-              onChildArrayChange={(arr) => {
-                console.log({ arr });
-              }}
+              onChildArrayChange={(arr) => handleValueChange("sections", arr)}
               dataArr={newSchema.sections}
             />
           )}

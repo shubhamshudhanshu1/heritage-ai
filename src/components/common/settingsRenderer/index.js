@@ -58,7 +58,7 @@ function SettingsRenderer({
       <Draggable
         array={settings}
         renderItem={(item, index) => (
-          <div className="flex flex-row gap-0 bg-white items-center w-full p-4 rounded-md">
+          <div className="flex flex-row gap-0 bg-primary-50 items-center w-full p-4 rounded-md">
             <DragIndicatorIcon />
             <div className="w-full">{item.label}</div>
             <div className="flex flex-row gap-2">
