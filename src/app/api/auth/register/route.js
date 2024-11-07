@@ -17,7 +17,10 @@ export async function POST(request) {
       );
     }
     const hashedPassword = await hash(password, 12);
-    const userRole = await Role.findOne({ roleName: "USER" });
+    let userRole = await Role.findOne({ roleName: "USER" });
+    if (!userRole) {
+      userRole = await Role.create({ roleName: "USER" });
+    }
     const newUser = await User.create({
       email,
       password: hashedPassword,

@@ -1,13 +1,13 @@
-import { current } from "@reduxjs/toolkit";
-import CommonComponents from "../components/dynamic";
-import _ from "lodash";
+import { current } from '@reduxjs/toolkit';
+import CommonComponents from '../components/dynamic';
+import _ from 'lodash';
 
 export const renderComponents = (attribute = {}, args = {}) => {
   if (!attribute) return null;
   const type = attribute.type;
   const props = {
     ...attribute,
-    ...args.props,
+    ...args.props
   };
   return <CommonComponents {...props} key={`${type}`} />;
 };
@@ -51,13 +51,7 @@ export const deleteChildUtil = (schema, path) => {
   return schema;
 };
 
-export const updateChildAtIndexUtil = (
-  schema,
-  path,
-  childKey,
-  index,
-  updatedChild
-) => {
+export const updateChildAtIndexUtil = (schema, path, childKey, index, updatedChild) => {
   const target = _.get(schema, [...path, childKey]);
   if (Array.isArray(target) && index < target.length) {
     const updatedArray = [...target];
@@ -96,3 +90,43 @@ export function segregateByTypeAndSlug(data) {
     return acc;
   }, {});
 }
+
+export const getConfigArrFromSchemaArr = (schemaArr = [], configArr = [], options = {}) => {
+  const configMap = configArr.reduce((acc, ele) => {
+    acc[ele.config?.schemaId] = ele;
+    return acc;
+  }, {});
+
+  return configArr.map(config => {
+    const sec = schemaArr.find(schema => schema._id === config.config?.schemaId);
+    const defaultProps =
+      sec?.settings?.reduce((acc, ele) => {
+        acc[ele.id] = ele.default;
+        return acc;
+      }, {}) || {};
+    const savedConfigProps = config.config || {};
+    let result = {
+      name: sec?.name || '',
+      slug: sec?.slug || '',
+      config: {
+        props: { ...defaultProps, ...savedConfigProps.props },
+        ...savedConfigProps,
+        schemaId: sec?._id || ''
+      }
+    };
+    if (options.includeSchemaKey) {
+      result.setting = sec;
+    }
+    return result;
+  });
+};
+
+export const getFirstPathSegment = pathname => {
+  try {
+    const firstSegment = pathname.split('/').filter(Boolean)[0]; // Split by '/', filter out empty parts
+    return firstSegment || ''; // Return the first segment or an empty string if none exists
+  } catch (error) {
+    console.error('Invalid URL:', error);
+    return '';
+  }
+};

@@ -1,22 +1,38 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+import resolveConfig from "tailwindcss/resolveConfig";
+
+const config = {
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
       colors: {
-        primary: "#1976d2",
-        "primary-50": "#f0f6ff",
+        primary: {
+          DEFAULT: "#00927F",
+          dark: "#005f56",
+          light: "#00b2a0",
+        },
+        secondary: {
+          DEFAULT: "#5F6368",
+          light: "#B8BABC",
+        },
+        background: {
+          DEFAULT: "#ffffff",
+          muted: "#f3f4f6",
+        },
+        border: {
+          DEFAULT: "#e5e7eb",
+          active: "#5F6368",
+        },
+        tag: {
+          DEFAULT: "#D1E7FF",
+          text: "#1D4ED8",
+        },
       },
     },
   },
   plugins: [],
 };
+
+const resolvedConfig = resolveConfig(config);
+export default config;
+export { resolvedConfig };

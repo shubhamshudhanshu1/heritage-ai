@@ -3,6 +3,7 @@ import ClientLayout from "./clientLayout";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import "./globals.css";
+import "antd/dist/reset.css"; // import Ant Design styles here
 
 export const metadata = {
   title: "Create Next App",

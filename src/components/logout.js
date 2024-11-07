@@ -10,9 +10,6 @@ import Image from "next/image";
 import { signOut } from "next-auth/react";
 
 function Logout({ username }) {
-  const dispatch = useDispatch();
-  const navigate = () => {};
-
   const [anchorEl, setAnchorEl] = useState(null);
   const [name, setName] = useState("");
   const open = Boolean(anchorEl);
@@ -66,7 +63,7 @@ function Logout({ username }) {
               onLogout();
             }}
             classNames="logout_button"
-            startIcon={<img src={LogOff} alt="" className="logout_icon" />}
+            startIcon={<Image src={LogOff} alt="" className="logout_icon" />}
             label="Logout"
           />
         </div>

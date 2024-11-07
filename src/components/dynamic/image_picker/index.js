@@ -135,7 +135,7 @@ const ImageUpload = ({ label, onImageUpload, preview, ...props }) => {
             >
               {!selectedImage && <Add sx={{ fontSize: 40, color: "#ccc" }} />}
               {selectedImage && (
-                <img
+                <Image
                   src={selectedImage}
                   alt="Selected"
                   style={{

@@ -42,3 +42,28 @@ input:-webkit-autofill {
 input::selection {
   background: transparent; /* Or set your custom color */
 }
+.custom-card .ant-card-body {
+  padding: 16px;
+  /* Or use your Tailwind configured color */
+  border-radius: 8px;
+}
+
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  @apply text-primary-light !important;
+}
+
+.ant-tabs-ink-bar {
+  @apply bg-primary !important;
+}
+
+.ant-tabs-tab:hover .ant-tabs-tab-btn {
+  @apply text-primary-light;
+  /* Customize hover color */
+}
+.ant-btn-primary {
+  @apply bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark;
+}
+
+.ant-btn-variant-outlined {
+  @apply border-primary text-primary-light py-2 px-4 rounded-[100px] hover:!text-primary-light hover:!border-primary-light;
+}

@@ -1,18 +1,17 @@
-// helper/db.js
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export const connectToDatabase = async () => {
-  if (mongoose.connection.readyState >= 1) return;
+  if (mongoose.connection.readyState >= 1) {
+    console.log('Already connected to the database.');
+    return;
+  }
 
   try {
-    console.log("Connecting to database...");
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to database.");
+    console.log('Connecting to database...');
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to database.');
   } catch (error) {
-    console.error("Database connection error:", error);
-    throw new Error("Failed to connect to the database");
+    console.error('Database connection error:', error);
+    throw new Error('Failed to connect to the database');
   }
 };

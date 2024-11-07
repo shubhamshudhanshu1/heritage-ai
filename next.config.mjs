@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   images: {
-    domains: ["cdn.pixelbin.io"], // Add the required domain here
+    domains: ["randomuser.me"], // Add the required domain here
   },
 };
 
