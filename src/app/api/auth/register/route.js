@@ -2,6 +2,7 @@ import { hash } from "bcryptjs";
 import User from "@/models/User";
 import { connectToDatabase } from "@/helper/db";
 import { NextResponse } from "next/server";
+import Role from "@/models/Role";
 
 export async function POST(request) {
   const {
@@ -29,13 +30,17 @@ export async function POST(request) {
     }
     const hashedPassword = await hash(password, 12);
 
+    let userRole = await Role.findOne({ roleName: role });
+    if (!userRole) {
+      userRole = await Role.create({ roleName: role });
+    }
     const newUser = await User.create({
       email,
       password: hashedPassword,
       lastName,
       firstName,
       mobileNumber,
-      role,
+      role: userRole._id,
       companyName,
       itemsPrinted,
       materialsAvailable,

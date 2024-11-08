@@ -12,6 +12,7 @@ import Link from "next/link";
 const Button = dynamic(() => import("antd/es/button"), { ssr: false });
 
 const Header = ({ session }) => {
+  console.log(session.user);
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-white shadow-md">
       {/* Left Section: Hamburger, Logo, and Title */}

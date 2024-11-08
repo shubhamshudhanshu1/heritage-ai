@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -16,6 +16,8 @@ import { signIn } from "next-auth/react";
 const { Title, Text } = Typography;
 const { Option } = Select;
 
+const validatePincode = (pincode) => /^[1-9][0-9]{5}$/.test(pincode);
+
 export default function RegistrationPage() {
   const [role, setRole] = useState("customer");
   const [email, setEmail] = useState("");
@@ -28,17 +30,55 @@ export default function RegistrationPage() {
   const [itemsPrinted, setItemsPrinted] = useState([]);
   const [materialsAvailable, setMaterialsAvailable] = useState([]);
   const [pricing, setPricing] = useState("");
-  const [serviceablePincodes, setServiceablePincodes] = useState("");
+  const [serviceablePincodes, setServiceablePincodes] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [printingItems, setPrintingItems] = useState([]);
+  const [materials, setMaterials] = useState([]);
+
+  useEffect(() => {
+    const fetchLOVs = async () => {
+      try {
+        const itemsResponse = await fetch("/api/lov/printing_item", {
+          method: "GET",
+        });
+        const materialsResponse = await fetch("/api/lov/material", {
+          method: "GET",
+        });
+
+        const itemsData = await itemsResponse.json();
+        const materialsData = await materialsResponse.json();
+
+        setPrintingItems(itemsData);
+        setMaterials(materialsData);
+      } catch (error) {
+        console.error("Error fetching LOVs:", error);
+      }
+    };
+    if (role === "vendor") fetchLOVs();
+  }, [role]);
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
+    for (const pincode of serviceablePincodes) {
+      if (!validatePincode(pincode)) {
+        message.error({
+          content: "Invalid pincode entered",
+          key: "register",
+          duration: 2,
+        });
+        return;
+      }
+    }
+
     setLoading(true);
     message.loading({ content: "Registering...", key: "register" });
+
     try {
       const response = await fetch(`/api/auth/register`, {
         method: "POST",
@@ -98,6 +138,23 @@ export default function RegistrationPage() {
     }
   };
 
+  const handlePincodeChange = (value) => {
+    // Filter invalid pincodes
+    const invalidPincodes = value.filter(
+      (pincode) => !validatePincode(pincode)
+    );
+
+    if (invalidPincodes.length > 0) {
+      message.error(
+        "Invalid pincode(s) entered. Please enter valid 6-digit pincodes."
+      );
+    }
+
+    // Set only valid pincodes
+    const validPincodes = value.filter((pincode) => validatePincode(pincode));
+    setServiceablePincodes(validPincodes);
+  };
+
   return (
     <Form
       onFinish={handleRegister}
@@ -113,27 +170,36 @@ export default function RegistrationPage() {
       }}
     >
       <Title level={3}>Register</Title>
-      <Form.Item label={<CommonLabel>Select Role</CommonLabel>} required>
+      <Form.Item
+        label={<CommonLabel>Select Role</CommonLabel>}
+        required
+        className="!mt-8"
+      >
         <Radio.Group value={role} onChange={(e) => setRole(e.target.value)}>
           <Radio value="customer">Customer</Radio>
           <Radio value="vendor">Vendor</Radio>
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<CommonLabel>First Name</CommonLabel>} required>
-        <Input
-          name="firstName"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item label={<CommonLabel>Last Name</CommonLabel>} required>
-        <Input
-          name="lastName"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
-      </Form.Item>
+      {role === "customer" && (
+        <>
+          <Form.Item label={<CommonLabel>First Name</CommonLabel>} required>
+            <Input
+              name="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item label={<CommonLabel>Last Name</CommonLabel>} required>
+            <Input
+              name="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </Form.Item>
+        </>
+      )}
+
       <Form.Item label={<CommonLabel>Mobile Number</CommonLabel>} required>
         <Input
           name="mobileNumber"
@@ -182,8 +248,8 @@ export default function RegistrationPage() {
               onChange={(value) => setItemsPrinted(value)}
               placeholder="Enter items printed"
             >
-              {itemsPrinted.map((item) => (
-                <Option key={item}>{item}</Option>
+              {printingItems.map((item) => (
+                <Option key={item.name}>{item.name}</Option>
               ))}
             </Select>
           </Form.Item>
@@ -197,8 +263,8 @@ export default function RegistrationPage() {
               onChange={(value) => setMaterialsAvailable(value)}
               placeholder="Enter materials available"
             >
-              {materialsAvailable.map((material) => (
-                <Option key={material}>{material}</Option>
+              {materials.map((material) => (
+                <Option key={material.name}>{material.name}</Option>
               ))}
             </Select>
           </Form.Item>
@@ -220,12 +286,14 @@ export default function RegistrationPage() {
             <Select
               mode="tags"
               value={serviceablePincodes}
-              onChange={(value) => setServiceablePincodes(value)}
+              onChange={handlePincodeChange}
               placeholder="Enter serviceable pincodes"
             >
               {serviceablePincodes &&
                 serviceablePincodes.map((pincode) => (
-                  <Option key={pincode}>{pincode}</Option>
+                  <Option key={pincode} value={pincode}>
+                    {pincode}
+                  </Option>
                 ))}
             </Select>
           </Form.Item>

@@ -4,12 +4,12 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String, required: false },
+    lastName: { type: String, required: false },
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
     mobileNumber: { type: String, required: true, unique: true },
-    role: { type: String, enum: ["vendor", "customer"], required: true },
+    role: { type: Schema.Types.ObjectId, ref: "Role", required: true },
     companyName: { type: String },
     itemsPrinted: [{ type: String }],
     materialsAvailable: [{ type: String }],
