@@ -1,6 +1,15 @@
 "use client";
 import { useState } from "react";
-import { Form, Input, Button, Typography, Select, Radio } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  Select,
+  Radio,
+  Spin,
+  message,
+} from "antd";
 import CommonLabel from "@/components/common/label";
 import { signIn } from "next-auth/react";
 
@@ -21,12 +30,15 @@ export default function RegistrationPage() {
   const [pricing, setPricing] = useState("");
   const [serviceablePincodes, setServiceablePincodes] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+    setLoading(true);
+    message.loading({ content: "Registering...", key: "register" });
     try {
       const response = await fetch(`/api/auth/register`, {
         method: "POST",
@@ -48,18 +60,41 @@ export default function RegistrationPage() {
         }),
       });
       if (response.ok) {
+        message.success({
+          content: "Registration successful!",
+          key: "register",
+          duration: 2,
+        });
+
         await signIn("credentials", {
           email,
           password,
+          redirect: false,
           callbackUrl: "/explore",
+        }).then((res) => {
+          if (res?.ok) {
+            window.location.href = res.url;
+          }
         });
       } else {
         const data = await response.json();
         setError(data.message || "Registration failed");
+        message.error({
+          content: data.message || "Registration failed",
+          key: "register",
+          duration: 2,
+        });
       }
     } catch (err) {
       console.log(err);
       setError("An error occurred during registration");
+      message.error({
+        content: "An error occurred during registration",
+        key: "register",
+        duration: 2,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -200,8 +235,8 @@ export default function RegistrationPage() {
       {error && <Text type="danger">{error}</Text>}
       <div className="mt-4">
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
-            Register
+          <Button type="primary" htmlType="submit" block disabled={loading}>
+            {loading ? <Spin /> : "Register"}
           </Button>
         </Form.Item>
         <Form.Item>

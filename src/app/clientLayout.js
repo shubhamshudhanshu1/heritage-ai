@@ -13,6 +13,7 @@ import {
   OrderedListOutlined,
   StarOutlined,
 } from "@ant-design/icons";
+import "./globals.css";
 
 const menuItems = [
   {
@@ -78,7 +79,7 @@ export default function ClientLayout({ children, session }) {
             <>
               {showHeader && (
                 <div>
-                  <Header />
+                  <Header session={session} />
                 </div>
               )}
 

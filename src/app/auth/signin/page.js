@@ -21,8 +21,7 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [loginMethod, setLoginMethod] = useState("mobile");
 
-  const handleSignIn = async (e) => {
-    e.preventDefault();
+  const handleSignIn = async () => {
     setError("");
     setLoading(true);
     try {
@@ -36,7 +35,7 @@ export default function AuthPage() {
       });
       setLoading(false);
       if (!res.ok) setError(res.error);
-      else window.location.href = "/";
+      else window.location.href = "/explore";
     } catch (err) {
       setLoading(false);
       setError("Login failed. Please check your credentials or OTP.");

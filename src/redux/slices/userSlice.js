@@ -12,7 +12,7 @@ const initialState = {
 
 // Async thunk for fetching users
 export const fetchUsers = createAsyncThunk("user/fetchUsers", async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
+  const response = await fetch(`${process.env.NEXTAUTH_URL}/api/user`, {
     cache: "no-store",
   });
   const data = await response.json();

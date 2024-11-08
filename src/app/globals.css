@@ -64,12 +64,15 @@ input::selection {
 .ant-btn {
   @apply !h-[40px];
 }
-.ant-btn-primary {
-  @apply bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark;
+.ant-btn-variant-solid {
+  @apply !bg-primary !px-4 !py-4 !rounded-[100px] hover:!bg-primary-dark;
 }
 
+.ant-input-outlined {
+  @apply !border-primary  hover:!border-primary-light;
+}
 .ant-btn-variant-outlined {
-  @apply border-primary text-primary-light py-2 px-4 rounded-[100px] hover:!text-primary-light hover:!border-primary-light;
+  @apply !border-primary !text-primary-light !py-2 !px-4 !rounded-[100px] hover:!text-primary-light hover:!border-primary-light;
 }
 
 /* Ant Design Input and Select customization using Tailwind CSS */
@@ -84,6 +87,10 @@ input::selection {
 .ant-input-password:hover,
 .ant-select-selector:hover {
   @apply !border-primary;
+}
+
+.ant-input-password {
+  @apply !px-3 !py-0;
 }
 
 /* Customizing Ant Design Radio Button using Tailwind CSS */
