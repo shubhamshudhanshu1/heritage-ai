@@ -1,17 +1,10 @@
 // components/UserMenu.js
 import React from "react";
-import { Dropdown, Avatar, Menu, Typography } from "antd";
+import { Dropdown, Menu, Typography } from "antd";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { signOut } from "next-auth/react";
 
-// Sample user data - replace with actual user data from props or context
-const user = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-};
-
-const UserMenu = () => {
-  // Define menu items
+const UserMenu = ({ userDetails }) => {
   const menuItems = (
     <Menu
       items={[
@@ -19,11 +12,16 @@ const UserMenu = () => {
           key: "user-info",
           label: (
             <div className="flex flex-col items-start px-4 py-2">
-              <Typography.Text strong>{user.name}</Typography.Text>
-              <Typography.Text type="secondary">{user.email}</Typography.Text>
+              <Typography.Text strong>
+                {userDetails.companyName ||
+                  `${userDetails.firstName} ${userDetails.lastName}`}
+              </Typography.Text>
+              <Typography.Text type="secondary">
+                {userDetails.email}
+              </Typography.Text>
             </div>
           ),
-          disabled: true, // Info only, not clickable
+          disabled: true,
         },
         {
           type: "divider",
@@ -44,7 +42,6 @@ const UserMenu = () => {
 
   // Handle logout action
   const handleLogout = async () => {
-    // Implement your logout functionality here
     console.log("Logging out...");
     await signOut();
   };
@@ -52,11 +49,6 @@ const UserMenu = () => {
   return (
     <Dropdown overlay={menuItems} trigger={["click"]} placement="bottomRight">
       <UserOutlined className="text-xl" />
-      {/* <Avatar
-        icon={<UserOutlined className="text-xl" />}
-        className="cursor-pointer"
-        style={{ backgroundColor: "transaparent", color: "#ffffff" }} // Customize Avatar color to match theme
-      /> */}
     </Dropdown>
   );
 };

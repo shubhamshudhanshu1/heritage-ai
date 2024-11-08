@@ -106,6 +106,14 @@ export const authOptions = {
         token.id = user.id;
         token.email = user.email;
         token.role = user.role;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+        token.mobileNumber = user.mobileNumber;
+        token.companyName = user.companyName;
+        token.itemsPrinted = user.itemsPrinted;
+        token.materialsAvailable = user.materialsAvailable;
+        token.pricing = user.pricing;
+        token.serviceablePincodes = user.serviceablePincodes;
       }
       return token;
     },
@@ -114,6 +122,14 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.email = token.email;
         session.user.role = token.role;
+        session.user.firstName = token.firstName;
+        session.user.lastName = token.lastName;
+        session.user.mobileNumber = token.mobileNumber;
+        session.user.companyName = token.companyName;
+        session.user.itemsPrinted = token.itemsPrinted;
+        session.user.materialsAvailable = token.materialsAvailable;
+        session.user.pricing = token.pricing;
+        session.user.serviceablePincodes = token.serviceablePincodes;
       }
       return session;
     },
