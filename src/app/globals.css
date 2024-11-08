@@ -60,6 +60,10 @@ input::selection {
   @apply text-primary-light;
   /* Customize hover color */
 }
+
+.ant-btn {
+  @apply !h-[40px];
+}
 .ant-btn-primary {
   @apply bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark;
 }
@@ -67,3 +71,30 @@ input::selection {
 .ant-btn-variant-outlined {
   @apply border-primary text-primary-light py-2 px-4 rounded-[100px] hover:!text-primary-light hover:!border-primary-light;
 }
+
+/* Ant Design Input and Select customization using Tailwind CSS */
+.ant-input,
+.ant-input-password,
+.ant-select-selector {
+  @apply !h-10 !border-primary focus:!outline-primary focus:!ring-primary;
+}
+
+/* Add hover effects for better user interaction */
+.ant-input:hover,
+.ant-input-password:hover,
+.ant-select-selector:hover {
+  @apply !border-primary;
+}
+
+/* Customizing Ant Design Radio Button using Tailwind CSS */
+.ant-radio-inner {
+  @apply !border-primary !bg-primary;
+}
+
+.ant-radio-input {
+  @apply !bg-primary;
+}
+/* 
+.ant-radio-wrapper:hover .ant-radio-inner {
+  @apply !border-primary;
+}  */

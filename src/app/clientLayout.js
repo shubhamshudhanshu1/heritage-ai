@@ -67,21 +67,32 @@ export default function ClientLayout({ children, session }) {
       <Provider store={store}>
         <div className="h-screen flex flex-col overflow-scroll">
           {/* Header at the top */}
-          {showHeader && (
+          {isPublicRoute ? (
             <div>
-              <Header />
-            </div>
-          )}
-
-          {/* Main Content Area with Sidebar and Children */}
-          <div className="flex flex-1">
-            {showSidebar && (
-              <div className="w-64">
-                <Sidebar menuItems={menuItems} />
+              <div>
+                <Header session={session} />
               </div>
-            )}
-            <div className="flex-1 p-8 overflow-auto">{children}</div>
-          </div>
+              <div className="m-10">{children}</div>
+            </div>
+          ) : (
+            <>
+              {showHeader && (
+                <div>
+                  <Header />
+                </div>
+              )}
+
+              {/* Main Content Area with Sidebar and Children */}
+              <div className="flex flex-1">
+                {showSidebar && (
+                  <div className="w-64">
+                    <Sidebar menuItems={menuItems} />
+                  </div>
+                )}
+                <div className="flex-1 p-8 overflow-auto">{children}</div>
+              </div>
+            </>
+          )}
         </div>
       </Provider>
     </SessionProvider>

@@ -2,16 +2,19 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-// mySuperSecretPassword;
 const UserSchema = new Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
-    tenants: [{ type: Schema.Types.ObjectId, ref: "Tenant" }],
     mobileNumber: { type: String, required: true, unique: true },
-    role: { type: Schema.Types.ObjectId, ref: "Role", required: true },
+    role: { type: String, enum: ["vendor", "customer"], required: true },
+    companyName: { type: String },
+    itemsPrinted: [{ type: String }],
+    materialsAvailable: [{ type: String }],
+    pricing: { type: Number },
+    serviceablePincodes: [{ type: String }],
   },
   {
     timestamps: true,

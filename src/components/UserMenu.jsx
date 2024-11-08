@@ -2,6 +2,7 @@
 import React from "react";
 import { Dropdown, Avatar, Menu, Typography } from "antd";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { signOut } from "next-auth/react";
 
 // Sample user data - replace with actual user data from props or context
 const user = {
@@ -42,9 +43,10 @@ const UserMenu = () => {
   );
 
   // Handle logout action
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Implement your logout functionality here
     console.log("Logging out...");
+    await signOut();
   };
 
   return (

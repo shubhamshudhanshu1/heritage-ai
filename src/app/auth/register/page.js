@@ -1,43 +1,57 @@
 "use client";
 import { useState } from "react";
-import { TextField, Button, Box, Typography } from "@mui/material";
+import { Form, Input, Button, Typography, Select, Radio } from "antd";
 import CommonLabel from "@/components/common/label";
 import { signIn } from "next-auth/react";
 
-export default function RegisterPage() {
+const { Title, Text } = Typography;
+const { Option } = Select;
+
+export default function RegistrationPage() {
+  const [role, setRole] = useState("customer");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
   const [lastName, setLastName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [itemsPrinted, setItemsPrinted] = useState([]);
+  const [materialsAvailable, setMaterialsAvailable] = useState([]);
+  const [pricing, setPricing] = useState("");
+  const [serviceablePincodes, setServiceablePincodes] = useState("");
   const [error, setError] = useState("");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          role,
           email,
           password,
           firstName,
           lastName,
           mobileNumber,
+          companyName,
+          itemsPrinted,
+          materialsAvailable,
+          pricing,
+          serviceablePincodes,
         }),
       });
       if (response.ok) {
         await signIn("credentials", {
           email,
           password,
-          callbackUrl: "/settings",
+          callbackUrl: "/explore",
         });
       } else {
         const data = await response.json();
@@ -50,94 +64,152 @@ export default function RegisterPage() {
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleRegister}
-      sx={{
-        p: 4,
-        bgcolor: "background.paper",
-        borderRadius: 2,
-        boxShadow: 3,
-        maxWidth: 400,
-        mx: "auto",
+    <Form
+      onFinish={handleRegister}
+      layout="vertical"
+      style={{
+        padding: "24px",
+        backgroundColor: "#fff",
+        borderRadius: "8px",
+        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+        maxWidth: "600px",
+        minWidth: "400px",
+        margin: "0 auto",
       }}
     >
-      <Typography variant="h5" component="h2" gutterBottom>
-        Register
-      </Typography>
-      <CommonLabel>First Name</CommonLabel>
-      <TextField
-        name="firstName"
-        type="text"
-        fullWidth
-        margin="normal"
-        required
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-      />
-      <CommonLabel>Last Name</CommonLabel>
-      <TextField
-        name="lastName"
-        type="text"
-        fullWidth
-        margin="normal"
-        required
-        value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
-      />
-      <CommonLabel>Mobile Number</CommonLabel>
-      <TextField
-        name="mobileNumber"
-        type="number"
-        fullWidth
-        margin="normal"
-        required
-        value={mobileNumber}
-        onChange={(e) => setMobileNumber(e.target.value)}
-      />
-      <CommonLabel>Email</CommonLabel>
-      <TextField
-        name="email"
-        type="email"
-        fullWidth
-        margin="normal"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <CommonLabel>Password</CommonLabel>
-      <TextField
-        name="password"
-        type="password"
-        fullWidth
-        margin="normal"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <CommonLabel>Confirm Password</CommonLabel>
-      <TextField
-        name="confirmPassword"
-        type="password"
-        fullWidth
-        margin="normal"
-        required
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-      />
-      {error && <Typography color="error">{error}</Typography>}
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        fullWidth
-        sx={{ mt: 2 }}
-      >
-        Register
-      </Button>
-      <Button variant="text" fullWidth href="/auth/signin" sx={{ mt: 1 }}>
-        Already have an account? Sign In
-      </Button>
-    </Box>
+      <Title level={3}>Register</Title>
+      <Form.Item label={<CommonLabel>Select Role</CommonLabel>} required>
+        <Radio.Group value={role} onChange={(e) => setRole(e.target.value)}>
+          <Radio value="customer">Customer</Radio>
+          <Radio value="vendor">Vendor</Radio>
+        </Radio.Group>
+      </Form.Item>
+
+      <Form.Item label={<CommonLabel>First Name</CommonLabel>} required>
+        <Input
+          name="firstName"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+      </Form.Item>
+      <Form.Item label={<CommonLabel>Last Name</CommonLabel>} required>
+        <Input
+          name="lastName"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+      </Form.Item>
+      <Form.Item label={<CommonLabel>Mobile Number</CommonLabel>} required>
+        <Input
+          name="mobileNumber"
+          type="tel"
+          pattern="[0-9]{10}"
+          value={mobileNumber}
+          onChange={(e) => setMobileNumber(e.target.value)}
+        />
+      </Form.Item>
+      <Form.Item label={<CommonLabel>Email</CommonLabel>} required>
+        <Input
+          name="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </Form.Item>
+      <Form.Item label={<CommonLabel>Password</CommonLabel>} required>
+        <Input.Password
+          name="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </Form.Item>
+      <Form.Item label={<CommonLabel>Confirm Password</CommonLabel>} required>
+        <Input.Password
+          name="confirmPassword"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+      </Form.Item>
+
+      {role === "vendor" && (
+        <>
+          <Form.Item label={<CommonLabel>Company Name</CommonLabel>} required>
+            <Input
+              name="companyName"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item label={<CommonLabel>Items Printed</CommonLabel>} required>
+            <Select
+              mode="tags"
+              value={itemsPrinted}
+              onChange={(value) => setItemsPrinted(value)}
+              placeholder="Enter items printed"
+            >
+              {itemsPrinted.map((item) => (
+                <Option key={item}>{item}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label={<CommonLabel>Materials Available</CommonLabel>}
+            required
+          >
+            <Select
+              mode="tags"
+              value={materialsAvailable}
+              onChange={(value) => setMaterialsAvailable(value)}
+              placeholder="Enter materials available"
+            >
+              {materialsAvailable.map((material) => (
+                <Option key={material}>{material}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label={<CommonLabel>Initial Pricing (per unit)</CommonLabel>}
+            required
+          >
+            <Input
+              name="pricing"
+              type="number"
+              value={pricing}
+              onChange={(e) => setPricing(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item
+            label={<CommonLabel>Serviceable Pincodes</CommonLabel>}
+            required
+          >
+            <Select
+              mode="tags"
+              value={serviceablePincodes}
+              onChange={(value) => setServiceablePincodes(value)}
+              placeholder="Enter serviceable pincodes"
+            >
+              {serviceablePincodes &&
+                serviceablePincodes.map((pincode) => (
+                  <Option key={pincode}>{pincode}</Option>
+                ))}
+            </Select>
+          </Form.Item>
+        </>
+      )}
+
+      {error && <Text type="danger">{error}</Text>}
+      <div className="mt-4">
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Register
+          </Button>
+        </Form.Item>
+        <Form.Item>
+          <Button href="/auth/signin" block>
+            Already have an account? Sign In
+          </Button>
+        </Form.Item>
+      </div>
+    </Form>
   );
 }
