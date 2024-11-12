@@ -68,7 +68,7 @@ const DesignComponentContent = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <DesignHeader onSave={handleSave} />
+      <DesignHeader onSave={handleSave} designId={id} />
 
       {/* Tab Navigation */}
       <div className="flex border-b-2 font-medium">

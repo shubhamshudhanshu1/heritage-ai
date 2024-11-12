@@ -1,16 +1,24 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useDesign } from "./DesignContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import defaultIamge from "/public/assets/images/ai.png";
 
-const DesignHeader = ({ onSave }) => {
+const DesignHeader = ({ onSave, designId }) => {
   const router = useRouter();
   const {
     designData: { specification = {}, designType = "New", status = "Draft" },
   } = useDesign();
 
   let image = specification.generatedImages?.[0] || defaultIamge;
+
+  const handleSave = () => {
+    onSave();
+    if (designId === "new") {
+      router.back();
+    }
+  };
+
   return (
     <header className="flex items-center justify-between p-4 bg-white shadow-sm rounded-lg mb-6">
       <div className="flex items-center">
@@ -40,7 +48,7 @@ const DesignHeader = ({ onSave }) => {
       {/* Save Button */}
       <button
         className="bg-primary w-26 text-white px-4 py-2 rounded-full shadow-md hover:bg-primary-dark transition duration-200"
-        onClick={() => onSave()}
+        onClick={handleSave}
       >
         Save
       </button>

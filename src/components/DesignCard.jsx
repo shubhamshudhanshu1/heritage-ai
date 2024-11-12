@@ -10,7 +10,6 @@ const DesignCard = ({ design }) => {
   // Extract values from the design object
   const {
     _id,
-    previewImages,
     designType,
     specifications,
     description = `Design a ${designType} made of ${
@@ -18,7 +17,7 @@ const DesignCard = ({ design }) => {
     }`,
   } = design;
 
-  const image = previewImages?.[0] || logo; // Default image
+  const favImage = specifications?.fav_images?.[0] || logo; // Default image
 
   // Link to the specific design page
   const link = `/design/${_id}`;
@@ -26,7 +25,6 @@ const DesignCard = ({ design }) => {
   const handleEditClick = () => {
     router.push(link); // Navigate to edit page
   };
-  console.log({ image, link });
 
   return (
     <Card
@@ -39,7 +37,13 @@ const DesignCard = ({ design }) => {
         padding: "16px 24px",
       }}
     >
-      <Image src={image} />
+      <Image
+        src={favImage.src}
+        alt={favImage.alt}
+        height={50}
+        width={50}
+        className="object-cover rounded-full shadow-md"
+      />
       <div className="ml-4 flex-1">
         <h3 className="text-lg font-semibold text-secondary-dark mb-1">
           {designType}

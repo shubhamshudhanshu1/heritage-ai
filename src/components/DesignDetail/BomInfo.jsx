@@ -39,15 +39,6 @@ const BomInfo = () => {
                 ))}
               </ul>
             </div>
-            {favImage && index === 0 && (
-              <Image
-                src={favImage.src}
-                alt={favImage.alt}
-                height={160}
-                width={160}
-                className="object-cover rounded-lg shadow-md"
-              />
-            )}
           </div>
         );
       }
@@ -61,15 +52,6 @@ const BomInfo = () => {
               <li>{spec}</li>
             </ul>
           </div>
-          {favImage && index === 0 && (
-            <Image
-              src={favImage.src}
-              alt={favImage.alt}
-              height={160}
-              width={160}
-              className="object-cover rounded-lg shadow-md"
-            />
-          )}
         </div>
       );
     });
@@ -81,8 +63,21 @@ const BomInfo = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Bill of Materials for {title || designType}
         </h2>
-        <div className="text-gray-500 mb-6">
-          {renderSpecifications(specifications)}
+        <div className="flex flex-row gap-2 justify-between">
+          <div className="text-gray-500">
+            {renderSpecifications(specifications)}
+          </div>
+          {favImage && (
+            <div className="flex justify-center items-start">
+              <Image
+                src={favImage.src}
+                alt={favImage.alt}
+                height={160}
+                width={160}
+                className="object-contain rounded-lg"
+              />
+            </div>
+          )}
         </div>
       </div>
       <div className="rounded shadow-md p-6">
