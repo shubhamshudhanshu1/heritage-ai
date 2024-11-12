@@ -2,13 +2,16 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useDesign } from "./DesignContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import defaultIamge from "/public/assets/images/ai.png";
 
 const DesignHeader = () => {
   const router = useRouter();
   const {
-    designData: { image = "", title = "", status = "" },
+    designData: { specification = {}, designType = "New", status = "Draft" },
   } = useDesign();
+  console.log({ specification });
 
+  let image = specification.generatedImages?.[0] || defaultIamge;
   return (
     <header className="flex items-center justify-between p-4 bg-white shadow-sm rounded-lg mb-6">
       <div className="flex items-center">
@@ -24,11 +27,13 @@ const DesignHeader = () => {
         {/* Design Icon and Title */}
         <Image
           src={image}
-          alt={`${title} Icon`}
+          alt={`${designType} Icon`}
           className="rounded-full w-10 h-10 mr-3"
         />
         <div>
-          <h1 className="text-xl font-bold text-gray-800">{title}</h1>
+          <h1 className="text-xl font-bold text-gray-800">
+            {designType} Design
+          </h1>
           <span className="text-gray-500 text-sm">({status})</span>
         </div>
       </div>

@@ -65,56 +65,9 @@ let chatJson = {
       ],
     },
   ],
-  "Gift Box": [
-    {
-      question:
-        "Which part of the gift box would you like to choose a material for?",
-      type: "select",
-      options: ["Outer Box", "Inner Lining", "Partitions"],
-    },
-    {
-      question: "What material would you like for the {part}?",
-      type: "select",
-      options: ["Cardboard", "Kraft Paper", "Corrugated Board", "Rigid Box"],
-    },
-    {
-      question: "What box type do you want?",
-      type: "select",
-      options: [
-        "Lid and Base",
-        "Magnetic Closure",
-        "Drawer Box",
-        "Foldable Box",
-      ],
-    },
-    { question: "Would you like partitions inside the box?", type: "boolean" },
-    { question: "Any inserts for the box?", type: "text" },
-  ],
-  Tin: [
-    {
-      question: "What part of the tin do you want to choose a material for?",
-      type: "select",
-      options: ["Body", "Lid", "Base"],
-    },
-    {
-      question: "What material would you like for the {part}?",
-      type: "select",
-      options: ["Tinplate", "Aluminum", "Stainless Steel"],
-    },
-    {
-      question: "What type of coating?",
-      type: "select",
-      options: ["Lacquered", "Powder-Coated"],
-    },
-    {
-      question: "What shape do you want for the tin?",
-      type: "select",
-      options: ["Cylindrical", "Rectangular", "Square", "Custom Shape"],
-    },
-  ],
 };
 
-const ChatbotDesignSelector = () => {
+const ChatbotDesignSelector = ({ handleChange }) => {
   const [chatHistory, setChatHistory] = useState([
     {
       isAI: true,
@@ -163,40 +116,37 @@ const ChatbotDesignSelector = () => {
         },
       ]);
       setCurrentStep(null); // No further steps
-      // Call API to save data when all steps are completed
-      saveDesignData();
     }
     setInputValue(null); // Reset the input value after submission
+
+    // Send the updated payload to the parent
+    handleChange({ designType, specifications: updatedResponses });
   };
 
-  // Function to send data to API
-  const saveDesignData = async () => {
-    try {
-      const response = await fetch("/api/saveDesign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: "user123", // Replace with actual user ID if available
-          designType,
-          specifications: responses,
-        }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        notification.success({
-          message: "Design Saved",
-          description: "Your design details were successfully saved!",
-        });
-      } else {
-        throw new Error(data.message || "Failed to save design.");
-      }
-    } catch (error) {
-      notification.error({
-        message: "Error",
-        description:
-          error.message || "An error occurred while saving the design.",
-      });
-    }
+  // Handle generating an image
+  const handleGenerateImage = () => {
+    const newGeneratedImage = {
+      src: "/public/assets/images/random-design.jpg", // Placeholder image
+      alt: `Generated Design for ${designType}`,
+    };
+
+    // Update responses to include the generated image
+    const updatedResponses = {
+      ...responses,
+      generatedImages: [
+        ...(responses.generatedImages || []),
+        newGeneratedImage,
+      ],
+    };
+    setResponses(updatedResponses);
+
+    // Send the updated payload to the parent component
+    handleChange({ designType, specifications: updatedResponses });
+
+    // Notification for image generation
+    notification.info({
+      message: "Image has been generated and added to the gallery.",
+    });
   };
 
   const renderInput = () => {
@@ -262,12 +212,13 @@ const ChatbotDesignSelector = () => {
     setCurrentStep(null);
     setResponses({});
     setInputValue(null);
+    handleChange({ designType: null, specifications: {} });
   };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <div className="mt-4 flex flex-col gap-5">
-        <div className="h-[500px] overflow-y-auto pr-3">
+        <div className="max-h-[500px] overflow-y-auto pr-3">
           <List
             className="chat-history"
             dataSource={chatHistory}
@@ -309,12 +260,12 @@ const ChatbotDesignSelector = () => {
             }}
           />
         </div>
-        <Space direction="vertical" size="middle" className="mt-4" align="end">
+        <div className="mt-4 w-full flex flex-col items-end">
           {!designType && (
             <Select
               placeholder="Select an item to design"
               onChange={handleDesignTypeSelect}
-              style={{ width: "100%" }}
+              className="w-full"
               value={inputValue}
             >
               {Object.keys(chatJson).map((item) => (
@@ -328,36 +279,16 @@ const ChatbotDesignSelector = () => {
           {!currentStep && designType && (
             <Button
               type="primary"
-              style={{ alignSelf: "flex-end" }}
-              onClick={() => {
-                setChatHistory((prev) => [
-                  ...prev,
-                  {
-                    isAI: true,
-                    message: `Here is a preview of your design!`,
-                  },
-                  {
-                    isAI: true,
-                    message: (
-                      <Image
-                        src="/public/assets/images/random-design.jpg"
-                        alt="Generated Design"
-                        width={200}
-                        height={200}
-                      />
-                    ),
-                  },
-                ]);
-                notification.info({ message: "Generate Image" });
-              }}
+              className="self-end mt-4"
+              onClick={handleGenerateImage}
             >
               Generate Image
             </Button>
           )}
-          <Button type="default" onClick={resetChat}>
+          <Button type="text" className="ml-0 mt-4" onClick={resetChat}>
             Reset Chat
           </Button>
-        </Space>
+        </div>
       </div>
     </div>
   );

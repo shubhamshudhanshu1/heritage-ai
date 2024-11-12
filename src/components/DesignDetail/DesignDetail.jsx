@@ -1,22 +1,35 @@
 "use client";
 import ChatHistory from "./ChatHistory";
+import { useDesign } from "./DesignContext";
 import PreviewGallery from "./PreviewGallery";
-import ActionBar from "./ActionBar";
-import { useState } from "react";
 
 const DesignDetail = () => {
-  const [generatedImages, setGeneratedImages] = useState([]);
+  const { setDesignData, designData } = useDesign();
+
+  const handleDesignPayload = (payload) => {
+    setDesignData(payload);
+  };
+  console.log({ designData });
+
+  let generatedImages = designData.specifications?.generatedImages || [];
 
   return (
     <div className="flex flex-1 gap-6">
-      <div className=" bg-white py-6 w-full">
-        <ChatHistory />
+      <div
+        className={`bg-white pt-6 ${
+          generatedImages.length > 0 ? "w-1/2" : "w-full"
+        }`}
+      >
+        <ChatHistory
+          handleChange={handleDesignPayload}
+          designData={designData}
+        />
       </div>
-      {generatedImages.length > 0 ? (
-        <div className="flex-1 bg-gray-100 p-6 rounded-[30px] shadow-lg overflow-y-auto">
+      {generatedImages.length > 0 && (
+        <div className="w-1/2 bg-gray-100 rounded-[30px] shadow-lg p-6 mt-4">
           <PreviewGallery />
         </div>
-      ) : null}
+      )}
     </div>
   );
 };
