@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Select, Input, Button, Typography, List, Avatar, Space } from "antd";
+import { Select, Input, Button, List, Avatar, Space, notification } from "antd";
 import aiImage from "/public/assets/images/ai.png";
 import Image from "next/image";
 
@@ -11,15 +11,25 @@ let userImage = "https://randomuser.me/api/portraits/women/32.jpg";
 let chatJson = {
   "T-shirt": [
     {
-      question:
-        "What part of the T-shirt would you like to choose a material for?",
-      type: "select",
-      options: ["Body", "Sleeves", "Collar", "Pocket"],
-    },
-    {
-      question: "What material would you like for the {part}?",
+      question: "What material would you like for the body of the T-shirt?",
+      part: "Body",
       type: "select",
       options: ["Cotton", "Polyester", "Cotton-Poly Blend", "Silk", "Lycra"],
+      key: "material",
+    },
+    {
+      question: "What material would you like for the sleeves?",
+      part: "Sleeves",
+      type: "select",
+      options: ["Cotton", "Polyester", "Cotton-Poly Blend", "Silk", "Lycra"],
+      key: "material",
+    },
+    {
+      question: "What material would you like for the collar?",
+      part: "Collar",
+      type: "select",
+      options: ["Cotton", "Polyester", "Cotton-Poly Blend", "Silk", "Lycra"],
+      key: "material",
     },
     {
       question: "What is the fabric weight?",
@@ -37,11 +47,6 @@ let chatJson = {
         "Short Sleeve",
         "Tank Top",
       ],
-    },
-    {
-      question: "Which fit would you prefer?",
-      type: "select",
-      options: ["Regular", "Slim Fit", "Loose Fit"],
     },
     {
       question: "Which sizes are available?",
@@ -121,6 +126,8 @@ const ChatbotDesignSelector = () => {
   const [designType, setDesignType] = useState(null);
   const [currentStep, setCurrentStep] = useState(null);
   const [responses, setResponses] = useState({});
+  const [inputValue, setInputValue] = useState(null);
+
   const handleDesignTypeSelect = (value) => {
     setDesignType(value);
     setCurrentStep(chatJson[value][0]);
@@ -132,8 +139,11 @@ const ChatbotDesignSelector = () => {
   };
 
   const handleAnswerSubmit = (answer) => {
-    const updatedResponses = { ...responses, [currentStepIndex]: answer };
+    const updatedResponses = { ...responses };
+    updatedResponses[currentStep.part || currentStepIndex] = answer;
     setResponses(updatedResponses);
+
+    setChatHistory((prev) => [...prev, { isAI: false, message: answer }]);
 
     const nextStepIndex = currentStepIndex + 1;
     if (nextStepIndex < chatJson[designType].length) {
@@ -142,21 +152,21 @@ const ChatbotDesignSelector = () => {
       setCurrentStepIndex(nextStepIndex);
       setChatHistory((prev) => [
         ...prev,
-        { isAI: false, message: answer },
         { isAI: true, message: nextStep.question },
       ]);
     } else {
       setChatHistory((prev) => [
         ...prev,
-        { isAI: false, message: answer },
         {
           isAI: true,
           message: `Thank you for providing all the details for your ${designType} design!`,
         },
       ]);
+      setCurrentStep(null); // No further steps
       // Call API to save data when all steps are completed
       saveDesignData();
     }
+    setInputValue(null); // Reset the input value after submission
   };
 
   // Function to send data to API
@@ -198,7 +208,11 @@ const ChatbotDesignSelector = () => {
           mode={currentStep.type === "multi-select" ? "multiple" : undefined}
           placeholder={currentStep.question}
           style={{ width: "100%" }}
-          onChange={(value) => handleAnswerSubmit(value)}
+          value={inputValue}
+          onChange={(value) => {
+            setInputValue(value);
+            handleAnswerSubmit(value);
+          }}
         >
           {currentStep.options.map((option) => (
             <Option key={option} value={option}>
@@ -212,7 +226,11 @@ const ChatbotDesignSelector = () => {
         <Select
           placeholder={currentStep.question}
           style={{ width: "100%" }}
-          onChange={(value) => handleAnswerSubmit(value)}
+          value={inputValue}
+          onChange={(value) => {
+            setInputValue(value);
+            handleAnswerSubmit(value);
+          }}
         >
           <Option value="Yes">Yes</Option>
           <Option value="No">No</Option>
@@ -223,6 +241,8 @@ const ChatbotDesignSelector = () => {
         <TextArea
           placeholder={currentStep.question}
           rows={3}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           onPressEnter={(e) => handleAnswerSubmit(e.target.value)}
         />
       );
@@ -231,44 +251,54 @@ const ChatbotDesignSelector = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
-      {/* <Typography.Title level={4}>Design Assistant Chatbot</Typography.Title> */}
       <div className="mt-4 flex flex-col gap-5">
         <List
           className="chat-history"
           dataSource={chatHistory}
           renderItem={(chat, index) => {
             if (chat.isAI) {
-              <List.Item key={index} className={`flex items-start space-x-3`}>
-                <Image
-                  src={aiImage}
-                  alt="Avatar"
-                  width={35}
-                  height={35}
-                  style={"100%"}
-                />
-                <div className="text-gray-700 text-sm">{chat.message}</div>
-              </List.Item>;
+              return (
+                <List.Item
+                  key={index}
+                  className={`flex items-start space-x-3 mb-4 !bg-[#F3F9F8] !p-3 rounded-[20px] !border-0`}
+                  style={{ borderBlockEnd: "unset !important" }}
+                >
+                  <Image
+                    src={aiImage}
+                    alt="Avatar"
+                    width={35}
+                    height={35}
+                    style={{ borderRadius: "100%" }}
+                  />
+                  <div className="text-gray-700 text-sm">{chat.message}</div>
+                </List.Item>
+              );
             }
             return (
-              <List.Item key={index} className={`flex items-start space-x-3`}>
+              <List.Item
+                key={index}
+                className={`flex items-start mb-4 space-x-3`}
+                style={{ borderBlockEnd: "unset !important" }}
+              >
                 <Image
                   src={userImage}
                   alt="Avatar"
                   width={35}
                   height={35}
-                  style={"100%"}
+                  style={{ borderRadius: "100%" }}
                 />
                 <div className="text-gray-700 text-sm">{chat.message}</div>
               </List.Item>
             );
           }}
         />
-        <Space direction="vertical" size="middle" className="mt-4">
+        <Space direction="vertical" size="middle" className="mt-4" align="end">
           {!designType && (
             <Select
               placeholder="Select an item to design"
               onChange={handleDesignTypeSelect}
               style={{ width: "100%" }}
+              value={inputValue}
             >
               {Object.keys(chatJson).map((item) => (
                 <Option key={item} value={item}>
@@ -278,6 +308,15 @@ const ChatbotDesignSelector = () => {
             </Select>
           )}
           {designType && currentStep && renderInput()}
+          {!currentStep && designType && (
+            <Button
+              type="primary"
+              style={{ alignSelf: "flex-end" }}
+              onClick={() => notification.info({ message: "Generate Image" })}
+            >
+              Generate Image
+            </Button>
+          )}
         </Space>
       </div>
     </div>
