@@ -25,13 +25,15 @@ const Header = ({ session }) => {
       {/* Right Section: Actions */}
       {session ? (
         <div className="flex items-center space-x-4">
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            className="bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark"
-          >
-            New Design
-          </Button>
+          <Link href="/design/new" passHref>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              className="bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark"
+            >
+              New Design
+            </Button>
+          </Link>
           <QuestionCircleOutlined className="text-xl" />
           <UserMenu userDetails={session?.user} />
         </div>

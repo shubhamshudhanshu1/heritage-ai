@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import { Select, Input, Button, List, Avatar, Space, notification } from "antd";
+import React, { useState, useEffect } from "react";
+import { Select, Input, Button, List, Avatar, notification } from "antd";
 import aiImage from "/public/assets/images/ai.png";
 import Image from "next/image";
 
@@ -67,28 +67,56 @@ let chatJson = {
   ],
 };
 
-const ChatbotDesignSelector = ({ handleChange }) => {
-  const [chatHistory, setChatHistory] = useState([
-    {
-      isAI: true,
-      message:
-        "Hello! I'd be happy to help you design something. What would you like to design today?",
-    },
-  ]);
+const ChatbotDesignSelector = ({ handleChange, savedData }) => {
+  const [chatHistory, setChatHistory] = useState([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [designType, setDesignType] = useState(null);
   const [currentStep, setCurrentStep] = useState(null);
   const [responses, setResponses] = useState({});
   const [inputValue, setInputValue] = useState(null);
 
+  // Load saved data if available
+  useEffect(() => {
+    if (savedData) {
+      setChatHistory(
+        savedData.chatHistory || [
+          {
+            isAI: true,
+            message:
+              "Hello! I'd be happy to help you design something. What would you like to design today?",
+          },
+        ]
+      );
+      setCurrentStepIndex(savedData.currentStepIndex || 0);
+      setDesignType(savedData.designType || null);
+      setResponses(savedData.responses || {});
+      if (
+        savedData.designType &&
+        savedData.currentStepIndex < chatJson[savedData.designType]?.length
+      ) {
+        setCurrentStep(
+          chatJson[savedData.designType][savedData.currentStepIndex]
+        );
+      }
+    }
+  }, [savedData]);
+
   const handleDesignTypeSelect = (value) => {
     setDesignType(value);
-    setCurrentStep(chatJson[value][0]);
-    setChatHistory((prev) => [
-      ...prev,
+    const newStep = chatJson[value][0];
+    setCurrentStep(newStep);
+    const updatedChatHistory = [
+      ...chatHistory,
       { isAI: false, message: `I want to design a ${value}.` },
-      { isAI: true, message: chatJson[value][0].question },
-    ]);
+      { isAI: true, message: newStep.question },
+    ];
+    setChatHistory(updatedChatHistory);
+    handleChange({
+      designType: value,
+      specifications: responses,
+      chatHistory: updatedChatHistory,
+      currentStepIndex: 0,
+    });
   };
 
   const handleAnswerSubmit = (answer) => {
@@ -96,31 +124,35 @@ const ChatbotDesignSelector = ({ handleChange }) => {
     updatedResponses[currentStep.part || currentStepIndex] = answer;
     setResponses(updatedResponses);
 
-    setChatHistory((prev) => [...prev, { isAI: false, message: answer }]);
+    const updatedChatHistory = [
+      ...chatHistory,
+      { isAI: false, message: answer },
+    ];
+    setChatHistory(updatedChatHistory);
 
     const nextStepIndex = currentStepIndex + 1;
     if (nextStepIndex < chatJson[designType].length) {
       const nextStep = chatJson[designType][nextStepIndex];
       setCurrentStep(nextStep);
       setCurrentStepIndex(nextStepIndex);
-      setChatHistory((prev) => [
-        ...prev,
-        { isAI: true, message: nextStep.question },
-      ]);
+      updatedChatHistory.push({ isAI: true, message: nextStep.question });
     } else {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          isAI: true,
-          message: `Thank you for providing all the details for your ${designType} design!`,
-        },
-      ]);
+      updatedChatHistory.push({
+        isAI: true,
+        message: `Thank you for providing all the details for your ${designType} design!`,
+      });
       setCurrentStep(null); // No further steps
     }
     setInputValue(null); // Reset the input value after submission
+    setChatHistory(updatedChatHistory);
 
     // Send the updated payload to the parent
-    handleChange({ designType, specifications: updatedResponses });
+    handleChange({
+      designType,
+      specifications: updatedResponses,
+      chatHistory: updatedChatHistory,
+      currentStepIndex: nextStepIndex,
+    });
   };
 
   // Handle generating an image
@@ -141,7 +173,12 @@ const ChatbotDesignSelector = ({ handleChange }) => {
     setResponses(updatedResponses);
 
     // Send the updated payload to the parent component
-    handleChange({ designType, specifications: updatedResponses });
+    handleChange({
+      designType,
+      specifications: updatedResponses,
+      chatHistory,
+      currentStepIndex,
+    });
 
     // Notification for image generation
     notification.info({
@@ -200,19 +237,25 @@ const ChatbotDesignSelector = ({ handleChange }) => {
   };
 
   const resetChat = () => {
-    setChatHistory([
+    const resetChatHistory = [
       {
         isAI: true,
         message:
           "Hello! I'd be happy to help you design something. What would you like to design today?",
       },
-    ]);
+    ];
+    setChatHistory(resetChatHistory);
     setCurrentStepIndex(0);
     setDesignType(null);
     setCurrentStep(null);
     setResponses({});
     setInputValue(null);
-    handleChange({ designType: null, specifications: {} });
+    handleChange({
+      designType: null,
+      specifications: {},
+      chatHistory: resetChatHistory,
+      currentStepIndex: 0,
+    });
   };
 
   return (

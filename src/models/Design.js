@@ -20,6 +20,15 @@ const DesignSchema = new Schema(
     // Flexible fields for design specifications
     specifications: { type: Schema.Types.Mixed }, // Holds JSON-like design data
 
+    // New fields for chat history and current step index
+    chatHistory: [
+      {
+        isAI: { type: Boolean, required: true },
+        message: { type: Schema.Types.Mixed, required: true },
+      },
+    ],
+    currentStepIndex: { type: Number, default: 0 }, // Tracks the current step in the design process
+
     // General packaging requirements or other metadata
     metadata: { type: Schema.Types.Mixed }, // Additional data or configuration
   },

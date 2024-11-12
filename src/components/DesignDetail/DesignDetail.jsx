@@ -22,7 +22,7 @@ const DesignDetail = () => {
       >
         <ChatHistory
           handleChange={handleDesignPayload}
-          designData={designData}
+          savedData={designData}
         />
       </div>
       {generatedImages.length > 0 && (

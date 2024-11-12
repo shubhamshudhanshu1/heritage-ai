@@ -4,7 +4,16 @@ import Design from "@/models/Design";
 
 // 1. Create Design API
 export async function createDesign(req, res) {
-  const { userId, title, description, tags, previewImages } = req.body;
+  const {
+    userId,
+    title,
+    description,
+    tags,
+    previewImages,
+    chatHistory,
+    currentStepIndex,
+    specifications,
+  } = req.body;
 
   try {
     await connectToDatabase();
@@ -14,6 +23,9 @@ export async function createDesign(req, res) {
       description,
       tags,
       previewImages,
+      chatHistory,
+      currentStepIndex,
+      specifications,
       lastAccessedAt: new Date(),
     });
     res
@@ -96,9 +108,9 @@ export async function getDesignById(req, res) {
 
 // 6. Get Recent Designs by User ID API
 export async function getRecentDesigns(req, res) {
-  try {
-    const userId = req.nextUrl.searchParams.get("userId");
+  const { userId } = req.query;
 
+  try {
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }

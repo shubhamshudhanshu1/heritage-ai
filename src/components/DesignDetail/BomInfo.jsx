@@ -13,13 +13,8 @@ const BomInfo = () => {
     );
   }
 
-  const {
-    designType,
-    title,
-    description,
-    packagingRequirements,
-    ...specificDetails
-  } = designData;
+  const { designType, title, packagingRequirements, ...specificDetails } =
+    designData;
 
   // Function to render specifications dynamically
   const renderSpecifications = (specifications) => {
@@ -28,20 +23,26 @@ const BomInfo = () => {
 
       // Handle fields that are arrays (e.g., materials, sizes)
       if (Array.isArray(spec)) {
-        return spec.map((item, i) => (
-          <div key={`${key}-${i}`}>
-            <p className="font-semibold">{`${index + 1}. ${
-              item.part || key
-            }`}</p>
-            <ul className="list-disc pl-6 mb-2">
-              {Object.entries(item).map(([field, value]) => (
-                <li key={`${key}-${i}-${field}`}>
-                  {field}: {value}
-                </li>
-              ))}
-            </ul>
+        return (
+          <div key={`${key}-${index}`}>
+            <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
+            {spec.map((item, i) => (
+              <div key={`${key}-${i}`} className="pl-4">
+                <ul className="list-disc pl-6 mb-2">
+                  {Object.entries(item).map(([field, value]) => (
+                    <li key={`${key}-${i}-${field}`}>
+                      {`${field}: ${
+                        typeof value === "object"
+                          ? JSON.stringify(value)
+                          : value
+                      }`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-        ));
+        );
       }
 
       // Handle nested objects
@@ -51,7 +52,9 @@ const BomInfo = () => {
             <p className="font-semibold">{`${index + 1}. ${key}`}</p>
             <ul className="list-disc pl-6 mb-2">
               {Object.entries(spec).map(([field, value]) => (
-                <li key={`${key}-${field}`}>{`${field}: ${value}`}</li>
+                <li key={`${key}-${field}`}>{`${field}: ${
+                  typeof value === "object" ? JSON.stringify(value) : value
+                }`}</li>
               ))}
             </ul>
           </div>
@@ -63,7 +66,7 @@ const BomInfo = () => {
         <div key={key}>
           <p className="font-semibold">{`${index + 1}. ${key}`}</p>
           <ul className="list-disc pl-6 mb-2">
-            <li>{spec}</li>
+            <li>{typeof spec === "object" ? JSON.stringify(spec) : spec}</li>
           </ul>
         </div>
       );
