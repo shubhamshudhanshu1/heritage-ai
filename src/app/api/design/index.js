@@ -96,13 +96,18 @@ export async function getDesignById(req, res) {
 
 // 6. Get Recent Designs by User ID API
 export async function getRecentDesigns(req, res) {
-  const { userId } = req.query;
-
   try {
+    const userId = req.nextUrl.searchParams.get("userId");
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
     await connectToDatabase();
     const recentDesigns = await Design.find({ userId })
       .sort({ lastAccessedAt: -1 })
       .limit(5);
+
     res.status(200).json({ data: recentDesigns });
   } catch (err) {
     console.error(err);

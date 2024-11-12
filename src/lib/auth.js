@@ -52,7 +52,6 @@ export const authOptions = {
             return user; // Return user object for email/password authentication
           } else if (credentials.mobile && credentials.otp) {
             // Handle mobile/OTP authentication
-            console.log({ credentials });
             const user = await User.findOne({
               mobileNumber: credentials.mobile,
             }).populate({

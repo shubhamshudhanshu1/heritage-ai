@@ -1,10 +1,12 @@
 // otpService.js
+import { connectToDatabase } from "@/helper/db";
 import User from "../models/User"; // Adjust the import based on your User model location
 
 let otpStore = {};
 
 const otpService = {
   sendOtp: async (mobileNumber) => {
+    await connectToDatabase(); // Ensure DB connection
     const user = await User.findOne({ mobileNumber }); // Adjust the field name as needed
     if (!user) {
       throw new Error("Mobile number does not exist");
@@ -19,6 +21,7 @@ const otpService = {
   },
 
   verifyOtp: async (mobileNumber, otp) => {
+    await connectToDatabase(); // Ensure DB connection
     const storedOtpData = otpStore[mobileNumber];
     return true;
     if (!storedOtpData) {

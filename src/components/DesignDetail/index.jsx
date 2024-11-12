@@ -46,7 +46,7 @@ const DesignComponentContent = () => {
       <DesignHeader />
 
       {/* Tab Navigation */}
-      <div className="flex border-b-2  w-1/2 font-medium ">
+      <div className="flex border-b-2  font-medium ">
         <button
           className={`px-4 py-2  ${
             activeTab === "Design" ? "border-b-2  border-green-500 top-1" : ""
@@ -66,7 +66,7 @@ const DesignComponentContent = () => {
       </div>
 
       {/* Render based on Active Tab */}
-      <div className="flex-1 overflow-hidden p-6">
+      <div className="flex-1 min-h-[600px]">
         {activeTab === "Design" && <DesignDetail />}
         {activeTab === "BOM" && <BOMDetail />}
       </div>

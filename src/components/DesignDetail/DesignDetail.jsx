@@ -1,18 +1,22 @@
+"use client";
 import ChatHistory from "./ChatHistory";
 import PreviewGallery from "./PreviewGallery";
 import ActionBar from "./ActionBar";
+import { useState } from "react";
 
 const DesignDetail = () => {
+  const [generatedImages, setGeneratedImages] = useState([]);
+
   return (
-    <div className="flex flex-1 overflow-hidden p-6 gap-6">
-      <aside className="w-1/2 bg-white p-6 rounded-lg shadow-lg overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4">Chat History</h2>
+    <div className="flex flex-1 gap-6">
+      <div className=" bg-white py-6 w-full">
         <ChatHistory />
-        <ActionBar />
-      </aside>
-      <main className="flex-1 bg-gray-100 p-6 rounded-lg shadow-lg overflow-y-auto">
-        <PreviewGallery />
-      </main>
+      </div>
+      {generatedImages.length > 0 ? (
+        <div className="flex-1 bg-gray-100 p-6 rounded-[30px] shadow-lg overflow-y-auto">
+          <PreviewGallery />
+        </div>
+      ) : null}
     </div>
   );
 };
