@@ -9,7 +9,6 @@ const DesignDetail = () => {
   const handleDesignPayload = (payload) => {
     setDesignData(payload);
   };
-  console.log({ designData });
 
   let generatedImages = designData.specifications?.generatedImages || [];
 

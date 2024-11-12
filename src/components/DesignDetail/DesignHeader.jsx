@@ -9,7 +9,6 @@ const DesignHeader = () => {
   const {
     designData: { specification = {}, designType = "New", status = "Draft" },
   } = useDesign();
-  console.log({ specification });
 
   let image = specification.generatedImages?.[0] || defaultIamge;
   return (

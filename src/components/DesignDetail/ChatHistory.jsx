@@ -89,7 +89,7 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
       );
       setCurrentStepIndex(savedData.currentStepIndex || 0);
       setDesignType(savedData.designType || null);
-      setResponses(savedData.responses || {});
+      setResponses(savedData.specifications || {});
       if (
         savedData.designType &&
         savedData.currentStepIndex < chatJson[savedData.designType]?.length
@@ -121,6 +121,7 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
 
   const handleAnswerSubmit = (answer) => {
     const updatedResponses = { ...responses };
+    console.log({ updatedResponses, responses });
     updatedResponses[currentStep.part || currentStepIndex] = answer;
     setResponses(updatedResponses);
 
@@ -145,8 +146,8 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
     }
     setInputValue(null); // Reset the input value after submission
     setChatHistory(updatedChatHistory);
-
-    // Send the updated payload to the parent
+    console.log({ updatedResponses });
+    // Send the udated payload to the parent
     handleChange({
       designType,
       specifications: updatedResponses,
