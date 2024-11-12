@@ -249,22 +249,55 @@ const ChatbotDesignSelector = () => {
     }
   };
 
+  const resetChat = () => {
+    setChatHistory([
+      {
+        isAI: true,
+        message:
+          "Hello! I'd be happy to help you design something. What would you like to design today?",
+      },
+    ]);
+    setCurrentStepIndex(0);
+    setDesignType(null);
+    setCurrentStep(null);
+    setResponses({});
+    setInputValue(null);
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <div className="mt-4 flex flex-col gap-5">
-        <List
-          className="chat-history"
-          dataSource={chatHistory}
-          renderItem={(chat, index) => {
-            if (chat.isAI) {
+        <div className="h-[500px] overflow-y-auto pr-3">
+          <List
+            className="chat-history"
+            dataSource={chatHistory}
+            renderItem={(chat, index) => {
+              if (chat.isAI) {
+                return (
+                  <List.Item
+                    key={index}
+                    style={{ borderBlockEnd: "unset !important" }}
+                    className={`flex items-start space-x-3 mb-4 !bg-[#F3F9F8] !p-3 rounded-[20px] !border-0`}
+                  >
+                    <Image
+                      src={aiImage}
+                      alt="Avatar"
+                      width={35}
+                      height={35}
+                      style={{ borderRadius: "100%" }}
+                    />
+                    <div className="text-gray-700 text-sm">{chat.message}</div>
+                  </List.Item>
+                );
+              }
               return (
                 <List.Item
                   key={index}
-                  className={`flex items-start space-x-3 mb-4 !bg-[#F3F9F8] !p-3 rounded-[20px] !border-0`}
                   style={{ borderBlockEnd: "unset !important" }}
+                  className={`flex items-start mb-4 space-x-3`}
                 >
                   <Image
-                    src={aiImage}
+                    src={userImage}
                     alt="Avatar"
                     width={35}
                     height={35}
@@ -273,25 +306,9 @@ const ChatbotDesignSelector = () => {
                   <div className="text-gray-700 text-sm">{chat.message}</div>
                 </List.Item>
               );
-            }
-            return (
-              <List.Item
-                key={index}
-                className={`flex items-start mb-4 space-x-3`}
-                style={{ borderBlockEnd: "unset !important" }}
-              >
-                <Image
-                  src={userImage}
-                  alt="Avatar"
-                  width={35}
-                  height={35}
-                  style={{ borderRadius: "100%" }}
-                />
-                <div className="text-gray-700 text-sm">{chat.message}</div>
-              </List.Item>
-            );
-          }}
-        />
+            }}
+          />
+        </div>
         <Space direction="vertical" size="middle" className="mt-4" align="end">
           {!designType && (
             <Select
@@ -312,11 +329,34 @@ const ChatbotDesignSelector = () => {
             <Button
               type="primary"
               style={{ alignSelf: "flex-end" }}
-              onClick={() => notification.info({ message: "Generate Image" })}
+              onClick={() => {
+                setChatHistory((prev) => [
+                  ...prev,
+                  {
+                    isAI: true,
+                    message: `Here is a preview of your design!`,
+                  },
+                  {
+                    isAI: true,
+                    message: (
+                      <Image
+                        src="/public/assets/images/random-design.jpg"
+                        alt="Generated Design"
+                        width={200}
+                        height={200}
+                      />
+                    ),
+                  },
+                ]);
+                notification.info({ message: "Generate Image" });
+              }}
             >
               Generate Image
             </Button>
           )}
+          <Button type="default" onClick={resetChat}>
+            Reset Chat
+          </Button>
         </Space>
       </div>
     </div>
