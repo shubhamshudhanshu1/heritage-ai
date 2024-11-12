@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button, message } from "antd";
 import ManufacturerCard from "./ManufactureCard";
 import { useSession } from "next-auth/react";
-import { useDesign } from "./DesignContext";
 
 /**
  * Counter component for increment and decrement of quantity.
@@ -47,9 +46,7 @@ const Vendors = ({ materials }) => {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { designData } = useDesign();
 
-  let designId = designData._id;
   useEffect(() => {
     const fetchVendors = async () => {
       if (!materials || materials.length === 0) {

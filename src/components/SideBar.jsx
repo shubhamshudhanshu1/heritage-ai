@@ -1,10 +1,14 @@
 "use client";
 import React from "react";
 import { Menu } from "antd";
-import Link from "next/link"; // Use next/link for routing in Next.js
-import { usePathname } from "next/navigation"; // Import useRouter from next/router
-import { AppstoreOutlined, CommentOutlined } from "@ant-design/icons";
-import { resolvedConfig } from "../../tailwind.config"; // Make sure the tailwind config is accessible
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  AppstoreOutlined,
+  CloudFilled,
+  CommentOutlined,
+} from "@ant-design/icons";
+import { resolvedConfig } from "../../tailwind.config";
 import dynamic from "next/dynamic";
 
 // Use dynamic imports for specific components
@@ -27,11 +31,32 @@ const recentDesigns = [
   },
 ];
 
-const Sidebar = ({ menuItems = [] }) => {
+const iconsMap = {
+  "my-orders": <AppstoreOutlined />, // Example icon
+  "my-account": <AppstoreOutlined />,
+  support: <AppstoreOutlined />,
+  explore: <AppstoreOutlined />,
+  "design-details": <AppstoreOutlined />,
+};
+
+const Sidebar = ({ allowedModules = [] }) => {
   const pathname = usePathname(); // Get the current pathname
   const primaryColor = resolvedConfig.theme.colors.primary.DEFAULT;
   const backgroundColor = resolvedConfig.theme.colors.background.DEFAULT;
   const secondaryColor = resolvedConfig.theme.colors.secondary.DEFAULT;
+
+  // Filter the menu items based on allowed modules
+  const filteredMenuItems = allowedModules.map((module) => {
+    console.log({ module });
+    return {
+      key: module.route,
+      label: module.name,
+      icon: iconsMap[module.slug],
+      ...module.config,
+    };
+  });
+
+  console.log({ filteredMenuItems, allowedModules });
 
   return (
     <div className="h-full p-6 w-72">
@@ -45,7 +70,7 @@ const Sidebar = ({ menuItems = [] }) => {
         className="border-none"
         style={{ paddingRight: "0", borderInlineEnd: "none" }} // Remove right border and padding
       >
-        {menuItems.map((item) => {
+        {filteredMenuItems.map((item) => {
           const isSelected = pathname === item.key;
           const styles = {
             backgroundColor: isSelected ? primaryColor : "",
@@ -72,12 +97,13 @@ const Sidebar = ({ menuItems = [] }) => {
                     isSelected ? "border-background" : "bg-background-muted"
                   }`}
                 >
-                  {React.cloneElement(item.icon, {
-                    style: {
-                      fontSize: "16px",
-                      color: isSelected ? backgroundColor : secondaryColor,
-                    },
-                  })}
+                  {item.icon &&
+                    React.cloneElement(item.icon, {
+                      style: {
+                        fontSize: "16px",
+                        color: isSelected ? backgroundColor : secondaryColor,
+                      },
+                    })}
                 </div>
                 <span
                   className={isSelected ? "text-background" : "text-secondary"}

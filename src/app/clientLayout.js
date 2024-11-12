@@ -15,53 +15,50 @@ import {
 } from "@ant-design/icons";
 import "./globals.css";
 
-const menuItems = [
-  {
-    key: "/myOrders",
-    label: "My Orders",
+const iconsMap = {
+  "my-orders": {
     icon: <OrderedListOutlined />,
+    config: { showHeader: true, showSidebar: true },
   },
-  {
-    key: "/myAccount",
-    label: "My Account",
+  "my-account": {
     icon: <UserOutlined />,
+    config: { showHeader: true, showSidebar: true },
   },
-  {
-    key: "/support",
-    label: "Support",
+  support: {
     icon: <AppstoreOutlined />,
+    config: { showHeader: true, showSidebar: true },
   },
-  {
-    key: "/explore",
-    label: "Explore",
+  explore: {
     icon: <StarOutlined />,
-    extraClasses: "mt-4",
+    config: { showHeader: true, showSidebar: true },
   },
-  {
-    key: "/design",
-    show: false,
-    label: "Design Details",
+  "design-details": {
     icon: <StarOutlined />,
-    extraClasses: "mt-4",
-    config: {
-      showHeader: false,
-      showSidebar: false,
-    },
+    config: { showHeader: false, showSidebar: false },
   },
-];
+};
 
 let publicRoutes = ["/auth/signin", "/auth/register"];
 
 export default function ClientLayout({ children, session }) {
   const pathname = usePathname();
+
+  // Filter allowed modules based on session
+  let allowedModules = session?.user?.role?.allowedModules || [];
+  let menuItems = allowedModules.map((module) => ({
+    key: module.route,
+    label: module.name,
+    icon: iconsMap[module.slug]?.icon,
+    config: { ...iconsMap[module.slug]?.config, ...module.config },
+  }));
+
   let activeRoute = menuItems.find((item) => pathname.includes(item.key));
   let { showHeader = true, showSidebar = true } = activeRoute?.config || {};
   let isPublicRoute = publicRoutes.includes(pathname);
+
   if (!isPublicRoute && !session) {
     redirect("/auth/signin");
   }
-
-  let allowedModules = session?.user?.role?.allowedModules || [];
 
   return (
     <SessionProvider>
@@ -87,7 +84,7 @@ export default function ClientLayout({ children, session }) {
               <div className="flex flex-1">
                 {showSidebar && (
                   <div className="w-64">
-                    <Sidebar menuItems={menuItems} />
+                    <Sidebar allowedModules={allowedModules} />
                   </div>
                 )}
                 <div className="flex-1 p-8 overflow-auto">{children}</div>

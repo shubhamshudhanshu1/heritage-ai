@@ -11,6 +11,7 @@ export async function POST(req) {
     deliveryTime,
     gst,
     quantity,
+    userId,
   } = await req.json();
 
   if (!designId || !vendorId || !quantity) {
@@ -24,9 +25,12 @@ export async function POST(req) {
     await connectToDatabase();
 
     const totalAmount =
-      unitPrice * quantity + shippingCost + (gst / 100) * unitPrice * quantity;
+      unitPrice * quantity +
+        shippingCost +
+        (gst / 100) * unitPrice * quantity || 0;
 
     const quotation = await Quotation.create({
+      userId,
       designId,
       vendorId,
       unitPrice,

@@ -153,3 +153,10 @@ export const getRandomImage = () => {
   ];
   return images[Math.floor(Math.random() * images.length)];
 };
+
+export const getDefaultPage = (session) => {
+  if (session?.user?.role?.roleName === "vendor") {
+    return "/myOrders";
+  }
+  return "/explore";
+};

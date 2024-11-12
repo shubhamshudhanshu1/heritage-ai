@@ -1,11 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
 import { Form, Input, Button, Typography, message, Spin } from "antd";
 import { MailOutlined, LockOutlined, MobileOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import ErrorMessage from "./../../../components/auth/ErrorMessage";
+import { getDefaultPage } from "@/helper/utils";
 
 const { Title } = Typography;
 
@@ -20,6 +21,7 @@ export default function AuthPage() {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [error, setError] = useState("");
   const [loginMethod, setLoginMethod] = useState("mobile");
+  const { data: session } = useSession();
 
   const handleSignIn = async () => {
     setError("");
@@ -35,7 +37,7 @@ export default function AuthPage() {
       });
       setLoading(false);
       if (!res.ok) setError(res.error);
-      else window.location.href = "/explore";
+      else window.location.href = getDefaultPage(session);
     } catch (err) {
       setLoading(false);
       setError("Login failed. Please check your credentials or OTP.");

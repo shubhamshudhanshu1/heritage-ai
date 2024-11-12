@@ -11,7 +11,8 @@ import {
   message,
 } from "antd";
 import CommonLabel from "@/components/common/label";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { getDefaultPage } from "./../../../helper/utils";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -36,6 +37,7 @@ export default function RegistrationPage() {
 
   const [printingItems, setPrintingItems] = useState([]);
   const [materials, setMaterials] = useState([]);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchLOVs = async () => {
@@ -110,7 +112,7 @@ export default function RegistrationPage() {
           email,
           password,
           redirect: false,
-          callbackUrl: "/explore",
+          callbackUrl: getDefaultPage(session),
         }).then((res) => {
           if (res?.ok) {
             window.location.href = res.url;
