@@ -1,10 +1,36 @@
 import Image from "next/image";
 import { useDesign } from "./DesignContext";
+import { useState } from "react";
+import { HeartOutlined, HeartFilled } from "@ant-design/icons";
 
 const PreviewGallery = () => {
-  const { designData } = useDesign();
+  const { designData = {}, setDesignData } = useDesign();
+  const [wishlist, setWishlist] = useState(
+    designData.specifications?.fav_images || []
+  );
 
   let previews = designData.specifications?.generatedImages || [];
+
+  const handleAddToWishlist = (option) => {
+    let updatedWishlist;
+    if (wishlist.some((item) => item.src === option.src)) {
+      // Remove from wishlist if already present
+      updatedWishlist = wishlist.filter((item) => item.src !== option.src);
+    } else {
+      // Add to wishlist if not present
+      updatedWishlist = [...wishlist, option];
+    }
+    setWishlist(updatedWishlist);
+
+    // Update the design data in context
+    setDesignData({
+      ...designData,
+      specifications: {
+        ...designData.specifications,
+        fav_images: updatedWishlist,
+      },
+    });
+  };
 
   return (
     <div>
@@ -15,11 +41,13 @@ const PreviewGallery = () => {
         {previews?.map((option, index) => (
           <div
             key={index}
-            className="w-[200px] h-[300px] bg-white p-4 rounded-lg shadow-lg transition duration-200 hover:shadow-xl"
+            className="w-[200px] h-[300px] bg-white p-4 rounded-lg shadow-lg transition duration-200 hover:shadow-xl relative"
           >
             <Image
-              src={option.image}
-              alt={option.label}
+              src={option.src}
+              alt={option.alt}
+              width={100}
+              height={100}
               className="w-full object-contain rounded-lg mb-4 max-h-48"
               style={{
                 aspectRatio: "3/4", // Ensures responsive aspect ratio
@@ -35,8 +63,15 @@ const PreviewGallery = () => {
                 </p>
               </div>
               <div className="flex justify-center mt-auto">
-                <button className="text-red-500 hover:text-red-600 transition">
-                  <i className="far fa-heart"></i>
+                <button
+                  className="text-red-500 hover:text-red-600 transition absolute top-1 right-2"
+                  onClick={() => handleAddToWishlist(option)}
+                >
+                  {wishlist.some((item) => item.src === option.src) ? (
+                    <HeartFilled />
+                  ) : (
+                    <HeartOutlined />
+                  )}
                 </button>
               </div>
             </div>

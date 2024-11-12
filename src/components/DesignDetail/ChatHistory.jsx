@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Select, Input, Button, List, Avatar, notification } from "antd";
 import aiImage from "/public/assets/images/ai.png";
 import Image from "next/image";
-
+import { getRandomImage } from "./../../helper/utils";
 const { Option } = Select;
 const { TextArea } = Input;
 let userImage = "https://randomuser.me/api/portraits/women/32.jpg";
@@ -11,32 +11,34 @@ let userImage = "https://randomuser.me/api/portraits/women/32.jpg";
 let chatJson = {
   "T-shirt": [
     {
+      key: "body_material",
       question: "What material would you like for the body of the T-shirt?",
       part: "Body",
       type: "select",
       options: ["Cotton", "Polyester", "Cotton-Poly Blend", "Silk", "Lycra"],
-      key: "material",
     },
     {
+      key: "sleeves_material",
       question: "What material would you like for the sleeves?",
       part: "Sleeves",
       type: "select",
       options: ["Cotton", "Polyester", "Cotton-Poly Blend", "Silk", "Lycra"],
-      key: "material",
     },
     {
+      key: "collar_material",
       question: "What material would you like for the collar?",
       part: "Collar",
       type: "select",
       options: ["Cotton", "Polyester", "Cotton-Poly Blend", "Silk", "Lycra"],
-      key: "material",
     },
     {
+      key: "fabric_weight",
       question: "What is the fabric weight?",
       type: "select",
       options: ["Light", "Medium", "Heavy"],
     },
     {
+      key: "style_preference",
       question: "What style do you prefer?",
       type: "select",
       options: [
@@ -49,11 +51,13 @@ let chatJson = {
       ],
     },
     {
+      key: "available_sizes",
       question: "Which sizes are available?",
       type: "multi-select",
       options: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"],
     },
     {
+      key: "printing_type",
       question: "What is the printing type?",
       type: "select",
       options: [
@@ -75,6 +79,7 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
   const [responses, setResponses] = useState({});
   const [inputValue, setInputValue] = useState(null);
 
+  console.log({ savedData });
   // Load saved data if available
   useEffect(() => {
     if (savedData) {
@@ -120,9 +125,7 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
   };
 
   const handleAnswerSubmit = (answer) => {
-    const updatedResponses = { ...responses };
-    console.log({ updatedResponses, responses });
-    updatedResponses[currentStep.part || currentStepIndex] = answer;
+    const updatedResponses = { ...responses, [currentStep.key]: answer };
     setResponses(updatedResponses);
 
     const updatedChatHistory = [
@@ -146,8 +149,8 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
     }
     setInputValue(null); // Reset the input value after submission
     setChatHistory(updatedChatHistory);
-    console.log({ updatedResponses });
-    // Send the udated payload to the parent
+
+    // Send the updated payload to the parent
     handleChange({
       designType,
       specifications: updatedResponses,
@@ -159,7 +162,7 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
   // Handle generating an image
   const handleGenerateImage = () => {
     const newGeneratedImage = {
-      src: "/public/assets/images/random-design.jpg", // Placeholder image
+      src: getRandomImage(), // Random image from the function
       alt: `Generated Design for ${designType}`,
     };
 

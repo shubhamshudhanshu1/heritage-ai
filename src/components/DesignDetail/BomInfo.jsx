@@ -13,48 +13,24 @@ const BomInfo = () => {
     );
   }
 
-  const { designType, title, packagingRequirements, ...specificDetails } =
-    designData;
+  const { designType, title, specifications } = designData;
 
   // Function to render specifications dynamically
   const renderSpecifications = (specifications) => {
     return Object.keys(specifications).map((key, index) => {
       const spec = specifications[key];
 
-      // Handle fields that are arrays (e.g., materials, sizes)
+      // Skip image fields
+      if (key === "generatedImages" || key === "fav_images") return null;
+
+      // Handle fields that are arrays (e.g., sizes)
       if (Array.isArray(spec)) {
         return (
           <div key={`${key}-${index}`}>
             <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
-            {spec.map((item, i) => (
-              <div key={`${key}-${i}`} className="pl-4">
-                <ul className="list-disc pl-6 mb-2">
-                  {Object.entries(item).map(([field, value]) => (
-                    <li key={`${key}-${i}-${field}`}>
-                      {`${field}: ${
-                        typeof value === "object"
-                          ? JSON.stringify(value)
-                          : value
-                      }`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        );
-      }
-
-      // Handle nested objects
-      if (typeof spec === "object" && spec !== null) {
-        return (
-          <div key={key}>
-            <p className="font-semibold">{`${index + 1}. ${key}`}</p>
             <ul className="list-disc pl-6 mb-2">
-              {Object.entries(spec).map(([field, value]) => (
-                <li key={`${key}-${field}`}>{`${field}: ${
-                  typeof value === "object" ? JSON.stringify(value) : value
-                }`}</li>
+              {spec.map((item, i) => (
+                <li key={`${key}-${i}`}>{item}</li>
               ))}
             </ul>
           </div>
@@ -64,9 +40,9 @@ const BomInfo = () => {
       // Handle simple fields
       return (
         <div key={key}>
-          <p className="font-semibold">{`${index + 1}. ${key}`}</p>
+          <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
           <ul className="list-disc pl-6 mb-2">
-            <li>{typeof spec === "object" ? JSON.stringify(spec) : spec}</li>
+            <li>{spec}</li>
           </ul>
         </div>
       );
@@ -80,15 +56,7 @@ const BomInfo = () => {
           Bill of Materials for {title || designType}
         </h2>
         <div className="text-gray-500 mb-6">
-          {renderSpecifications(specificDetails)}
-          {packagingRequirements && (
-            <>
-              <p className="font-semibold">Packaging Requirements:</p>
-              <ul className="list-disc pl-6 mb-2">
-                <li>{packagingRequirements}</li>
-              </ul>
-            </>
-          )}
+          {renderSpecifications(specifications)}
         </div>
       </div>
       <div className="rounded shadow-md p-6">

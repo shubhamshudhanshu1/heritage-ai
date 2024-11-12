@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { manufacturersdata } from "./mockdata";
+import { useState, useEffect } from "react";
 import { Button } from "antd";
 import ManufacturerCard from "./ManufactureCard";
 
@@ -14,7 +13,8 @@ const QuantityCounter = ({ quantity, setQuantity }) => {
     <div className="flex items-center border rounded">
       <button
         onClick={decrement}
-        className="px-2 py-1 border-r text-gray-500 hover:bg-gray-100">
+        className="px-2 py-1 border-r text-gray-500 hover:bg-gray-100"
+      >
         -
       </button>
       <input
@@ -25,7 +25,8 @@ const QuantityCounter = ({ quantity, setQuantity }) => {
       />
       <button
         onClick={increment}
-        className="px-2 py-1 border-l text-gray-500 hover:bg-gray-100">
+        className="px-2 py-1 border-l text-gray-500 hover:bg-gray-100"
+      >
         +
       </button>
     </div>
@@ -33,55 +34,95 @@ const QuantityCounter = ({ quantity, setQuantity }) => {
 };
 
 /**
- * Renders a list of manufacturers with single-selection functionality.
- * Each manufacturer is displayed using the ManufacturerCard component.
+ * Renders a list of vendors with single-selection functionality.
+ * Each vendor is displayed using the ManufacturerCard component.
  * Includes a counter for specifying quantity and a button to request a quote.
  */
-const Manufacturers = () => {
+const Vendors = ({ materials }) => {
   const [quantity, setQuantity] = useState(50);
-  const [selectedManufacturer, setSelectedManufacturer] = useState(null);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [vendors, setVendors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      if (!materials || materials.length === 0) {
+        setVendors([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/vendors?materials=${materials.join(",")}`
+        );
+        const result = await response.json();
+        setVendors(result.data);
+        setError(null);
+      } catch (err) {
+        setError("Failed to load vendors");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVendors();
+  }, [materials]);
 
   const handleSelect = (index) => {
     // Toggle selection for single-select mode
-    setSelectedManufacturer((prevSelected) =>
+    setSelectedVendor((prevSelected) =>
       prevSelected === index ? null : index
     );
   };
 
-  const isSelected = (index) => selectedManufacturer === index;
+  const isSelected = (index) => selectedVendor === index;
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>
-      <h2 className="text-lg text-center font-semibold   text-gray-500 mb-4">
-        Select Manufacturer
+      <h2 className="text-lg text-center font-semibold text-gray-500 mb-4">
+        Select Vendor
       </h2>
-      {manufacturersdata.map((manufacturer, index) => (
-        <div
-          key={index}
-          onClick={() => handleSelect(index)}
-          className="cursor-pointer">
-          <input
-            type="radio"
-            checked={isSelected(index)}
-            onChange={() => handleSelect(index)}
-            className="mr-3"
-            hidden
-          />
+      <div className="flex flex-col justify-between">
+        {vendors && vendors.length > 0 ? (
+          vendors.map((vendor, index) => (
+            <div
+              key={index}
+              onClick={() => handleSelect(index)}
+              className="cursor-pointer"
+            >
+              <input
+                type="radio"
+                checked={isSelected(index)}
+                onChange={() => handleSelect(index)}
+                className="mr-3"
+                hidden
+              />
 
-          <ManufacturerCard {...manufacturer} isSelected={isSelected(index)} />
+              <ManufacturerCard {...vendor} isSelected={isSelected(index)} />
+            </div>
+          ))
+        ) : (
+          <div>No vendors available for the selected materials</div>
+        )}
+        <div className="flex justify-end p-4 items-center space-x-3">
+          <QuantityCounter quantity={quantity} setQuantity={setQuantity} />
+          <Button
+            type="primary"
+            disabled={selectedVendor === null}
+            className="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:!bg-green-600 transition duration-200"
+          >
+            Request Quote
+          </Button>
         </div>
-      ))}
-      <div className="flex justify-end  p-4 items-center space-x-3">
-        <QuantityCounter quantity={quantity} setQuantity={setQuantity} />
-        <Button
-          type="primary"
-          disabled={selectedManufacturer === null}
-          className="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:!bg-green-600 transition duration-200">
-          Request Quote
-        </Button>
       </div>
     </div>
   );
 };
 
-export default Manufacturers;
+export default Vendors;

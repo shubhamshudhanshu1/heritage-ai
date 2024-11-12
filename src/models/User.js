@@ -13,7 +13,14 @@ const UserSchema = new Schema(
     companyName: { type: String },
     itemsPrinted: [{ type: String }],
     materialsAvailable: [{ type: String }],
-    pricing: { type: Number },
+    pricingRange: { type: String }, // E.g., "₹5-15/Unit"
+    minimumOrderQuantity: { type: Number }, // Minimum order units
+    deliveryTime: { type: String }, // Delivery duration, e.g., "10 days"
+    description: { type: String }, // Vendor description
+    location: { type: String }, // Location of the vendor
+    yearsOfExperience: { type: Number }, // Years in business
+    numberOfJobs: { type: Number }, // Number of jobs completed
+    rating: { type: Number }, // Rating, e.g., 4.5/5
     serviceablePincodes: [{ type: String }],
   },
   {
