@@ -2,9 +2,26 @@
 import { Card, Avatar, Tooltip } from "antd";
 import { MoreOutlined, EditOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-
-const DesignCard = ({ image, title, description, link }) => {
+import logo from "/public/assets/images/ai.png";
+import Image from "next/image";
+const DesignCard = ({ design }) => {
   const router = useRouter();
+
+  // Extract values from the design object
+  const {
+    _id,
+    previewImages,
+    designType,
+    specifications,
+    description = `Design a ${designType} made of ${
+      specifications?.body_material || "material not specified"
+    }`,
+  } = design;
+
+  const image = previewImages?.[0] || logo; // Default image
+
+  // Link to the specific design page
+  const link = `/design/${_id}`;
 
   const handleEditClick = () => {
     router.push(link); // Navigate to edit page
@@ -22,10 +39,10 @@ const DesignCard = ({ image, title, description, link }) => {
         padding: "16px 24px",
       }}
     >
-      <Avatar src={image} style={{ width: "48px", height: "48px" }} />
+      <Image src={image} />
       <div className="ml-4 flex-1">
         <h3 className="text-lg font-semibold text-secondary-dark mb-1">
-          {title}
+          {designType}
         </h3>
         <p className="text-secondary-light text-sm mb-0">{description}</p>
       </div>

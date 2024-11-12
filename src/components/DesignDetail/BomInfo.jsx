@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useDesign } from "./DesignContext";
 
 const BomInfo = () => {
@@ -15,35 +16,60 @@ const BomInfo = () => {
 
   const { designType, title, specifications } = designData;
 
+  // Extract the first favorite image if available
+  const favImage = specifications?.fav_images?.[0];
+
   // Function to render specifications dynamically
   const renderSpecifications = (specifications = {}) => {
     return Object.keys(specifications).map((key, index) => {
       const spec = specifications[key];
 
-      // Skip image fields
+      // Skip generatedImages fields
       if (key === "generatedImages" || key === "fav_images") return null;
 
       // Handle fields that are arrays (e.g., sizes)
       if (Array.isArray(spec)) {
         return (
-          <div key={`${key}-${index}`}>
-            <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
-            <ul className="list-disc pl-6 mb-2">
-              {spec.map((item, i) => (
-                <li key={`${key}-${i}`}>{item}</li>
-              ))}
-            </ul>
+          <div key={`${key}-${index}`} className="flex justify-between">
+            <div>
+              <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
+              <ul className="list-disc pl-6 mb-2">
+                {spec.map((item, i) => (
+                  <li key={`${key}-${i}`}>{item}</li>
+                ))}
+              </ul>
+            </div>
+            {favImage && index === 0 && (
+              <Image
+                src={favImage.src}
+                alt={favImage.alt}
+                height={160}
+                width={160}
+                className="object-cover rounded-lg shadow-md"
+              />
+            )}
           </div>
         );
       }
 
       // Handle simple fields
       return (
-        <div key={key}>
-          <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
-          <ul className="list-disc pl-6 mb-2">
-            <li>{spec}</li>
-          </ul>
+        <div key={key} className="flex justify-between items-center mb-4">
+          <div>
+            <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
+            <ul className="list-disc pl-6 mb-2">
+              <li>{spec}</li>
+            </ul>
+          </div>
+          {favImage && index === 0 && (
+            <Image
+              src={favImage.src}
+              alt={favImage.alt}
+              height={160}
+              width={160}
+              className="object-cover rounded-lg shadow-md"
+            />
+          )}
         </div>
       );
     });
