@@ -1,11 +1,18 @@
 "use client";
 import { Card, Avatar, Tooltip } from "antd";
-import { MoreOutlined, EditOutlined } from "@ant-design/icons";
+import { MoreOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import logo from "/public/assets/images/ai.png";
 import Image from "next/image";
+import {
+  deleteDesign,
+  getRecentDesignsByUserId,
+} from "@/redux/slices/designSlice";
+
 const DesignCard = ({ design }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   // Extract values from the design object
   const {
@@ -24,6 +31,12 @@ const DesignCard = ({ design }) => {
 
   const handleEditClick = () => {
     router.push(link); // Navigate to edit page
+  };
+
+  const handleDeleteClick = () => {
+    dispatch(deleteDesign(_id)).then(() => {
+      dispatch(getRecentDesignsByUserId()); // Fetch recent designs after deletion
+    });
   };
 
   return (
@@ -59,14 +72,22 @@ const DesignCard = ({ design }) => {
             aria-label="Edit"
           />
         </Tooltip>
-        <Tooltip title="More options">
+        <Tooltip title="Delete">
+          <DeleteOutlined
+            className="cursor-pointer hover:text-red-500"
+            style={{ fontSize: "20px" }}
+            onClick={handleDeleteClick}
+            aria-label="Delete"
+          />
+        </Tooltip>
+        {/* <Tooltip title="More options">
           <MoreOutlined
             className="cursor-pointer hover:text-primary-light"
             style={{ fontSize: "20px" }}
             rotate={90}
             aria-label="More options"
           />
-        </Tooltip>
+        </Tooltip> */}
       </div>
     </Card>
   );

@@ -45,7 +45,7 @@ const BomInfo = () => {
 
       // Handle simple fields
       return (
-        <div key={key} className="flex justify-between items-center mb-4">
+        <div key={key} className="flex justify-between items-center mb-0">
           <div>
             <p className="font-semibold mb-2">{`${index + 1}. ${key}`}</p>
             <ul className="list-disc pl-6 mb-2">

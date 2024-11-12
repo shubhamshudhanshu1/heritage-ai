@@ -7,12 +7,17 @@ const quotationSchema = new mongoose.Schema({
     required: true,
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  vendorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   unitPrice: { type: Number },
   shippingCost: { type: Number },
   deliveryTime: { type: Number },
   gst: { type: Number },
   totalAmount: { type: Number },
+  quantity: { type: Number },
   status: {
     type: String,
     enum: ["new", "counter", "approved", "rejected"],

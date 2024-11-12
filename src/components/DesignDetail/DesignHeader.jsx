@@ -13,10 +13,11 @@ const DesignHeader = ({ onSave, designId }) => {
   let image = specification.generatedImages?.[0] || defaultIamge;
 
   const handleSave = () => {
-    onSave();
-    if (designId === "new") {
-      router.back();
-    }
+    onSave().then(() => {
+      if (designId === "new") {
+        router.back();
+      }
+    });
   };
 
   return (

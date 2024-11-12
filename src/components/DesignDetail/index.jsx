@@ -19,13 +19,12 @@ const DesignComponentContent = () => {
   const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
-  const { status, error } = useSelector((state) => state.design);
 
   useEffect(() => {
     // Fetch the design data based on the ID when component mounts
     const fetchDesignData = async () => {
       try {
-        if (id) {
+        if (id && id !== "new") {
           const resultAction = await dispatch(getDesignById(id)).unwrap();
           if (resultAction.data) {
             setDesignData(resultAction.data);
@@ -44,9 +43,9 @@ const DesignComponentContent = () => {
     };
 
     fetchDesignData();
-  }, [id, setDesignData, dispatch]);
+  }, [id]);
 
-  const handleSave = async () => {
+  const handleSave = async (callback) => {
     try {
       if (designData?._id) {
         // Update existing design
@@ -63,7 +62,6 @@ const DesignComponentContent = () => {
       console.error("Error saving design data:", error);
     }
   };
-
   if (loading) return <p>Loading...</p>;
 
   return (
