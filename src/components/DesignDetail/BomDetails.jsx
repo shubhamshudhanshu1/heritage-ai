@@ -19,7 +19,7 @@ const BOMDetail = () => {
         <BomInfo />
         {/* <ActionBar /> Actions specific to BOM */}
       </div>
-      <div className="lg:w-1/2 bg-gray-100 p-6 rounded-[30px] shadow-md">
+      <div className="lg:w-1/2 bg-gray-100 p-6 rounded-[30px] shadow-md ">
         <Manufacturers materials={materials} />
       </div>
     </div>

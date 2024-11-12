@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import defaultIamge from "/public/assets/images/ai.png";
 
-const DesignHeader = () => {
+const DesignHeader = ({ onSave }) => {
   const router = useRouter();
   const {
     designData: { specification = {}, designType = "New", status = "Draft" },
@@ -38,7 +38,10 @@ const DesignHeader = () => {
       </div>
 
       {/* Save Button */}
-      <button className="bg-primary w-26 text-white px-4 py-2 rounded-full shadow-md hover:bg-primary-dark transition duration-200">
+      <button
+        className="bg-primary w-26 text-white px-4 py-2 rounded-full shadow-md hover:bg-primary-dark transition duration-200"
+        onClick={() => onSave()}
+      >
         Save
       </button>
     </header>

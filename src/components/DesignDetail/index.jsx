@@ -3,8 +3,13 @@ import DesignHeader from "./DesignHeader";
 import { DesignProvider, useDesign } from "./DesignContext";
 import DesignDetail from "./DesignDetail";
 import BOMDetail from "./BomDetails";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createDesign,
+  updateDesign,
+  getDesignById,
+} from "./../../redux/slices/designSlice";
 
 const DesignComponentContent = () => {
   const params = useParams();
@@ -13,36 +18,57 @@ const DesignComponentContent = () => {
   const [activeTab, setActiveTab] = useState("Design");
   const [loading, setLoading] = useState(true);
 
+  const dispatch = useDispatch();
+  const { status, error } = useSelector((state) => state.design);
+
   useEffect(() => {
     // Fetch the design data based on the ID when component mounts
     const fetchDesignData = async () => {
       try {
-        const response = await fetch(`/api/getDesignById?designId=${id}`);
-        if (response.ok) {
-          const { data = {} } = await response.json();
-          setDesignData(data);
+        if (id) {
+          const resultAction = await dispatch(getDesignById(id)).unwrap();
+          if (resultAction.data) {
+            setDesignData(resultAction.data);
+          } else {
+            setDesignData({}); // If no design found, allow to start from scratch
+          }
         } else {
-          setDesignData({}); // If no design found, allow to start from scratch
+          setDesignData({});
         }
       } catch (error) {
-        console.error("Error fetching design data:", error.message);
+        console.error("Error fetching design data:", error);
         setDesignData({});
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) fetchDesignData();
-    else {
-      setDesignData({});
+    fetchDesignData();
+  }, [id, setDesignData, dispatch]);
+
+  const handleSave = async () => {
+    try {
+      if (designData?._id) {
+        // Update existing design
+        await dispatch(
+          updateDesign({ designId: designData._id, updateData: designData })
+        ).unwrap();
+      } else {
+        // Create new design
+        const resultAction = await dispatch(createDesign(designData)).unwrap();
+        setDesignData(resultAction.data); // Update with the new design data, including the ID
+      }
+      console.log("Design saved successfully");
+    } catch (error) {
+      console.error("Error saving design data:", error);
     }
-  }, [id, setDesignData]);
+  };
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className="flex flex-col h-full">
-      <DesignHeader />
+      <DesignHeader onSave={handleSave} />
 
       {/* Tab Navigation */}
       <div className="flex border-b-2 font-medium">

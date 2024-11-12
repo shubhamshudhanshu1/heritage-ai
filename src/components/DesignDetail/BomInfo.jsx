@@ -16,7 +16,7 @@ const BomInfo = () => {
   const { designType, title, specifications } = designData;
 
   // Function to render specifications dynamically
-  const renderSpecifications = (specifications) => {
+  const renderSpecifications = (specifications = {}) => {
     return Object.keys(specifications).map((key, index) => {
       const spec = specifications[key];
 

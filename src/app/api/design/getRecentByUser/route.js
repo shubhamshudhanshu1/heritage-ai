@@ -7,9 +7,19 @@ export async function GET(req) {
   const userId = searchParams.get("userId");
 
   try {
+    if (!userId) {
+      return NextResponse.json(
+        { message: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
     await connectToDatabase();
-    const designs = await Design.find({ userId }).sort({ lastAccessedAt: -1 });
-    return NextResponse.json({ data: designs }, { status: 200 });
+    const recentDesigns = await Design.find({ userId })
+      .sort({ lastAccessedAt: -1 })
+      .limit(5);
+
+    return NextResponse.json({ data: recentDesigns }, { status: 200 });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
