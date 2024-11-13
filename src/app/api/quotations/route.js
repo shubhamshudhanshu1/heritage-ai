@@ -71,7 +71,7 @@ export async function GET(req) {
   try {
     await connectToDatabase();
 
-    const query = { userId };
+    const query = { vendorId: userId };
     if (designId) query.designId = designId;
     if (status) query.status = status;
 

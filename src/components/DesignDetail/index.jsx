@@ -45,23 +45,27 @@ const DesignComponentContent = () => {
     fetchDesignData();
   }, [id]);
 
-  const handleSave = async (callback) => {
+  const handleSave = async () => {
     try {
+      let result;
       if (designData?._id) {
         // Update existing design
-        await dispatch(
+        result = await dispatch(
           updateDesign({ designId: designData._id, updateData: designData })
         ).unwrap();
       } else {
         // Create new design
-        const resultAction = await dispatch(createDesign(designData)).unwrap();
-        setDesignData(resultAction.data); // Update with the new design data, including the ID
+        result = await dispatch(createDesign(designData)).unwrap();
+        setDesignData(result.data); // Update with the new design data, including the ID
       }
       console.log("Design saved successfully");
+      return result;
     } catch (error) {
       console.error("Error saving design data:", error);
+      throw error; // Rethrow the error so it can be caught outside
     }
   };
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -91,7 +95,7 @@ const DesignComponentContent = () => {
       {/* Render based on Active Tab */}
       <div className="flex-1 min-h-[600px]">
         {activeTab === "Design" && <DesignDetail />}
-        {activeTab === "BOM" && <BOMDetail />}
+        {activeTab === "BOM" && <BOMDetail onSave={handleSave} designId={id} />}
       </div>
     </div>
   );

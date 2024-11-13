@@ -3,7 +3,7 @@ import ActionBar from "./ActionBar"; // Actions related to BOM
 import BomInfo from "./BomInfo";
 import Manufacturers from "./Manufacturers";
 
-const BOMDetail = () => {
+const BOMDetail = ({ onSave, designId }) => {
   const { designData } = useDesign();
 
   // Extracting materials from the designData specifications
@@ -20,7 +20,11 @@ const BOMDetail = () => {
         {/* <ActionBar /> Actions specific to BOM */}
       </div>
       <div className="lg:w-1/2 bg-gray-100 p-6 rounded-[30px] shadow-md ">
-        <Manufacturers materials={materials} />
+        <Manufacturers
+          materials={materials}
+          designId={designId}
+          onDesignSave={onSave}
+        />
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ const QuantityCounter = ({ quantity, setQuantity }) => {
  * Each vendor is displayed using the ManufacturerCard component.
  * Includes a counter for specifying quantity and a button to request a quote.
  */
-const Vendors = ({ materials }) => {
+const Vendors = ({ materials, designId, onDesignSave }) => {
   const { data: session } = useSession();
   const [quantity, setQuantity] = useState(50);
   const [selectedVendor, setSelectedVendor] = useState(null);
@@ -83,40 +83,39 @@ const Vendors = ({ materials }) => {
   const isSelected = (index) => selectedVendor === index;
 
   const handleRequestQuote = async (designId) => {
-    if (selectedVendor === null || !session || !designId) return;
-
-    const vendor = vendors[selectedVendor];
-    const quotationData = {
-      designId: designId, // Replace with actual designId
-      userId: session.user.id,
-      vendorId: vendor._id,
-      unitPrice: vendor.unitPrice, // Assuming vendor provides unitPrice
-      shippingCost: vendor.shippingCost, // Assuming vendor provides shippingCost
-      deliveryTime: vendor.deliveryTime, // Assuming vendor provides deliveryTime
-      gst: vendor.gst, // Assuming vendor provides gst
-      quantity,
-    };
-
+    if (selectedVendor === null || !session) return;
     try {
-      const response = await fetch("/api/quotations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(quotationData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        message.success("Quotation created successfully");
-      } else {
-        message.error(result.error || "Failed to create quotation");
+      let res = await onDesignSave();
+      const vendor = vendors[selectedVendor];
+      const quotationData = {
+        designId: designId, // Replace with actual designId
+        userId: session.user.id,
+        vendorId: vendor._id,
+        unitPrice: vendor.unitPrice, // Assuming vendor provides unitPrice
+        shippingCost: vendor.shippingCost, // Assuming vendor provides shippingCost
+        deliveryTime: vendor.deliveryTime, // Assuming vendor provides deliveryTime
+        gst: vendor.gst, // Assuming vendor provides gst
+        quantity,
+      };
+      try {
+        const response = await fetch("/api/quotations", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(quotationData),
+        });
+        const result = await response.json();
+        if (response.ok) {
+          message.success("Quotation created successfully");
+        } else {
+          message.error(result.error || "Failed to create quotation");
+        }
+      } catch (error) {
+        console.error("Error creating quotation: ", error);
+        message.error("Failed to create quotation");
       }
-    } catch (error) {
-      console.error("Error creating quotation: ", error);
-      message.error("Failed to create quotation");
-    }
+    } catch (err) {}
   };
 
   if (loading) return <div>Loading...</div>;
