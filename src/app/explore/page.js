@@ -35,8 +35,8 @@ const Explore = () => {
             )}
             {recentDesigns.length > 0 ? (
               recentDesigns.map((design) => (
-                <div>
-                  <DesignCard key={design._id} design={design} />
+                <div key={design._id}>
+                  <DesignCard design={design} />
                 </div>
               ))
             ) : (
