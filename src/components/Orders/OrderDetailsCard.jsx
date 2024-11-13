@@ -27,7 +27,7 @@ const OrderDetailsCard = ({
   };
   const router = useRouter();
   const handleView = () => {
-    router.push("/design/tea-tin");
+    router.push(`/design/${designId._id}`);
   };
   const notificationCount = useMemo(() => {
     return Math.floor(Math.random() * 100) / 1;
@@ -39,10 +39,10 @@ const OrderDetailsCard = ({
         className="rounded-3xl  shadow-md bg-white p-4"
         bodyStyle={{ padding: 0, overflow: "hidden" }}
       >
-        <div className="flex items-start justify-between py-3">
-          <div className="flex items-center">
+        <div className="flex items-start justify-between p-3 items-center">
+          <div className="flex items-center gap-3">
             <Avatar
-              src={image}
+              src={image.src}
               style={{ objectFit: "contain", width: "48px", height: "48px" }}
               className="mr-1 rounded-full object-contain"
             />

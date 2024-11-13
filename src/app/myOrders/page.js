@@ -1,14 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button, message } from "antd";
-import OrdersTabContent from "@/components/Orders/OrdersTabContent"; // Adjust path if needed
-import {
-  DefaultImage,
-  Tea1Image,
-  Tea2Image,
-} from "@/components/DesignDetail/mockdata"; // Ensure these are accessible
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
+import OrdersTabContent from "@/components/Orders/OrdersTabContent";
 
 // Use dynamic imports for specific components
 const Tabs = dynamic(() => import("antd/es/tabs"), { ssr: false });
@@ -18,6 +13,8 @@ const { TabPane } = Tabs;
 const MyOrders = () => {
   const [activeKey, setActiveKey] = useState("1");
   const [quotationData, setQuotationData] = useState([]);
+  const [productionData, setProductionData] = useState([]);
+  const [shippedData, setShippedData] = useState([]);
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
@@ -51,7 +48,7 @@ const MyOrders = () => {
   };
 
   const quotationColumns = [
-    { title: "Vendor", dataIndex: ["vendorId", "name"], key: "vendor" },
+    { title: "Vendor", dataIndex: ["vendorId", "companyName"], key: "vendor" },
     { title: "Unit Price", dataIndex: "unitPrice", key: "unitPrice" },
     { title: "Shipping", dataIndex: "shippingCost", key: "shipping" },
     { title: "Delivery In", dataIndex: "deliveryTime", key: "delivery" },
@@ -85,30 +82,6 @@ const MyOrders = () => {
     },
   ];
 
-  const productionData = [
-    {
-      image: Tea2Image,
-      title: "Festive gift box | Mona Boxmakers, Chandigarh",
-      description: "₹ 24/Unit | 400 Units | Expected Delivery: 04/Nov/2024",
-      actions: ["view"],
-    },
-  ];
-
-  const shippedData = [
-    {
-      image: Tea1Image,
-      title: "Wedding invitation | VM Paperworks, Pondicherry",
-      description: "₹ 14/Unit | 100 Units | Expected Delivery: 12/Nov/2024",
-      actions: ["view"],
-    },
-    {
-      image: DefaultImage,
-      title: "Wedding invitation | VM Paperworks, Pondicherry",
-      description: "₹ 14/Unit | 100 Units | Expected Delivery: 12/Nov/2024",
-      actions: ["view"],
-    },
-  ];
-
   return (
     <div className="my-orders min-h-full">
       <Tabs
@@ -122,17 +95,15 @@ const MyOrders = () => {
             <OrdersTabContent
               title="Quotation Requests"
               data={quotationData.map((quotation) => ({
-                image: Tea1Image, // Assuming a default image for now
-                title: `${quotation.designId.name} | ${quotation.quantity} units`,
-                description: quotation.designId.description,
+                image: quotation.designId?.previewImages?.[0]?.src || "", // Assuming a default image for now
+                title: `${quotation.designId.designType} | ${quotation.quantity} units`,
+                description: `${quotation.designId.specifications.body_material}, ${quotation.designId.specifications.sleeves_material}`,
                 tableData: [quotation],
                 tableColumns: quotationColumns,
                 showAccordionIcon: true,
               }))}
               loading={loading}
             />
-            <OrdersTabContent title="In Production" data={productionData} />
-            <OrdersTabContent title="Shipped" data={shippedData} />
           </div>
         </TabPane>
         <TabPane tab={<span>Delivered Orders</span>} key="2">
