@@ -10,6 +10,9 @@ const nextConfig = {
       "mms-images.out.customink.com",
       "cdn.logojoy.com",
       "encrypted-tbn0.gstatic.com",
+      "marketplace.canva.com",
+      "www.morganchaney.com",
+      "img.freepik.com",
     ], // Add the required domain here
   },
 };

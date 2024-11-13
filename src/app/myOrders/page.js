@@ -12,9 +12,12 @@ const { TabPane } = Tabs;
 
 const MyOrders = () => {
   const [activeKey, setActiveKey] = useState("1");
-  const [quotationData, setQuotationData] = useState([]);
-  const [productionData, setProductionData] = useState([]);
-  const [shippedData, setShippedData] = useState([]);
+  const [quotationData, setQuotationData] = useState({
+    draft: [],
+    approved: [],
+    rejected: [],
+    new: [],
+  });
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
@@ -24,14 +27,28 @@ const MyOrders = () => {
     }
   }, [session?.user?.id]);
 
-  const fetchQuotations = async (userId) => {
+  const fetchQuotations = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/quotations?userId=${userId}`);
+      const identifier =
+        session.user.role.roleName === "vendor"
+          ? `vendorId=${session.user.id}`
+          : `userId=${session.user.id}`;
+      const response = await fetch(`/api/quotations?${identifier}`);
       const result = await response.json();
 
       if (response.ok) {
-        setQuotationData(result.quotations);
+        const segregatedData = result.quotations.reduce(
+          (acc, quotation) => {
+            const designStatus = quotation.designId?.status || "other";
+            acc[designStatus] = acc[designStatus] || [];
+            acc[designStatus].push(quotation);
+            return acc;
+          },
+          { draft: [], approved: [], rejected: [], new: [] }
+        );
+
+        setQuotationData(segregatedData);
       } else {
         message.error(result.error || "Failed to fetch quotations");
       }
@@ -42,7 +59,6 @@ const MyOrders = () => {
       setLoading(false);
     }
   };
-
   const handleTabChange = (key) => {
     setActiveKey(key);
   };
@@ -93,9 +109,21 @@ const MyOrders = () => {
         <TabPane tab={<span>Active Orders</span>} key="1">
           <div className="bg-gray-100 p-6 overflow-auto">
             <OrdersTabContent
-              title="Quotation Requests"
-              data={quotationData.map((quotation) => ({
-                image: quotation.designId?.previewImages?.[0]?.src || "", // Assuming a default image for now
+              title="Draft Quotations"
+              data={quotationData.draft.map((quotation) => ({
+                image: quotation.designId?.previewImages?.[0]?.src || "",
+                title: `${quotation.designId.designType} | ${quotation.quantity} units`,
+                description: `${quotation.designId.specifications.body_material}, ${quotation.designId.specifications.sleeves_material}`,
+                tableData: [quotation],
+                tableColumns: quotationColumns,
+                showAccordionIcon: true,
+              }))}
+              loading={loading}
+            />
+            <OrdersTabContent
+              title="New Quotations"
+              data={quotationData.new.map((quotation) => ({
+                image: quotation.designId?.previewImages?.[0]?.src || "",
                 title: `${quotation.designId.designType} | ${quotation.quantity} units`,
                 description: `${quotation.designId.specifications.body_material}, ${quotation.designId.specifications.sleeves_material}`,
                 tableData: [quotation],
@@ -108,14 +136,23 @@ const MyOrders = () => {
         </TabPane>
         <TabPane tab={<span>Delivered Orders</span>} key="2">
           <div className="bg-gray-100 p-6 overflow-auto">
-            <OrdersTabContent title="In Production" data={productionData} />
-            <OrdersTabContent title="Shipped" data={shippedData} />
+            <OrdersTabContent
+              title="Approved Quotations"
+              data={quotationData.approved}
+            />
+            <OrdersTabContent
+              title="Rejected Quotations"
+              data={quotationData.rejected}
+            />
           </div>
         </TabPane>
         <TabPane tab={<span>Disputes</span>} key="3">
           <div className="bg-gray-100 p-6 overflow-auto">
-            <OrdersTabContent title="In Process" data={shippedData} />
-            <OrdersTabContent title="Rejected" data={productionData} />
+            <OrdersTabContent
+              title="In Process"
+              data={quotationData.rejected}
+            />
+            <OrdersTabContent title="Rejected" data={quotationData.draft} />
           </div>
         </TabPane>
       </Tabs>

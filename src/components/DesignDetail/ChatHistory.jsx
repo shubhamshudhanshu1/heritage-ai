@@ -69,6 +69,114 @@ let chatJson = {
       ],
     },
   ],
+  "Gift Box": [
+    {
+      key: "box_material",
+      question: "What material would you like for the gift box?",
+      part: "Box",
+      type: "select",
+      options: ["Cardboard", "Wood", "Metal", "Plastic", "Paper"],
+    },
+    {
+      key: "box_size",
+      question: "What size should the gift box be?",
+      type: "select",
+      options: ["Small", "Medium", "Large", "Custom Size"],
+    },
+    {
+      key: "box_color",
+      question: "What color do you want for the gift box?",
+      type: "select",
+      options: ["Red", "Blue", "Green", "Black", "White", "Custom Color"],
+    },
+    {
+      key: "finishing_type",
+      question: "What type of finishing would you prefer?",
+      type: "select",
+      options: ["Glossy", "Matte", "Textured", "Metallic"],
+    },
+    {
+      key: "printing_option",
+      question: "Would you like any custom printing on the gift box?",
+      type: "select",
+      options: ["No Printing", "Logo", "Pattern", "Custom Text"],
+    },
+    {
+      key: "ribbon_type",
+      question: "Do you want a ribbon for the gift box?",
+      type: "select",
+      options: ["No Ribbon", "Satin Ribbon", "Silk Ribbon", "Organza Ribbon"],
+    },
+    {
+      key: "insert_material",
+      question: "What material do you prefer for the insert?",
+      part: "Insert",
+      type: "select",
+      options: ["Foam", "Silk", "Velvet", "None"],
+    },
+  ],
+  "Wedding Card": [
+    {
+      key: "card_material",
+      question: "What material would you like for the wedding card?",
+      part: "Card",
+      type: "select",
+      options: [
+        "Cardstock",
+        "Vellum",
+        "Linen",
+        "Pearlescent",
+        "Recycled Paper",
+      ],
+    },
+    {
+      key: "card_size",
+      question: "What size should the wedding card be?",
+      type: "select",
+      options: ["A5", "A6", "Square", "Custom Size"],
+    },
+    {
+      key: "card_style",
+      question: "What style of wedding card are you looking for?",
+      type: "select",
+      options: ["Traditional", "Modern", "Floral", "Minimalist", "Rustic"],
+    },
+    {
+      key: "printing_method",
+      question: "Which printing method would you like to use?",
+      type: "select",
+      options: [
+        "Digital Printing",
+        "Foil Stamping",
+        "Letterpress",
+        "Screen Printing",
+        "Embossing",
+      ],
+    },
+    {
+      key: "card_color",
+      question: "What color theme do you want for the wedding card?",
+      type: "select",
+      options: ["White", "Ivory", "Gold", "Pastel", "Custom Color"],
+    },
+    {
+      key: "envelope_type",
+      question: "Would you like an envelope with the card?",
+      type: "select",
+      options: [
+        "No Envelope",
+        "Plain Envelope",
+        "Printed Envelope",
+        "Custom Lined Envelope",
+      ],
+    },
+    {
+      key: "embellishments",
+      question: "Do you want any embellishments on the wedding card?",
+      type: "multi-select",
+      options: ["Ribbon", "Pearls", "Sequins", "Wax Seal", "None"],
+    },
+  ],
 };
 
 const ChatbotDesignSelector = ({ handleChange, savedData }) => {
@@ -162,7 +270,7 @@ const ChatbotDesignSelector = ({ handleChange, savedData }) => {
   // Handle generating an image
   const handleGenerateImage = () => {
     const newGeneratedImage = {
-      src: getRandomImage(), // Random image from the function
+      src: getRandomImage(designType), // Random image from the function
       alt: `Generated Design for ${designType}`,
     };
 

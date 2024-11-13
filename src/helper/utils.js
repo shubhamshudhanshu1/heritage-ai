@@ -143,15 +143,27 @@ export const getFirstPathSegment = (pathname) => {
   }
 };
 
-export const getRandomImage = () => {
-  const images = [
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSya_RH2Kt3LptFzgbedVrxUPVqxwj0TTjRmQ&s",
-    "https://images.squarespace-cdn.com/content/v1/5a802676b7411c2497540b80/1610457880081-91BSTJGD5MNGJ43TUNKH/TSHIRT-DESIGN-TEXINTEL.jpg",
-    "https://cdn.shopify.com/s/files/1/0984/4522/products/Graphic-Designer-T-Shirt-2.jpg?v=1571504977",
-    "https://mms-images.out.customink.com/mms/images/catalog/6a62c76ef0978853a20391b6c32da4fe/colors/176100/views/alt/front_medium.png?autoNegate=1&design=djn0-00by-wu36&digest=000000028&ixbg=%23ffffff&ixfm=jpeg&ixq=60&ixw=412&placeMax=1&placeMaxPct=0.8&placeUseProduct=1&placeUseView=front",
-    "https://cdn.logojoy.com/wp-content/uploads/20230824145637/hiking-business-t-shirt-design-idea.jpg",
-  ];
-  return images[Math.floor(Math.random() * images.length)];
+export const getRandomImage = (designType) => {
+  const imagesByType = {
+    ["T-shirt"]: [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSya_RH2Kt3LptFzgbedVrxUPVqxwj0TTjRmQ&s",
+      "https://images.squarespace-cdn.com/content/v1/5a802676b7411c2497540b80/1610457880081-91BSTJGD5MNGJ43TUNKH/TSHIRT-DESIGN-TEXINTEL.jpg",
+      "https://cdn.shopify.com/s/files/1/0984/4522/products/Graphic-Designer-T-Shirt-2.jpg?v=1571504977",
+      "https://mms-images.out.customink.com/mms/images/catalog/6a62c76ef0978853a20391b6c32da4fe/colors/176100/views/alt/front_medium.png?autoNegate=1&design=djn0-00by-wu36&digest=000000028&ixbg=%23ffffff&ixfm=jpeg&ixq=60&ixw=412&placeMax=1&placeMaxPct=0.8&placeUseProduct=1&placeUseView=front",
+      "https://cdn.logojoy.com/wp-content/uploads/20230824145637/hiking-business-t-shirt-design-idea.jpg",
+    ],
+    ["Gift Box"]: [
+      "https://img.freepik.com/premium-photo/gift-decorative-box-modern-packaging-design_700081-1143.jpg",
+      "https://www.morganchaney.com/content/165954/layu-boxes.jpg",
+    ],
+    "Wedding Card": [
+      "https://marketplace.canva.com/EAF6Q0JILnc/1/0/571w/canva-pink-floral-wedding-invitation-giEZQtHxqj8.jpg",
+      "https://marketplace.canva.com/print-mockup/bundle/FTpibBRols4/corners%3Asquare%2Cproductsize%3Aportrait%2Csurface%3Amarketplace/surface%3Amarketplace/EAF5o8aMa88/2/0/1143w/canva-white-green-floral-watercolor-wedding-invitation-F0ZiIPW6OBM.jpg?sig=bbbad3fc49836826e5326d3aaff2bbc7&width=800",
+    ],
+  };
+
+  const selectedImages = imagesByType[designType] || imagesByType["T-shirt"]; // Default to 'tshirt' images if designType doesn't match
+  return selectedImages[Math.floor(Math.random() * selectedImages.length)];
 };
 
 export const getDefaultPage = (session) => {

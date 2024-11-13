@@ -58,6 +58,7 @@ export async function POST(req) {
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
+  const vendorId = searchParams.get("vendorId");
   const designId = searchParams.get("designId");
   const status = searchParams.get("status");
 
@@ -71,9 +72,11 @@ export async function GET(req) {
   try {
     await connectToDatabase();
 
-    const query = { vendorId: userId };
+    const query = {};
     if (designId) query.designId = designId;
     if (status) query.status = status;
+    if (vendorId) query.vendorId = vendorId;
+    if (userId) query.userId = userId;
 
     const quotations = await Quotation.find(query)
       .populate("designId")
