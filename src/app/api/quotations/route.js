@@ -38,6 +38,7 @@ export async function POST(req) {
       deliveryTime,
       gst,
       totalAmount,
+      quantity,
       status: "new",
     });
 
@@ -47,6 +48,43 @@ export async function POST(req) {
     );
   } catch (error) {
     console.error("Error creating quotation: ", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
+  const designId = searchParams.get("designId");
+  const status = searchParams.get("status");
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Missing required userId parameter" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+
+    const query = { userId };
+    if (designId) query.designId = designId;
+    if (status) query.status = status;
+
+    const quotations = await Quotation.find(query)
+      .populate("designId")
+      .populate("vendorId");
+
+    return NextResponse.json(
+      { message: "Quotations fetched successfully", quotations },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching quotations: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

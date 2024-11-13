@@ -155,6 +155,9 @@ export const getRandomImage = () => {
 };
 
 export const getDefaultPage = (session) => {
+  if (!session) {
+    return "/";
+  }
   if (session?.user?.role?.roleName === "vendor") {
     return "/myOrders";
   }

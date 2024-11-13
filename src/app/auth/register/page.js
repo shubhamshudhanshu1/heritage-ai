@@ -12,7 +12,6 @@ import {
 } from "antd";
 import CommonLabel from "@/components/common/label";
 import { signIn, useSession } from "next-auth/react";
-import { getDefaultPage } from "./../../../helper/utils";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -112,7 +111,7 @@ export default function RegistrationPage() {
           email,
           password,
           redirect: false,
-          callbackUrl: getDefaultPage(session),
+          callbackUrl: "/",
         }).then((res) => {
           if (res?.ok) {
             window.location.href = res.url;

@@ -32,30 +32,39 @@ const iconsMap = {
     icon: <StarOutlined />,
     config: { showHeader: true, showSidebar: true },
   },
-  "design-details": {
+  design: {
     icon: <StarOutlined />,
     config: { showHeader: false, showSidebar: false },
   },
 };
 
 let publicRoutes = ["/auth/signin", "/auth/register"];
-
+const getFirstPath = (pathname) => {
+  return pathname.split("/")[1] || "";
+};
 export default function ClientLayout({ children, session }) {
   const pathname = usePathname();
 
+  console.log(iconsMap[getFirstPath(pathname)], "getFirstPath(pathname)");
   // Filter allowed modules based on session
   let allowedModules = session?.user?.role?.allowedModules || [];
   let menuItems = allowedModules.map((module) => ({
     key: module.route,
     label: module.name,
     icon: iconsMap[module.slug]?.icon,
-    config: { ...iconsMap[module.slug]?.config, ...module.config },
+    config: {
+      ...iconsMap[module.slug]?.config,
+      ...module.config,
+      ...iconsMap[getFirstPath(pathname)]?.config,
+    },
   }));
 
   let activeRoute = menuItems.find((item) => pathname.includes(item.key));
+  activeRoute = iconsMap[getFirstPath(pathname)];
   let { showHeader = true, showSidebar = true } = activeRoute?.config || {};
   let isPublicRoute = publicRoutes.includes(pathname);
 
+  console.log(activeRoute?.config, " activeRoute?.config");
   if (!isPublicRoute && !session) {
     redirect("/auth/signin");
   }

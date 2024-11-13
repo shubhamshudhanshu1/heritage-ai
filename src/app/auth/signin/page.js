@@ -6,7 +6,6 @@ import { Form, Input, Button, Typography, message, Spin } from "antd";
 import { MailOutlined, LockOutlined, MobileOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import ErrorMessage from "./../../../components/auth/ErrorMessage";
-import { getDefaultPage } from "@/helper/utils";
 
 const { Title } = Typography;
 
@@ -37,7 +36,7 @@ export default function AuthPage() {
       });
       setLoading(false);
       if (!res.ok) setError(res.error);
-      else window.location.href = getDefaultPage(session);
+      else window.location.href = "/";
     } catch (err) {
       setLoading(false);
       setError("Login failed. Please check your credentials or OTP.");

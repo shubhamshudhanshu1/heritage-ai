@@ -12,6 +12,8 @@ import Link from "next/link";
 const Button = dynamic(() => import("antd/es/button"), { ssr: false });
 
 const Header = ({ session }) => {
+  console.log(session?.user?.role?.roleName, "session?.user?.role?.roleName");
+
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-white shadow-md">
       {/* Left Section: Hamburger, Logo, and Title */}
@@ -26,13 +28,15 @@ const Header = ({ session }) => {
       {session ? (
         <div className="flex items-center space-x-4">
           <Link href="/design/new" passHref>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              className="bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark"
-            >
-              New Design
-            </Button>
+            {session?.user?.role?.roleName !== "vendor" ? (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                className="bg-primary px-4 py-4 rounded-[100px] hover:!bg-primary-dark"
+              >
+                New Design
+              </Button>
+            ) : null}
           </Link>
           <QuestionCircleOutlined className="text-xl" />
           <UserMenu userDetails={session?.user} />
