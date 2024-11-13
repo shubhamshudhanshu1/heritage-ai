@@ -1,5 +1,5 @@
 import { connectToDatabase } from "@/helper/db";
-import LOV from "@/models/LOV";
+import LOV from "@/models/lov";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
