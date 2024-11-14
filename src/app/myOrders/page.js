@@ -111,7 +111,9 @@ const MyOrders = () => {
             <OrdersTabContent
               title="Draft Quotations"
               data={quotationData.draft.map((quotation) => ({
-                image: quotation.designId?.previewImages?.[0]?.src || "",
+                image:
+                  quotation.designId?.specifications?.fav_images?.[0]?.src ||
+                  "",
                 title: `${quotation.designId.designType} | ${quotation.quantity} units`,
                 description: `${quotation.designId.specifications.body_material}, ${quotation.designId.specifications.sleeves_material}`,
                 tableData: [quotation],

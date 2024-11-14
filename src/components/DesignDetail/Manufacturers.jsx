@@ -88,10 +88,10 @@ const Vendors = ({ materials, designId, onDesignSave }) => {
       let res = await onDesignSave();
       const vendor = vendors[selectedVendor];
       const quotationData = {
-        designId: designId, // Replace with actual designId
+        designId: res?.data?._id, // Replace with actual designId
         userId: session.user.id,
         vendorId: vendor._id,
-        unitPrice: vendor.unitPrice, // Assuming vendor provides unitPrice
+        unitPrice: vendor.pricingRange, // Assuming vendor provides unitPrice
         shippingCost: vendor.shippingCost, // Assuming vendor provides shippingCost
         deliveryTime: vendor.deliveryTime, // Assuming vendor provides deliveryTime
         gst: vendor.gst, // Assuming vendor provides gst

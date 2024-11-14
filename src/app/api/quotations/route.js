@@ -1,7 +1,7 @@
 import { Quotation } from "@/models/Quotation";
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/helper/db";
-
+import Design from "@/models/Design";
 export async function POST(req) {
   const {
     designId,
@@ -14,7 +14,7 @@ export async function POST(req) {
     userId,
   } = await req.json();
 
-  if (!designId || !vendorId || !quantity) {
+  if (!designId || !quantity) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -62,12 +62,12 @@ export async function GET(req) {
   const designId = searchParams.get("designId");
   const status = searchParams.get("status");
 
-  if (!userId) {
-    return NextResponse.json(
-      { error: "Missing required userId parameter" },
-      { status: 400 }
-    );
-  }
+  // if (!designId) {
+  //   return NextResponse.json(
+  //     { error: "Missing required designId parameter" },
+  //     { status: 400 }
+  //   );
+  // }
 
   try {
     await connectToDatabase();

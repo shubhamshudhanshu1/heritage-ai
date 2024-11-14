@@ -42,7 +42,7 @@ const OrderDetailsCard = ({
         <div className="flex items-start justify-between p-3 items-center">
           <div className="flex items-center gap-3">
             <Avatar
-              src={image.src}
+              src={image}
               style={{ objectFit: "contain", width: "48px", height: "48px" }}
               className="mr-1 rounded-full object-contain"
             />
