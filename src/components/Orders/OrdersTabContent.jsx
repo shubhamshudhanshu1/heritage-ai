@@ -16,6 +16,7 @@ const OrdersTabContent = ({ title, data }) => {
           title={item.title}
           description={item.description}
           actions={item.actions}
+          vendorName={item.vendorName}
           tableData={item.tableData}
           tableColumns={item.tableColumns}
           showAccordionIcon={item.showAccordionIcon || false}

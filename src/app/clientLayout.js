@@ -48,6 +48,8 @@ export default function ClientLayout({ children, session }) {
   console.log(iconsMap[getFirstPath(pathname)], "getFirstPath(pathname)");
   // Filter allowed modules based on session
   let allowedModules = session?.user?.role?.allowedModules || [];
+  let roleName = session?.user?.role?.roleName || [];
+
   let menuItems = allowedModules.map((module) => ({
     key: module.route,
     label: module.name,
@@ -93,7 +95,10 @@ export default function ClientLayout({ children, session }) {
               <div className="flex flex-1">
                 {showSidebar && (
                   <div className="w-64">
-                    <Sidebar allowedModules={allowedModules} />
+                    <Sidebar
+                      allowedModules={allowedModules}
+                      roleName={roleName}
+                    />
                   </div>
                 )}
                 <div className="flex-1 p-8 overflow-auto">{children}</div>

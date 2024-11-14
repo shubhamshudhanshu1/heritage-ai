@@ -39,7 +39,7 @@ const iconsMap = {
   "design-details": <AppstoreOutlined />,
 };
 
-const Sidebar = ({ allowedModules = [] }) => {
+const Sidebar = ({ allowedModules = [], roleName }) => {
   const pathname = usePathname(); // Get the current pathname
   const primaryColor = resolvedConfig.theme.colors.primary.DEFAULT;
   const backgroundColor = resolvedConfig.theme.colors.background.DEFAULT;
@@ -47,7 +47,6 @@ const Sidebar = ({ allowedModules = [] }) => {
 
   // Filter the menu items based on allowed modules
   const filteredMenuItems = allowedModules.map((module) => {
-    console.log({ module });
     return {
       key: module.route,
       label: module.name,
@@ -55,8 +54,6 @@ const Sidebar = ({ allowedModules = [] }) => {
       ...module.config,
     };
   });
-
-  console.log({ filteredMenuItems, allowedModules });
 
   return (
     <div className="h-full p-6 w-72">
@@ -117,37 +114,39 @@ const Sidebar = ({ allowedModules = [] }) => {
       </Menu>
 
       {/* Recent Designs Section */}
-      <div className="mt-8">
-        <h3 className="text-sm font-semibold text-secondary mb-4 flex justify-between items-center">
-          Recent Designs
-          <AppstoreOutlined
-            className="text-secondary"
-            style={{ fontSize: "16px" }}
-          />
-        </h3>
+      {roleName !== "vendor" ? (
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold text-secondary mb-4 flex justify-between items-center">
+            Recent Designs
+            <AppstoreOutlined
+              className="text-secondary"
+              style={{ fontSize: "16px" }}
+            />
+          </h3>
 
-        <div className="space-y-4 flex flex-col gap-2">
-          {recentDesigns.map((design) => (
-            <Link key={design.key} href={design.key}>
-              <div className="flex items-center p-3 rounded-md border border-border hover:bg-background-muted transition">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border bg-background-muted">
-                  <CommentOutlined
-                    className="text-secondary"
-                    style={{ fontSize: "16px" }}
-                  />
-                </div>
-                <div className="ml-4 flex-1">
-                  <span className="text-xs border border-tag text-primary font-semibold px-2 py-1 rounded-full">
-                    {design.tag}
-                  </span>
+          <div className="space-y-4 flex flex-col gap-2">
+            {recentDesigns.map((design) => (
+              <Link key={design.key} href={design.key}>
+                <div className="flex items-center p-3 rounded-md border border-border hover:bg-background-muted transition">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full border bg-background-muted">
+                    <CommentOutlined
+                      className="text-secondary"
+                      style={{ fontSize: "16px" }}
+                    />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <span className="text-xs border border-tag text-primary font-semibold px-2 py-1 rounded-full">
+                      {design.tag}
+                    </span>
 
-                  <div className="text-xs leading-4 mt-2">{design.label}</div>
+                    <div className="text-xs leading-4 mt-2">{design.label}</div>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 };

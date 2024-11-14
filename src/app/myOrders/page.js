@@ -125,6 +125,7 @@ const MyOrders = () => {
             <OrdersTabContent
               title="New Quotations"
               data={quotationData.new.map((quotation) => ({
+                vendorName: quotation.vendorId?.companyName || "Company",
                 image: quotation.designId?.previewImages?.[0]?.src || "",
                 title: `${quotation.designId.designType} | ${quotation.quantity} units`,
                 description: `${quotation.designId.specifications.body_material}, ${quotation.designId.specifications.sleeves_material}`,

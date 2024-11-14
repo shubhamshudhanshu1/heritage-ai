@@ -19,6 +19,7 @@ const OrderDetailsCard = ({
   tableData = null,
   tableColumns = [],
   showAccordionIcon = false,
+  vendorName = "",
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -31,8 +32,8 @@ const OrderDetailsCard = ({
   };
   const notificationCount = useMemo(() => {
     return Math.floor(Math.random() * 100) / 1;
-    //without decimal points
   }, []);
+
   return (
     <div className="mb-8">
       <Card
@@ -48,7 +49,9 @@ const OrderDetailsCard = ({
             />
             <div className="flex flex-col">
               <h4 className="text-sm  font-semibold text-gray-800">{title}</h4>
-              <p className="text-gray-500 text-xs">{description}</p>
+              <p className="text-gray-500 text-xs">
+                {tableData[0]?.vendorId?.companyName}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
